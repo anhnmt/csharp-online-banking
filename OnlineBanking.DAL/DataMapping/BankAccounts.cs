@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Backend.Models
+namespace OnlineBanking.DAL
 {
     public class BankAccounts : BaseModel
     {
+        [Key]
         public int BankAccountId { get; set; }
         public int AccountId { get; set; }
         public int CurrencyId { get; set; }
