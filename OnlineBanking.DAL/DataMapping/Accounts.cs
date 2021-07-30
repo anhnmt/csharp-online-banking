@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -16,7 +17,13 @@ namespace OnlineBanking.DAL
         public string Phone { get; set; }
         public DateTime Birthday { get; set; }
         public int Status { get; set; } // active, delete, lock
-        public int Role_Id { get; set; } // Quyền
+        public int RoleId { get; set; } // Quyền
 
+        [ForeignKey("RoleId")]
+        public Roles Role { get; set; }
+
+        public ICollection<BankAccounts> BankAccounts { get; set; }
+        public ICollection<Transactions> FromTransactions { get; set; }
+        public ICollection<Transactions> ToTransactions { get; set; }
     }
 }

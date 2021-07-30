@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 
@@ -14,5 +15,10 @@ namespace OnlineBanking.DAL
         public int ToId { get; set; }
         public int Status { get; set; }
         public double Amount { get; set; }
+
+        [ForeignKey("FromId")]
+        public Accounts FromAccount { get; set; }
+        [ForeignKey("ToId")]
+        public Accounts ToAccount { get; set; }
     }
 }
