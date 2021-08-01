@@ -117,6 +117,14 @@
                                 </p>
                             </a>
                         </li>
+                        <li class="nav-item ">
+                            <a href="@Url.Action("InfoAccount", "Account")" class="nav-link @ViewBag.InfoAccount">
+                                <i class="nav-icon fas fa-users"></i>
+                                <p>
+                                    Quản lý User
+                                </p>
+                            </a>
+                        </li>
 
                     </ul>
                 </nav>
@@ -151,8 +159,6 @@
     <script src="~/Content/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="~/Content/dist/js/demo.js"></script>
+    @RenderSection("Scripts", required: false)
 </body>
 </html>
-<script>
-
-</script>
