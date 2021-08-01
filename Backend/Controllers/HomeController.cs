@@ -29,7 +29,7 @@ namespace Backend.Controllers
 
            
         }
-         public ActionResult InfoAccount()
+         public ActionResult InfoAccountData()
         {
             if (Session["email"] != null)
             {
@@ -37,25 +37,32 @@ namespace Backend.Controllers
                 int userId = int.Parse(Session["userId"].ToString());
                 IRepository<Accounts> users = new Repository<Accounts>();
                 Accounts acc = users.Get(userId);
-                return View(acc);
+                return Json(
+                    new
+                    {
+                        data = acc,
+                        message = "Success",
+                        statusCode = 200
+                    }, JsonRequestBehavior.AllowGet);
             }
             else
             {
                 return RedirectToAction("Login");
             }
         }
-        //[HttpPost]
-        //public ActionResult InfoAccount(int id)
-        //{
-        //    Accounts acc = accounts.Get(id);
-        //    return View(acc);
-        //}
-        public ActionResult Contact()
-        {
-            ViewBag.Message = "Your contact page.";
 
-            return View();
+        public ActionResult InfoAccount()
+        {
+            if (Session["email"] != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
         }
+
         public ActionResult Login()
         {
             return View();
