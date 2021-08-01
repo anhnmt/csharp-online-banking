@@ -65,13 +65,22 @@ namespace Backend.Controllers
         {
             DateTime time = DateTime.Now;
             acc.CreatedAt = time;
-            acc.UpdatedAt = time;
             if (ModelState.IsValid)
             {
-                if (accounts.Add(acc))
+                try
                 {
-                    return RedirectToAction("Login");
+                    if (accounts.Add(acc))
+                    {
+                        return RedirectToAction("Login");
+                    }
                 }
+                catch (Exception e)
+                {
+
+                    Console.WriteLine(e);
+                }
+                
+                
                 return View(acc);
             }
             return View(acc);
