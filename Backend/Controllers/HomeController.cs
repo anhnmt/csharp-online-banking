@@ -17,16 +17,39 @@ namespace Backend.Controllers
         }
         public ActionResult Index()
         {
-            return View();
-        }
+            if (Session["email"] != null)
+            {
+                ViewBag.Index = "active";
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
 
-        public ActionResult About()
+           
+        }
+         public ActionResult InfoAccount()
         {
-            ViewBag.Message = "Your application description page.";
-
-            return View();
+            if (Session["email"] != null)
+            {
+                ViewBag.InfoAccount = "active";
+                int userId = int.Parse(Session["userId"].ToString());
+                IRepository<Accounts> users = new Repository<Accounts>();
+                Accounts acc = users.Get(userId);
+                return View(acc);
+            }
+            else
+            {
+                return RedirectToAction("Login");
+            }
         }
-
+        //[HttpPost]
+        //public ActionResult InfoAccount(int id)
+        //{
+        //    Accounts acc = accounts.Get(id);
+        //    return View(acc);
+        //}
         public ActionResult Contact()
         {
             ViewBag.Message = "Your contact page.";
@@ -43,7 +66,8 @@ namespace Backend.Controllers
             IRepository<Accounts> users = new Repository<Accounts>();
             if (users.CheckDuplicate(x => x.Email == email && x.Password == password))
             {
-                Session["user"] = users.Get(x => x.Email == email && x.Password == password).SingleOrDefault();
+                var obj = users.Get(x => x.Email == email && x.Password == password).FirstOrDefault();
+                Session["userId"] = obj.AccountId;
                 Session["email"] = email;
                 return RedirectToAction("Index", "Home");
             }
@@ -76,11 +100,8 @@ namespace Backend.Controllers
                 }
                 catch (Exception e)
                 {
-
                     Console.WriteLine(e);
                 }
-                
-                
                 return View(acc);
             }
             return View(acc);
