@@ -22,32 +22,62 @@
 
     <!-- Main content -->
     <section class="content">
-
-        <!-- Default box -->
-        <div class="card">
-            <div class="card-header">
-                <h3 class="card-title">Title</h3>
-
-                <div class="card-tools">
-                    <button type="button" class="btn btn-tool" data-card-widget="collapse" title="Collapse">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-tool" data-card-widget="remove" title="Remove">
-                        <i class="fas fa-times"></i>
-                    </button>
+        <div class="col-md-4">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Account Number</h3>
                 </div>
+                <div class="card-body">
+                    <table class="table">
+                        <tr>
+                            <th>Name</th>
+                            <th>CurrencyId</th>
+                            <th>Balance</th>
+                            <th>Status </th>
+                            <th></th>
+                        </tr>
+
+                        <tbody id="tbl_user"></tbody>
+
+                    </table>
+                </div>
+                <!-- /.card-body -->
             </div>
-            <div class="card-body">
-                Start creating your amazing application!
-            </div>
-            <!-- /.card-body -->
-            <div class="card-footer">
-                Footer
-            </div>
-            <!-- /.card-footer-->
         </div>
+        <!-- Default box -->
         <!-- /.card -->
 
     </section>
     <!-- /.content -->
 </div>
+@section scripts{
+    <script>
+        var managerAcc = {
+            load: function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/User/GetData",
+                    success: function (res) {
+                        let _html = "";
+                        for (let item of res.data) {
+                            _html += `<tr>
+                                            <td>${item.Name}</td>
+                                            <td>${item.CurrencyId}</td>
+                                            <td>${item.Balance}</td>
+                                            <td>${item.Status}</td>
+                                            <td><button data-id="${item.Id}" class='btn btn-warning btn-edit'>Sửa</button> | <button  class='btn btn-danger'>Xóa</button></td>
+                                          </tr>`
+                        }
+                        $('#tbl_user').html(_html);
+                        var pages = '';
+                        
+                        $(".pagination").html(pages);
+                    }
+                });
+            }
+        }
+        $(function () {
+            managerAcc.load();
+        })
+    </script>
+    }
