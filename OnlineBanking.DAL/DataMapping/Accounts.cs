@@ -20,7 +20,7 @@ namespace OnlineBanking.DAL
         public DateTime? Birthday { get; set; }
         public int? Status { get; set; } // active, delete, lock
         public int? RoleId { get; set; } // Quyền
-        public int NumberID { get; set; }
+        public int? NumberID { get; set; }
 
         [ForeignKey("RoleId")]
         public Roles Role { get; set; }
