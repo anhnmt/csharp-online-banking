@@ -44,7 +44,7 @@ namespace OnlineBanking.DAL.Migrations
                 new Accounts() { AccountId = 5, Name = "User 2", Email = "user2@gmail.com", Password = "123456", RoleId = 3, Status = 1 }
         );
 
-            
+
         }
     }
 }

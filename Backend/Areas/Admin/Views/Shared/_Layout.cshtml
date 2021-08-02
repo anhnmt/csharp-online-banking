@@ -100,7 +100,7 @@
                 <nav class="mt-2">
                     <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
                         <!-- Add icons to the links using the .nav-icon class
-                             with font-awesome or any other icon font library -->
+    with font-awesome or any other icon font library -->
                         <li class="nav-item ">
                             <a href="@Url.Action("Index", "Home")" class="nav-link @ViewBag.Index">
                                 <i class="nav-icon fas fa-tachometer-alt"></i>
@@ -122,6 +122,22 @@
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
                                     User Management
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a href="@Url.Action("Index", "Roles")" class="nav-link @ViewBag.RoleIndex">
+                                <i class="nav-icon fas fa-money-bill-alt"></i>
+                                <p>
+                                    Role Management
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a href="@Url.Action("Index", "Accounts")" class="nav-link @ViewBag.InfoAccount">
+                                <i class="nav-icon fas fa-money-bill-alt"></i>
+                                <p>
+                                    Currency Management
                                 </p>
                             </a>
                         </li>
