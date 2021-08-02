@@ -43,12 +43,9 @@ namespace Backend.Areas.Admin.Controllers
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
                 RoleId = x.RoleId,
-                CreatedAt = x.CreatedAt.ToString("dd-MM-yyyy"),
-                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy"),
-                Action = "<td><button data-id="+x.AccountId+" class='btn btn-warning btn-edit'>Sửa</button> | <button  class='btn btn-danger'>Xóa</button></td>"
+                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
+                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-           
-
             return Json(
                 new
                 {
