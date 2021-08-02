@@ -1,0 +1,101 @@
+﻿@model IEnumerable<OnlineBanking.DAL.Roles>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Role Management </h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Role Management</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="col-md-12">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Role Management</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-hover" id="datatables">
+                        <thead>
+                            <tr>
+                                <th>RoleId</th>
+                                <th>Name</th>
+                                <th>Status </th>
+                                <th>Action </th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_user"></tbody>
+
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+        </div>
+        <!-- Default box -->
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+</div>
+
+@section scripts{
+    <script src="~/Areas/Admin/Content/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/jszip/jszip.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+    <script>
+        var managerAcc = {
+            load: function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Roles/GetData",
+                    success: function (res) {
+                        let _html = "";
+                        console.log(res.data)
+                        for (let item of res.data) {
+                            _html += `<tr>
+                                        <td>${(item.RoleId) == null ? "" : item.RoleId}</td>
+                                        <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td>${(item.Status) == null ? "" : item.Status}</td>
+                                        <td><button data-id="${item.RoleId}" class='btn btn-warning btn-edit'>Edit</button> | <button data-id="${item.RoleId}" class='btn btn-danger'>Detele</button></td>
+                                     </tr>`
+                        }
+                        $('#tbl_user').html(_html);
+                        var pages = '';
+
+                        $(".pagination").html(pages);
+                    }
+                });
+            }
+        }
+        $(function () {
+            managerAcc.load();
+        })
+
+    </script>
+}

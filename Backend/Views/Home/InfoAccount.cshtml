@@ -1,0 +1,92 @@
+﻿@{
+    ViewBag.Title = "InfoAccount";
+}
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Thông tin tài khoản</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Thông tin tài khoản</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <!-- Default box -->
+        <div class="col-md-4">
+            <div class="card card-info">
+                <div class="card-header">
+                    <h3 class="card-title">Info Account </h3>
+                </div>
+                <div class="card-body">
+
+
+                </div>
+
+            </div>
+        </div>
+
+        <!-- /.card -->
+
+    </section>
+    <!-- /.content -->
+</div>
+@section scripts{
+    <script>
+        var accounts = {
+            load: function () {
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/InfoAccountData",
+                    success: function (response) {
+                        
+                        let _html = `
+                            <div class="form-horizontal">
+                                <div class="form-group">
+                                    <strong>Id: </strong> ${response.data.AccountId}
+                                </div>
+                                <div class="form-group">
+                                    <strong>Name: </strong> ${response.data.Name}
+                                </div>
+                               <div class="form-group">
+                                    <strong>Email: </strong> ${response.data.Email}
+                                </div>
+                               <div class="form-group">
+                                    <strong>Birthday: </strong>${(response.data.Birthday) == null ? "Updating" : response.data.Birthday}
+                                </div>
+                               <div class="form-group">
+                                    <strong>Status: </strong>${(response.data.Status) == null ? "Updating" : response.data.Status}
+                                </div>
+                               <div class="form-group">
+                                    <strong>RoleId: </strong> ${(response.data.RoleId) == null ? "Updating" : response.data.RoleId}
+                                </div>
+                               <div class="form-group">
+                                    <strong>CreatedAt: </strong> ${(new Date((parseInt((response.data.CreatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
+                                </div>
+                               <div class="form-group">
+                                    <strong>UpdatedAt: </strong> ${(response.data.UpdatedAt) == null ? "Updating" : response.data.UpdatedAt}
+                                </div>
+                            </div>
+                        `;
+                        $('.card-body').html(_html);
+                    }
+                })
+            }
+            
+        }
+        $(function () {
+            accounts.load();
+        })
+    </script>
+    }
