@@ -34,17 +34,64 @@ namespace Backend.Areas.Admin.Controllers
             }
         }
 
-        public ActionResult GetData()
+        public ActionResult GetData(int page = 1, string key = null)
         {
             ViewBag.Accounts = "active";
+            int pageSize = 5;
             var data = currencies.Get();
-            return Json(
-                new
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                data = data.Where(x => x.Name.Contains(key));
+            }
+            decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
+            return Json(new
+            {
+                totalPages = totalpage,
+                currentPage = page,
+                data = data.Skip((page - 1) * pageSize).Take(pageSize)
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FindId(int id)
+        {
+            return Json(currencies.Get(id), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PostData(Currencies c)
+        {
+            if (ModelState.IsValid)
+            {
+                currencies.Add(c);
+            }
+            return Json(new
+            {
+                statusCode = 200,
+                message = "Thêm mới thành công",
+                data = c
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PutData(Currencies c)
+        {
+            if (ModelState.IsValid)
+            {
+                currencies.Edit(c);
+                return Json(new
                 {
-                    data = data,
-                    message = "Success",
-                    statusCode = 200
+                    statusCode = 200,
+                    message = "Cập nhật thành công",
+                    data = c
                 }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Cập nhật lỗi",
+                data = c
+            }, JsonRequestBehavior.AllowGet);
         }
 
         // GET: Admin/Currencies/Create

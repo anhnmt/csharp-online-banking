@@ -49,47 +49,131 @@
 
     </section>
     <!-- /.content -->
+    <div class="modal fade" id="modifyModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Create new Currency</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <input type="hidden" name="type" id="type" value="CREATE" />
+                    <div class="form-group">
+                        <label for="Name">Name</label>
+                        <input type="text" class="form-control" id="Name" name="Name" value="" placeholder="Name..."/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
 </div>
 
 @section scripts{
-    <script src="~/Areas/Admin/Content/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/jszip/jszip.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="~/Areas/Admin/Content/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
     <script>
-        var managerAcc = {
-            load: function () {
+        var currencyManager = {
+            load: function (page = 1, key = null) {
                 $.ajax({
                     type: "GET",
                     url: "/Admin/Currencies/GetData",
+                    data: { page: page, key: key },
                     success: function (res) {
                         let _html = "";
-                        console.log(res.data)
                         for (let item of res.data) {
                             _html += `<tr>
                                         <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
                                          <td>${(item.Name) == null ? "" : item.Name}</td>
-                                        <td class="btn-group"><button data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger'>Detele</button></td>
+                                        <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger'>Detele</button></td>
                                      </tr>`
                         }
                         $('#tbl_currency').html(_html);
                         var pages = '';
-
+                        for (var i = 1; i <= res.totalPages; i++) {
+                            if (i == res.currentPage) {
+                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            } else {
+                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            }
+                        }
                         $(".pagination").html(pages);
                     }
                 });
+            },
+            post: function (currency) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Currencies/PostData",
+                    data: currency,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $("#modifyModal").modal("hide");;
+                            currencyManager.load();
+                        }
+                    }
+
+                })
+            },
+            put: function (currency) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Currencies/PutData",
+                    data: currency,
+                    success: function (res) {
+                        $("#modifyModal").modal("hide");
+                        currencyManager.load();
+                    }
+                })
+            },
+            get: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Currencies/FindId",
+                    data: { id: id },
+                    success: function (res) {
+                        $("#Name").val(res.Name);
+                        $("#myModal").modal("show");
+                    }
+                })
             }
         }
+
         $(function () {
-            managerAcc.load();
+            currencyManager.load();
+            $("#btn-add").click(function () {
+                $("#myModal").modal("show");
+            })
+            $("#btnSave").click(function () {
+                var currency = {
+                    Name: $("#Name").val(),
+                }
+                if ($("#type").val() == "EDIT") {
+                    currency.Id = $("#Id").val(),
+                        currencyManager.put(currency);
+                } else {
+                    currencyManager.post(currency);
+                }
+            })
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                currencyManager.load(page, key);
+            })
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                currencyManager.load(1, key);
+            })
+            $(document).on("click", ".btn-edit", function () {
+                $("#type").val("EDIT");
+                let currencyId = $(this).data("id");
+                currencyManager.get(currencyId);
+            })
         })
 
     </script>

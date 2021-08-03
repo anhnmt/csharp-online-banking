@@ -34,7 +34,8 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult GetData()
         {
             ViewBag.Accounts = "active";
-            var data = users.Get().Select(x => new AccountViewModel { 
+            var data = users.Get().Select(x => new AccountViewModel
+            {
                 AccountId = x.AccountId,
                 Name = x.Name,
                 Email = x.Email,
@@ -43,6 +44,7 @@ namespace Backend.Areas.Admin.Controllers
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
                 RoleId = x.RoleId,
+                RoleName = x.Role.Name,
                 Address = x.Address,
                 NumberID = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
