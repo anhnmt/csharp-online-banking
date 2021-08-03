@@ -17,8 +17,8 @@ namespace OnlineBanking.DAL
         public string Address { get; set; }
         public int? NumberID { get; set; }
         public int? Status { get; set; } // active, delete, lock
-        public int RoleId { get; set; } // Quyền
         public string RoleName { get; set; } // Quyền
+        public int RoleId { get; set; } // Quyền
         public string CreatedAt { get; set; }
         public string UpdatedAt { get; set; }
     }

@@ -8,10 +8,13 @@
 
     <!-- Google Font: Source Sans Pro -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+
     <!-- Font Awesome -->
     <link rel="stylesheet" href="~/Content/plugins/fontawesome/css/all.min.css">
     <!-- Theme style -->
+    @RenderSection("css", required: false)
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
+
 </head>
 <body class="hold-transition sidebar-mini">
     <!-- Site wrapper -->
@@ -81,15 +84,15 @@
                     <div class="info">
                         <a href="#" class="d-block " style="color:white">@Session["email"].ToString()</a>
                         <div>
-                            
+
                             <span class="btn btn-block btn-danger btn-xs">@Session["rold"].ToString()</span>
-                                
-                            
+
+
 
 
                         </div>
                     </div>
-                    
+
                 </div>
                 <!-- SidebarSearch Form -->
                 <div class="form-inline">
@@ -116,9 +119,9 @@
                                 </p>
                             </a>
                         </li>
-                        
+
                         <li class="nav-item ">
-                            <a href="@Url.Action("Index", "Accounts")" class="nav-link @ViewBag.InfoAccount">
+                            <a href="@Url.Action("Index", "Accounts")" class="nav-link @ViewBag.UserManagement">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
                                     User Management
@@ -172,10 +175,10 @@
     <!-- Bootstrap 4 -->
     <script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
+    @RenderSection("AdminlteJs", required: false)
     <script src="~/Content/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="~/Content/dist/js/demo.js"></script>
-    @RenderSection("TableJs", required: false)
     @RenderSection("Scripts", required: false)
 </body>
 </html>

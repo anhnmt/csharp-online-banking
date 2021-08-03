@@ -11,6 +11,7 @@ namespace OnlineBanking.DAL
         public int RoleId { get; set; }
         public string Name { get; set; }
         public int Status { get; set; }
+       
         public ICollection<Accounts> Accounts { get; set; }
     }
 }

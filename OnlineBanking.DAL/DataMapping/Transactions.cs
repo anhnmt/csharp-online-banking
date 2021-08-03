@@ -17,8 +17,8 @@ namespace OnlineBanking.DAL
         public double Amount { get; set; }
 
         [ForeignKey("FromId")]
-        public BankAccounts FromAccount { get; set; }
+        public virtual BankAccounts FromAccount { get; set; }
         [ForeignKey("ToId")]
-        public BankAccounts ToAccount { get; set; }
+        public virtual BankAccounts ToAccount { get; set; }
     }
 }
