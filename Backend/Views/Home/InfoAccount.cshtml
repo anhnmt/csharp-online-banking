@@ -1,7 +1,10 @@
 ﻿@{
     ViewBag.Title = "InfoAccount";
 }
+@section css{
 
+    <link href="~/Content/plugins/toastr/toastr.css" rel="stylesheet" />
+}
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -33,16 +36,70 @@
 
 
                 </div>
-
+                <div class="card-footer text-center">
+                    <a type="submit" href="#" class="btn btn-primary btn-block toastrDefaultSuccess" id="update">Update Infomation</a>
+                </div>
             </div>
         </div>
 
         <!-- /.card -->
 
     </section>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <div class="form-group">
+                        <label for="exampleInputName">Name</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Input Name">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Email</label>
+                        <input type="text" class="form-control" id="Email" placeholder="Input Email">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputAge">Birthday</label>
+                        <input type="text" class="form-control" id="Birthday" placeholder="Input Birthday">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Address</label>
+                        <input type="text" class="form-control" id="Address" placeholder="Input Address">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">NumberID</label>
+                        <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Status</label>
+                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
+                        <span class="error text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
     <!-- /.content -->
 </div>
+
 @section scripts{
+    <script src="~/Content/plugins/toastr/toastr.min.js"></script>
     <script>
         var accounts = {
             load: function () {
@@ -50,43 +107,106 @@
                     type: "GET",
                     url: "/Home/InfoAccountData",
                     success: function (response) {
-                        
                         let _html = `
-                            <div class="form-horizontal">
-                                <div class="form-group">
-                                    <strong>Id: </strong> ${response.data.AccountId}
-                                </div>
-                                <div class="form-group">
-                                    <strong>Name: </strong> ${response.data.Name}
-                                </div>
-                               <div class="form-group">
-                                    <strong>Email: </strong> ${response.data.Email}
-                                </div>
-                               <div class="form-group">
-                                    <strong>Birthday: </strong>${(response.data.Birthday) == null ? "Updating" : response.data.Birthday}
-                                </div>
-                               <div class="form-group">
-                                    <strong>Status: </strong>${(response.data.Status) == null ? "Updating" : response.data.Status}
-                                </div>
-                               <div class="form-group">
-                                    <strong>RoleId: </strong> ${(response.data.RoleId) == null ? "Updating" : response.data.RoleId}
-                                </div>
-                               <div class="form-group">
-                                    <strong>CreatedAt: </strong> ${(new Date((parseInt((response.data.CreatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
-                                </div>
-                               <div class="form-group">
-                                    <strong>UpdatedAt: </strong> ${(response.data.UpdatedAt) == null ? "Updating" : response.data.UpdatedAt}
-                                </div>
-                            </div>
-                        `;
+                                            <div class="form-horizontal">
+                                                <div class="form-group">
+                                                    <strong>Id: </strong> ${response.data.AccountId}
+                                                    <input type="hidden" name="Id" id="Id" value="${response.data.AccountId}" />
+                                                </div>
+                                                <div class="form-group">
+                                                    <strong>Name: </strong> ${response.data.Name}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>Email: </strong> ${response.data.Email}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>Birthday: </strong>${(response.data.Birthday) == null ? "..." : response.data.Birthday}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>Address: </strong>${(response.data.Address) == null ? "..." : response.data.Address}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>Phone: </strong>${(response.data.Phone) == null ? "..." : response.data.Phone}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>NumberID: </strong>${(response.data.NumberID) == null ? "..." : response.data.NumberID}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>Status: </strong>${(response.data.Status) == null ? "..." : response.data.Status}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>RoleId: </strong> ${(response.data.RoleId) == null ? "..." : response.data.RoleId}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>CreatedAt: </strong> ${(response.data.CreatedAt) == null ? "..." : (new Date((parseInt((response.data.CreatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
+                                                </div>
+                                               <div class="form-group">
+                                                    <strong>UpdatedAt: </strong> ${(response.data.UpdatedAt) == null ? "..." : (new Date((parseInt((response.data.UpdatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
+                                                </div>
+                                            </div>
+                                        `;
                         $('.card-body').html(_html);
                     }
                 })
+            },
+            get: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Home/FindId",
+                    data: { id: id },
+                    success: function (res) {
+                        $("#Id").val(res.AccountId);
+                        $("#Name").val(res.Name);
+                        $("#Email").val(res.Email);
+                        $("#Birthday").val(res.Birthday);
+                        $("#Address").val(res.Address);
+                        $("#NumberID").val(res.NumberID);
+                        $("#Phone").val(res.Phone);
+                        $("#Status").val(res.Status);
+                        $("#myModal").modal("show");
+                    }
+                })
+            },
+            put: function (user) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/UpdateInfo",
+                    data: user,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $("#myModal").modal("hide");;
+                            accounts.load();
+                            toastr.success('Update Successfully')
+                        }
+                    }
+
+                })
             }
-            
         }
         $(function () {
             accounts.load();
+            $("#update").click(function () {
+                let userId = $("#Id").val();
+                let a = accounts.get(userId);
+            })
+            $("#btnSave").click(function () {
+                var today = new Date();
+                var user = {
+                    Name: $("#Name").val(),
+                    Email: $("#Email").val(),
+                    Birthday: $("#Birthday").val(),
+                    Address: $("#Address").val(),
+                    Phone: $("#Phone").val(),
+                    NumberID: $("#NumberID").val(),
+                    Status: $("#Status").val(),
+                    UpdatedAt: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+                }
+                let userId = $("#Id").val();
+                user.AccountId = userId;
+                console.log(user);
+                accounts.put(user);
+            })
         })
+
     </script>
-    }
+}

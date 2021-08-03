@@ -30,7 +30,7 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "Home");
+                return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
         public ActionResult GetData()

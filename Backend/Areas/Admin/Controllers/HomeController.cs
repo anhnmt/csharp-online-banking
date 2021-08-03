@@ -20,30 +20,30 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login");
+                return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
         public ActionResult Login()
         {
             return View();
         }
-        [HttpPost]
-        public ActionResult Login(string email, string password)
-        {
-            IRepository<Accounts> users = new Repository<Accounts>();
-            if (users.CheckDuplicate(x => x.Email == email && x.Password == password))
-            {
-                var obj = users.Get(x => x.Email == email && x.Password == password).FirstOrDefault();
-                Session["userId"] = obj.AccountId;
-                Session["email"] = email;
-                return RedirectToAction("Index", "Home");
-            }
-            return View();
-        }
-        public ActionResult Logout()
-        {
-            Session.Remove("user");
-            return RedirectToAction("Login");
-        }
+        //[HttpPost]
+        //public ActionResult Login(string email, string password)
+        //{
+        //    IRepository<Accounts> users = new Repository<Accounts>();
+        //    if (users.CheckDuplicate(x => x.Email == email && x.Password == password))
+        //    {
+        //        var obj = users.Get(x => x.Email == email && x.Password == password).FirstOrDefault();
+        //        Session["userId"] = obj.AccountId;
+        //        Session["email"] = email;
+        //        return RedirectToAction("Index", "Home");
+        //    }
+        //    return View();
+        //}
+        //public ActionResult Logout()
+        //{
+        //    Session.Remove("user");
+        //    return RedirectToAction("Login", "Home", new { area = "" });
+        //}
     }
 }
