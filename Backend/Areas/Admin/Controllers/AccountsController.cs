@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
@@ -43,13 +44,13 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
+                StatusName = ((UserStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 Address = x.Address,
                 NumberID = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-
             int pageSize = 2;
             if (!string.IsNullOrEmpty(key))
             {
@@ -78,6 +79,7 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
+                StatusName = ((UserStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 RoleId = x.RoleId,
                 Address = x.Address,
@@ -87,7 +89,12 @@ namespace Backend.Areas.Admin.Controllers
             };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult GetStatus()
+        {
+            var data = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().Select(v => v.ToString()).ToArray();
 
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
@@ -159,9 +166,27 @@ namespace Backend.Areas.Admin.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ProfileAccount()
+        public ActionResult ProfileAccount(int id)
         {
-            return View();
+            var x = users.Get(id);
+            var data = new AccountViewModel
+            {
+                AccountId = x.AccountId,
+                Name = x.Name,
+                Email = x.Email,
+                Password = x.Password,
+                Phone = x.Phone,
+                Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
+                Status = x.Status,
+                StatusName = ((UserStatus)x.Status).ToString(),
+                RoleName = x.Role.Name,
+                RoleId = x.RoleId,
+                Address = x.Address,
+                NumberID = x.NumberID,
+                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
+                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
+            };
+            return View(data);
         }
         protected override void Dispose(bool disposing)
         {

@@ -1,4 +1,4 @@
-﻿
+﻿@model OnlineBanking.DAL.AccountViewModel
 @{
     ViewBag.Title = "ProfileAccount";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -24,22 +24,107 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="col-md-3">
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Profile Account</h3>
-                </div>
-                <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Profile Account</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <strong>Id: </strong> @Model.AccountId
+                            </div>
+                            <div class="form-group">
+                                <strong>Name: </strong> @Model.Name
+                            </div>
+                            <div class="form-group">
+                                <strong>Email: </strong> @Model.Email
+                            </div>
+                            <div class="form-group">
+                                <strong>Birthday: </strong>@Model.Birthday
+                            </div>
+                            <div class="form-group">
+                                <strong>Address: </strong>@Model.Address
+                            </div>
+                            <div class="form-group">
+                                <strong>Phone: </strong>@Model.Phone
+                            </div>
+                            <div class="form-group">
+                                <strong>NumberID: </strong>@Model.NumberID
+                            </div>
+                            <div class="form-group">
+                                <strong>Status: </strong>@Model.StatusName
+                            </div>
+                            <div class="form-group">
+                                <strong>RoleId: </strong> @Model.RoleName
+                            </div>
+                            <div class="form-group">
+                                <strong>CreatedAt: </strong>@Model.CreatedAt
+                            </div>
+                            <div class="form-group">
+                                <strong>UpdatedAt: </strong> @Model.UpdatedAt
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
 
+                    </div>
 
+                    <!-- /.card-body -->
                 </div>
-                <div class="card-footer d-flex justify-content-center">
-                    
-                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Account Number</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-horizontal">
+                            <div class="form-group">
+                                <strong>Id: </strong> @Model.AccountId
+                            </div>
+                            <div class="form-group">
+                                <strong>Name: </strong> @Model.Name
+                            </div>
+                            <div class="form-group">
+                                <strong>Email: </strong> @Model.Email
+                            </div>
+                            <div class="form-group">
+                                <strong>Birthday: </strong>@Model.Birthday
+                            </div>
+                            <div class="form-group">
+                                <strong>Address: </strong>@Model.Address
+                            </div>
+                            <div class="form-group">
+                                <strong>Phone: </strong>@Model.Phone
+                            </div>
+                            <div class="form-group">
+                                <strong>NumberID: </strong>@Model.NumberID
+                            </div>
+                            <div class="form-group">
+                                <strong>Status: </strong>@Model.StatusName
+                            </div>
+                            <div class="form-group">
+                                <strong>RoleId: </strong> @Model.RoleName
+                            </div>
+                            <div class="form-group">
+                                <strong>CreatedAt: </strong>@Model.CreatedAt
+                            </div>
+                            <div class="form-group">
+                                <strong>UpdatedAt: </strong> @Model.UpdatedAt
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
 
-                <!-- /.card-body -->
+                    </div>
+
+                    <!-- /.card-body -->
+                </div>
             </div>
         </div>
+        
         <!-- Default box -->
         <!-- /.card -->
 

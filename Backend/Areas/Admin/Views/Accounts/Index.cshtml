@@ -42,17 +42,10 @@
                     <table class="table table-hover" id="datatables">
                         <thead>
                             <tr>
-                                <th>AccountId</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Phone</th>
-                                <th>Birthday </th>
-                                <th>Address </th>
-                                <th>RoleId </th>
-                                <th>NumberID </th>
+                                <th>RoleName </th>
                                 <th>Status </th>
-                                <th>CreatedAt </th>
-                                <th>UpdatedAt </th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -141,7 +134,8 @@
                     </div>
                     <div class="form-group">
                         <label for="exampleInputClass">Status</label>
-                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
+                        <select class="form-control" id="Status" name="Status">
+                        </select>
                         <span class="error text-danger"></span>
                     </div>
                 </form>
@@ -162,6 +156,21 @@
 @section scripts{
 
     <script>
+        function loadStatus(status) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Accounts/GetStatus",
+                    success: function (res) {
+                        console.log(res)
+                        var html;
+                        $.each(res, function (key, value) {
+                            html += "<option value = '" + key + "' " + (status == key ? 'selected' : '')+">" + value + " </option>";
+                        });
+                        $('#Status').html(html);
+                    }
+                })
+            }
+        
         var managerAcc = {
             load: function (page = 1, key = null) {
                 $.ajax({
@@ -170,22 +179,18 @@
                     data: { page: page, key: key },
                     success: function (res) {
                         let _html = "";
+                        var ii = 1;
                         for (let item of res.data) {
-                            var Ida = item.AccountId;
+                            
                             _html += `<tr>
-                                                                <td>${(item.AccountId) == null ? "" : item.AccountId}</td>
-                                                                <td>${(item.Name) == null ? "" : item.Name}</td>
-                                                                <td>${(item.Email) == null ? "" : item.Email}</td>
-                                                                <td>${(item.Phone) == null ? "" : item.Phone}</td>
-                                                                <td>${(item.Birthday) == null ? "" : item.Birthday}</td>
-                                                                <td>${(item.Address) == null ? "" : item.Address}</td>
-                                                                <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
-                                                                <td>${(item.NumberID) == null ? "" : item.NumberID}</td>
-                                                                <td>${(item.Status) == null ? "" : item.Status}</td>
-                                                                <td>${(item.CreatedAt) == null ? "" : iteUrl.CreatedAt}</td>
-                                                                <td>${(item.UpdatedAt) == null ? "" : item.UpdatedAt}</td>
-                                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
-                                                             </tr>`
+                                        <td>${ii}</td>
+                                        <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td>${(item.Email) == null ? "" : item.Email}</td>
+                                        <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
+                                        <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                        <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                    </tr>`
+                            ii++;
                         }
                         $('#tbl_user').html(_html);
                         var pages = '';
@@ -213,10 +218,11 @@
                         $("#Password").val(res.Password);
                         $("#Phone").val(res.Phone);
                         $("#Address").val(res.Address);
-                        $("#Birthday").val((res.Birthday) == null ? "" : (new Date((parseInt((res.Birthday).replace(/\D/g, ''))))).toLocaleDateString());
+                        $("#Birthday").val((res.Birthday));
                         $("#NumberID").val(res.NumberID);
                         $("#RoleId").val(res.RoleId);
-                        $("#Status").val(res.Status);
+
+                        loadStatus(res.Status);
                         $("#myModal").modal("show");
                     }
                 })
@@ -253,6 +259,7 @@
             }
         }
         $(function () {
+           
             managerAcc.load();
 
             $(document).on("click", ".btn-edit", function () {
@@ -262,11 +269,13 @@
             })
 
             $(document).on("click", ".btn-add", function () {
+                $(".modal-title").html("Create Account");
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
             })
             $(document).on("click", ".btn-detail", function () {
-                window.location.assign("/Admin/Accounts/ProfileAccount")
+                let userId = $(this).data("id");
+                window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
             })
 
             $(document).on("click", "#btnSave", function () {
