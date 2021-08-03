@@ -89,65 +89,69 @@
             </div>
             <div class="modal-body">
                 <input type="hidden" name="Id" id="Id" value="" />
-                <div class="form-group">
-                    <label for="exampleInputName">Name</label>
-                    <input type="text" class="form-control" id="Name" placeholder="Input Name">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputName">Email</label>
-                    <input type="text" class="form-control" id="Email" placeholder="Input Email">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputName">Password</label>
-                    <input type="text" class="form-control" id="Password" placeholder="Input Password">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputName">Phone</label>
-                    <input type="text" class="form-control" id="Phone" placeholder="Input Phone">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputClass">Address</label>
-                    <input type="text" class="form-control" id="Address" placeholder="Input Address">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="exampleInputAge">Birthday</label>
-                            <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" name="Birthday" id="Birthday">
-                                <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                <input type="hidden" name="type" id="type" value="CREATE" />
+                <form method="post" id="Form">
+                    <div class="form-group">
+                        <label for="exampleInputName">Name</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Input Name">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Email</label>
+                        <input type="text" class="form-control" id="Email" placeholder="Input Email">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Password</label>
+                        <input type="text" class="form-control" id="Password" placeholder="Input Password">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Phone</label>
+                        <input type="text" class="form-control" id="Phone" placeholder="Input Phone">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Address</label>
+                        <input type="text" class="form-control" id="Address" placeholder="Input Address">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="exampleInputAge">Birthday</label>
+                                <div class="input-group date" id="reservationdate" data-target-input="nearest">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" name="Birthday" id="Birthday">
+                                    <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
+                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <span class="error text-danger"></span>
-                        <div class="col-md-6">
-                            <label for="exampleInputClass">NumberID</label>
-                            <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
                             <span class="error text-danger"></span>
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">NumberID</label>
+                                <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
+                                <span class="error text-danger"></span>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputClass">RoleId</label>
-                    <input type="text" class="form-control" id="RoleId" placeholder="Input RoleId">
-                    <span class="error text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label for="exampleInputClass">Status</label>
-                    <input type="text" class="form-control" id="Status" placeholder="Input Status">
-                    <span class="error text-danger"></span>
-                </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">RoleId</label>
+                        <input type="text" class="form-control" id="RoleId" placeholder="Input RoleId">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Status</label>
+                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
+                        <span class="error text-danger"></span>
+                    </div>
+                </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
             </div>
+            
         </div>
 
     </div>
@@ -168,6 +172,7 @@
                     success: function (res) {
                         let _html = "";
                         for (let item of res.data) {
+                            var Ida = item.AccountId;
                             _html += `<tr>
                                                                 <td>${(item.AccountId) == null ? "" : item.AccountId}</td>
                                                                 <td>${(item.Name) == null ? "" : item.Name}</td>
@@ -178,9 +183,9 @@
                                                                 <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
                                                                 <td>${(item.NumberID) == null ? "" : item.NumberID}</td>
                                                                 <td>${(item.Status) == null ? "" : item.Status}</td>
-                                                                <td>${(item.CreatedAt) == null ? "" : item.CreatedAt}</td>
+                                                                <td>${(item.CreatedAt) == null ? "" : iteUrl.CreatedAt}</td>
                                                                 <td>${(item.UpdatedAt) == null ? "" : item.UpdatedAt}</td>
-                                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
                                                              </tr>`
                         }
                         $('#tbl_user').html(_html);
@@ -225,7 +230,6 @@
                     success: function (res) {
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
-                            console.log(res)
                             managerAcc.load();
                             toastr.success('Updated Successfully')
                         }
@@ -241,7 +245,6 @@
                     success: function (res) {
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
-                            console.log(res)
                             managerAcc.load();
                             toastr.success('Created Successfully')
                         }
@@ -254,11 +257,17 @@
             managerAcc.load();
 
             $(document).on("click", ".btn-edit", function () {
+                $("#type").val("EDIT");
                 let userId = $(this).data("id");
                 let a = managerAcc.get(userId);
             })
+
             $(document).on("click", ".btn-add", function () {
+                $("#Form").trigger("reset");
                 $("#myModal").modal("show");
+            })
+            $(document).on("click", ".btn-detail", function () {
+                window.location.assign("/Admin/Accounts/ProfileAccount")
             })
 
             $(document).on("click", "#btnSave", function () {
@@ -276,11 +285,12 @@
                     Status: $("#Status").val(),
                     UpdatedAt: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
                 }
-
-                let userId = $("#Id").val();
-                user.AccountId = userId;
-                console.log(user);
-                managerAcc.put(user);
+                if ($("#type").val() == "EDIT") {
+                    user.AccountId = $("#Id").val(),
+                    managerAcc.put(user);
+                } else {
+                    managerAcc.post(user);
+                }
             })
             $("#key").keyup(function () {
                 let key = $("#key").val();

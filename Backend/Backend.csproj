@@ -2197,6 +2197,7 @@
     <Content Include="Content\plugins\fontawesome\webfonts\fa-solid-900.ttf" />
     <Content Include="Content\plugins\fontawesome\webfonts\fa-solid-900.woff" />
     <Content Include="Content\plugins\fontawesome\webfonts\fa-solid-900.woff2" />
+    <Content Include="Areas\Admin\Views\Accounts\ProfileAccount.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
