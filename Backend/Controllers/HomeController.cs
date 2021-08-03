@@ -67,7 +67,17 @@ namespace Backend.Controllers
         {
             if (ModelState.IsValid)
             {
-                accounts.Edit(acc);
+                Accounts acc1 = accounts.Get(acc.AccountId);
+                acc1.Name = acc.Name;
+                acc1.Email = acc.Email;
+                acc1.Birthday = acc.Birthday;
+                acc1.Address = acc.Address;
+                acc1.NumberID = acc.NumberID;
+                acc1.Status = acc.Status;
+                acc1.Phone = acc.Phone;
+                acc1.UpdatedAt = acc.UpdatedAt;
+                accounts.Edit(acc1);
+
                 return Json(new
                 {
                     statusCode = 200,
