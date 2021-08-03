@@ -117,6 +117,7 @@
     <Compile Include="Areas\Admin\Controllers\CurrenciesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\RolesController.cs" />
+    <Compile Include="Areas\Admin\Data\Status.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -2228,10 +2229,10 @@
     <Content Include="Views\Home\Login.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
     <Content Include="Views\Home\InfoAccount.cshtml" />
+    <Content Include="Views\Home\PageNotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Areas\Admin\Data\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>

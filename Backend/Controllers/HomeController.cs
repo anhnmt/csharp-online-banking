@@ -29,6 +29,13 @@ namespace Backend.Controllers
 
 
         }
+        public ActionResult PageNotFound()
+        {
+          
+                return View();
+           
+
+        }
         public ActionResult InfoAccountData()
         {
             if (Session["email"] != null)
