@@ -20,7 +20,7 @@ namespace OnlineBanking.DAL
         [ForeignKey("AccountId")]
         public Accounts Account { get; set; }
         [ForeignKey("CurrencyId")]
-        public Currencies Currency { get; set; }
+        public virtual Currencies Currency { get; set; }
         public ICollection<Transactions> FromTransactions { get; set; }
         public ICollection<Transactions> ToTransactions { get; set; }
     }
