@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
@@ -10,12 +9,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Account Management </h1>
+                    <h1>Currencies Management </h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Account Management</li>
+                        <li class="breadcrumb-item active">Currencies Management</li>
                     </ol>
                 </div>
             </div>
@@ -27,25 +26,18 @@
         <div class="col-md-12">
             <div class="card card-success">
                 <div class="card-header">
-                    <h3 class="card-title">Account Management</h3>
+                    <h3 class="card-title">Currencies Management</h3>
                 </div>
                 <div class="card-body">
                     <table class="table table-hover" id="datatables">
                         <thead>
                             <tr>
-                                <th>AccountId</th>
+                                <th>CurrencyId</th>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Birthday </th>
-                                <th>Status </th>
-                                <th>RoleId </th>
-                                <th>CreatedAt </th>
-                                <th>UpdatedAt </th>
-                                <th></th>
+                                <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="tbl_user"></tbody>
+                        <tbody id="tbl_currency"></tbody>
 
                     </table>
                 </div>
@@ -77,25 +69,18 @@
             load: function () {
                 $.ajax({
                     type: "GET",
-                    url: "/Admin/Accounts/GetData",
+                    url: "/Admin/Currencies/GetData",
                     success: function (res) {
                         let _html = "";
                         console.log(res.data)
                         for (let item of res.data) {
                             _html += `<tr>
-                                        <td>${(item.AccountId) == null ? "" : item.AccountId}</td>
-                                        <td>${(item.Name) == null ? "" : item.Name}</td>
-                                        <td>${(item.Email) == null ? "" : item.Email}</td>
-                                        <td>${(item.Phone) == null ? "" : item.Phone}</td>
-                                        <td>${(item.Birthday) == null ? "" : item.Birthday}</td>
-                                        <td>${(item.Status) == null ? "" : item.Status}</td>
-                                        <td>${(item.RoleId) == null ? "" : item.RoleId}</td>
-                                        <td>${(item.CreatedAt) == null ? "" : item.CreatedAt}</td>
-                                        <td>${(item.UpdatedAt) == null ? "" : item.UpdatedAt}</td>
-                                        <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                        <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
+                                         <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td class="btn-group"><button data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger'>Detele</button></td>
                                      </tr>`
                         }
-                        $('#tbl_user').html(_html);
+                        $('#tbl_currency').html(_html);
                         var pages = '';
 
                         $(".pagination").html(pages);
@@ -106,6 +91,6 @@
         $(function () {
             managerAcc.load();
         })
-        
+
     </script>
 }

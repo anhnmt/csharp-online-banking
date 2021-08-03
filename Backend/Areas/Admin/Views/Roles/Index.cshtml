@@ -82,7 +82,7 @@
                                         <td>${(item.RoleId) == null ? "" : item.RoleId}</td>
                                         <td>${(item.Name) == null ? "" : item.Name}</td>
                                         <td>${(item.Status) == null ? "" : item.Status}</td>
-                                        <td><button data-id="${item.RoleId}" class='btn btn-warning btn-edit'>Edit</button> | <button data-id="${item.RoleId}" class='btn btn-danger'>Detele</button></td>
+                                        <td class="btn-group"><button data-id="${item.RoleId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.RoleId}" class='btn btn-danger'>Detele</button></td>
                                      </tr>`
                         }
                         $('#tbl_user').html(_html);
