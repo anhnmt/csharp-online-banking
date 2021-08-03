@@ -30,117 +30,91 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "Home", new { area = "" });
+                return RedirectToAction("Login", "Home");
             }
         }
-        public ActionResult GetData()
+
+        public ActionResult GetData(int page = 1, string key = null)
         {
             ViewBag.Accounts = "active";
+            int pageSize = 5;
             var data = roles.Get();
 
+            if (!string.IsNullOrEmpty(key))
+            {
+                data = data.Where(x => x.Name.Contains(key));
+            }
+            decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
 
-            return Json(
-                new
+            return Json(new
+            {
+                totalPages = totalpage,
+                currentPage = page,
+                data = data.Skip((page - 1) * pageSize).Take(pageSize)
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FindId(int id)
+        {
+            return Json(roles.Get(id), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PostData(Roles r)
+        {
+            if (ModelState.IsValid)
+            {
+                roles.Add(r);
+            }
+            return Json(new
+            {
+                statusCode = 200,
+                message = "Success",
+                data = r
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PutData(Roles r)
+        {
+            if (ModelState.IsValid)
+            {
+                roles.Edit(r);
+                return Json(new
                 {
-                    data = data,
+                    statusCode = 200,
                     message = "Success",
-                    statusCode = 200
+                    data = r
                 }, JsonRequestBehavior.AllowGet);
-        }
-
-        // GET: Admin/Roles/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Roles roles = db.Roles.Find(id);
-            if (roles == null)
-            {
-                return HttpNotFound();
-            }
-            return View(roles);
-        }
-
-        // GET: Admin/Roles/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Admin/Roles/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "RoleId,Name,Status")] Roles roles)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Roles.Add(roles);
-                db.SaveChanges();
-                return RedirectToAction("Index");
             }
 
-            return View(roles);
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error",
+                data = r
+            }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: Admin/Roles/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Roles roles = db.Roles.Find(id);
-            if (roles == null)
-            {
-                return HttpNotFound();
-            }
-            return View(roles);
-        }
 
-        // POST: Admin/Roles/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "RoleId,Name,Status")] Roles roles)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(roles).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(roles);
-        }
 
         // GET: Admin/Roles/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int id)
         {
-            if (id == null)
+            if (roles.Delete(id))
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
             }
-            Roles roles = db.Roles.Find(id);
-            if (roles == null)
-            {
-                return HttpNotFound();
-            }
-            return View(roles);
-        }
 
-        // POST: Admin/Roles/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Roles roles = db.Roles.Find(id);
-            db.Roles.Remove(roles);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
         }
 
         protected override void Dispose(bool disposing)
