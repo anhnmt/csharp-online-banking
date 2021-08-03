@@ -4123,8 +4123,6 @@
     <Content Include="Areas\Admin\Content\plugins\toastr\toastr.js.map" />
     <Content Include="Areas\Admin\Views\Home\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Shared\_Layout.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Login.cshtml" />
-    <Content Include="Areas\Admin\Views\Home\Register.cshtml" />
     <Content Include="Areas\Admin\Views\Accounts\Create.cshtml" />
     <Content Include="Areas\Admin\Views\Accounts\Delete.cshtml" />
     <Content Include="Areas\Admin\Views\Accounts\Details.cshtml" />

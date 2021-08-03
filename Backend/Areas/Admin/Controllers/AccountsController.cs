@@ -28,7 +28,7 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login","Home");
+                return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
         public ActionResult GetData()
@@ -43,6 +43,8 @@ namespace Backend.Areas.Admin.Controllers
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
                 RoleId = x.RoleId,
+                Address = x.Address,
+                NumberID = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
@@ -54,7 +56,10 @@ namespace Backend.Areas.Admin.Controllers
                     statusCode = 200
                 }, JsonRequestBehavior.AllowGet);
         }
-
+        public ActionResult FindId(int id)
+        {
+            return Json(users.Get(id), JsonRequestBehavior.AllowGet);
+        }
         // GET: Admin/Accounts/Details/5
         public ActionResult Details(int? id)
         {

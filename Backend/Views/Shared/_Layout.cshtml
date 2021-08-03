@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="~/Content/plugins/fontawesome/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
+    @RenderSection("css", required: false)
 </head>
 <body class="hold-transition sidebar-mini">
     <!-- Site wrapper -->
@@ -79,8 +80,9 @@
                         <img src="~/Content/dist/img/user2-160x160.jpg" class="img-circle elevation-2" alt="User Image">
                     </div>
                     <div class="info">
-                        <a href="@Url.Action("InfoAccount", "Home")" class="d-block" style="color:red">@Session["email"].ToString()</a>
+                        <a href="@Url.Action("InfoAccount", "Home")" class="d-block" style="color: white">@Session["email"].ToString()</a>
                     </div>
+                    
 
                 </div>
 
@@ -117,14 +119,14 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-item ">
+                        @*<li class="nav-item ">
                             <a href="@Url.Action("InfoAccount", "Account")" class="nav-link @ViewBag.InfoAccount">
                                 <i class="nav-icon fas fa-users"></i>
                                 <p>
                                     Quản lý User
                                 </p>
                             </a>
-                        </li>
+                        </li>*@
 
                     </ul>
                 </nav>
