@@ -12,9 +12,13 @@ namespace Backend.Areas.Admin.Data
         Deleted = 3
     }
 
-    public enum Status : ushort
+    public enum BankAccountStatus
     {
         Actived = 1,
-        Deleted = 2
+        Locked = 2,
+        NonActive = 3,
+        Deleted = 4
     }
+
+
 }
