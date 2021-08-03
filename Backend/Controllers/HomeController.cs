@@ -27,9 +27,9 @@ namespace Backend.Controllers
                 return RedirectToAction("Login");
             }
 
-           
+
         }
-         public ActionResult InfoAccountData()
+        public ActionResult InfoAccountData()
         {
             if (Session["email"] != null)
             {
@@ -62,7 +62,30 @@ namespace Backend.Controllers
                 return RedirectToAction("Login");
             }
         }
+        [HttpPost]
+        public ActionResult UpdateInfo(Accounts acc)
+        {
+            if (ModelState.IsValid)
+            {
+                accounts.Edit(acc);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error",
+                data = acc
+            }, JsonRequestBehavior.AllowGet);
 
+        }
+        public ActionResult FindId(int id)
+        {
+            return Json(accounts.Get(id), JsonRequestBehavior.AllowGet);
+        }
         public ActionResult Login()
         {
             return View();
@@ -76,6 +99,19 @@ namespace Backend.Controllers
                 var obj = users.Get(x => x.Email == email && x.Password == password).FirstOrDefault();
                 Session["userId"] = obj.AccountId;
                 Session["email"] = email;
+
+
+                if (obj.RoleId == 1)
+                {
+                    Session["rold"] = "Admin";
+                    return RedirectToAction("Index", "Admin/Home");
+                }
+                if (obj.RoleId == 2)
+                {
+                    Session["rold"] = "TeleSopport";
+                    return RedirectToAction("Index", "Admin/Home");
+                }
+
                 return RedirectToAction("Index", "Home");
             }
             return View();
@@ -84,10 +120,10 @@ namespace Backend.Controllers
 
         public ActionResult Logout()
         {
-            Session.Remove("user");
+            Session.Clear();
             return RedirectToAction("Login");
         }
-         public ActionResult Register()
+        public ActionResult Register()
         {
             return View();
         }

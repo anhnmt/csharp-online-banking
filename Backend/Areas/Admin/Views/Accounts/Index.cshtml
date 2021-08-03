@@ -38,11 +38,13 @@
                                 <th>Email</th>
                                 <th>Phone</th>
                                 <th>Birthday </th>
-                                <th>Status </th>
+                                <th>Address </th>
                                 <th>RoleId </th>
+                                <th>NumberID </th>
+                                <th>Status </th>
                                 <th>CreatedAt </th>
                                 <th>UpdatedAt </th>
-                                <th></th>
+                                <th>Action</th>
                             </tr>
                         </thead>
                         <tbody id="tbl_user"></tbody>
@@ -56,6 +58,61 @@
         <!-- /.card -->
 
     </section>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <div class="form-group">
+                        <label for="exampleInputName">Name</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Input Name">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Email</label>
+                        <input type="text" class="form-control" id="Email" placeholder="Input Email">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputAge">Birthday</label>
+                        <input type="text" class="form-control" id="Birthday" placeholder="Input Birthday">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Address</label>
+                        <input type="text" class="form-control" id="Address" placeholder="Input Address">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">NumberID</label>
+                        <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">RoleId</label>
+                        <input type="text" class="form-control" id="RoleId" placeholder="Input RoleId">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputClass">Status</label>
+                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
+                        <span class="error text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
     <!-- /.content -->
 </div>
 
@@ -88,8 +145,10 @@
                                         <td>${(item.Email) == null ? "" : item.Email}</td>
                                         <td>${(item.Phone) == null ? "" : item.Phone}</td>
                                         <td>${(item.Birthday) == null ? "" : item.Birthday}</td>
-                                        <td>${(item.Status) == null ? "" : item.Status}</td>
+                                        <td>${(item.Address) == null ? "" : item.Address}</td>
                                         <td>${(item.RoleId) == null ? "" : item.RoleId}</td>
+                                        <td>${(item.NumberID) == null ? "" : item.NumberID}</td>
+                                        <td>${(item.Status) == null ? "" : item.Status}</td>
                                         <td>${(item.CreatedAt) == null ? "" : item.CreatedAt}</td>
                                         <td>${(item.UpdatedAt) == null ? "" : item.UpdatedAt}</td>
                                         <td><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button> | <button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
@@ -101,10 +160,68 @@
                         $(".pagination").html(pages);
                     }
                 });
+            },
+            get: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Accounts/FindId",
+                    data: { id: id },
+                    success: function (res) {
+                        $("#Id").val(res.AccountId);
+                        $("#Name").val(res.Name);
+                        $("#Email").val(res.Email);
+                        $("#Birthday").val((res.Birthday) == null ? "" : (new Date((parseInt((res.Birthday).replace(/\D/g, ''))))).toLocaleDateString());
+                        $("#Address").val(res.Address);
+                        $("#NumberID").val(res.NumberID);
+                        $("#Phone").val(res.Phone);
+                        $("#RoleId").val(res.RoleId);
+                        $("#Status").val(res.Status);
+                        $("#myModal").modal("show");
+                    }
+                })
+            },
+            put: function (user) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/UpdateInfo",
+                    data: user,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $("#myModal").modal("hide");;
+                            managerAcc.load();
+                            toastr.success('Update Successfully')
+                        }
+                    }
+
+                })
             }
         }
         $(function () {
             managerAcc.load();
+            
+            $(document).on("click", ".btn-edit", function () {
+                let userId = $(this).data("id");
+                let a = managerAcc.get(userId);
+            })
+
+            $("#btnSave").click(function () {
+                var today = new Date();
+                var user = {
+                    Name: $("#Name").val(),
+                    Email: $("#Email").val(),
+                    Birthday: $("#Birthday").val(),
+                    Address: $("#Address").val(),
+                    Phone: $("#Phone").val(),
+                    NumberID: $("#NumberID").val(),
+                    RoleId: $("#RoleId").val(),
+                    Status: $("#Status").val(),
+                    UpdatedAt: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+                }
+                let userId = $("#Id").val();
+                user.AccountId = userId;
+                console.log(user);
+                accounts.put(user);
+            })
         })
         
     </script>
