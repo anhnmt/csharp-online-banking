@@ -19,11 +19,11 @@ namespace Backend.Areas.Admin.Controllers
         {
             users = new Repository<Accounts>();
         }
-        // GET: Admin/Accounts
         public ActionResult Index()
         {
             if (Session["email"] != null)
             {
+                ViewBag.UserManagement = "active";
                 return View();
             }
             else
@@ -31,7 +31,7 @@ namespace Backend.Areas.Admin.Controllers
                 return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
-        public ActionResult GetData()
+        public ActionResult GetData(int page =1,string key =null)
         {
             ViewBag.Accounts = "active";
             var data = users.Get().Select(x => new AccountViewModel
@@ -43,124 +43,126 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
-                RoleId = x.RoleId,
                 RoleName = x.Role.Name,
                 Address = x.Address,
                 NumberID = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-            return Json(
-                new
-                {
-                    data = data,
-                    message = "Success",
-                    statusCode = 200
-                }, JsonRequestBehavior.AllowGet);
+
+            int pageSize = 2;
+            if (!string.IsNullOrEmpty(key))
+            {
+                data = data.Where(x => x.Email.Contains(key));
+            }
+            decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
+            return Json(new { 
+                totalPages = totalPages,
+                currentPage = page,
+                data = data.Skip((page - 1) * pageSize).Take(pageSize),
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+           
         }
+
         public ActionResult FindId(int id)
         {
-            return Json(users.Get(id), JsonRequestBehavior.AllowGet);
-        }
-        // GET: Admin/Accounts/Details/5
-        public ActionResult Details(int? id)
-        {
-            if (id == null)
+            var x = users.Get(id);
+            var data = new AccountViewModel
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Accounts accounts = db.Accounts.Find(id);
-            if (accounts == null)
-            {
-                return HttpNotFound();
-            }
-            return View(accounts);
+                AccountId = x.AccountId,
+                Name = x.Name,
+                Email = x.Email,
+                Password = x.Password,
+                Phone = x.Phone,
+                Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
+                Status = x.Status,
+                RoleName = x.Role.Name,
+                RoleId = x.RoleId,
+                Address = x.Address,
+                NumberID = x.NumberID,
+                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
+                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
+            };
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: Admin/Accounts/Create
-        public ActionResult Create()
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult Create(Accounts accounts)
         {
-            ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "Name");
+            if (ModelState.IsValid)
+            {
+                users.Add(accounts);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error",
+                data = accounts
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(Accounts acc)
+        {
+            if (ModelState.IsValid)
+            {
+                Accounts acc1 = users.Get(acc.AccountId);
+                acc1.Name = acc.Name;
+                acc1.Email = acc.Email;
+                acc1.Password = acc.Password;
+                acc1.Phone = acc.Phone;
+                acc1.Birthday = acc.Birthday;
+                acc1.Address = acc.Address;
+                acc1.NumberID = acc.NumberID;
+                acc1.RoleId = acc.RoleId;
+                acc1.Status = acc.Status;
+                acc1.UpdatedAt = acc.UpdatedAt;
+                users.Edit(acc1);
+
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error",
+                data = acc
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Delete(int id)
+        {
+            if (users.Delete(id))
+            {
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ProfileAccount()
+        {
             return View();
         }
-
-        // POST: Admin/Accounts/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "AccountId,Name,Email,Password,Phone,Birthday,Status,RoleId,CreatedAt,UpdatedAt")] Accounts accounts)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Accounts.Add(accounts);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "Name", accounts.RoleId);
-            return View(accounts);
-        }
-
-        // GET: Admin/Accounts/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Accounts accounts = db.Accounts.Find(id);
-            if (accounts == null)
-            {
-                return HttpNotFound();
-            }
-            ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "Name", accounts.RoleId);
-            return View(accounts);
-        }
-
-        // POST: Admin/Accounts/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "AccountId,Name,Email,Password,Phone,Birthday,Status,RoleId,CreatedAt,UpdatedAt")] Accounts accounts)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(accounts).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            ViewBag.RoleId = new SelectList(db.Roles, "RoleId", "Name", accounts.RoleId);
-            return View(accounts);
-        }
-
-        // GET: Admin/Accounts/Delete/5
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Accounts accounts = db.Accounts.Find(id);
-            if (accounts == null)
-            {
-                return HttpNotFound();
-            }
-            return View(accounts);
-        }
-
-        // POST: Admin/Accounts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Accounts accounts = db.Accounts.Find(id);
-            db.Accounts.Remove(accounts);
-            db.SaveChanges();
-            return RedirectToAction("Index");
-        }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)

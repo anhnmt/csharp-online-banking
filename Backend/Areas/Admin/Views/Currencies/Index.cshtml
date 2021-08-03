@@ -3,6 +3,8 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
+
+
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
     <section class="content-header">
@@ -24,6 +26,8 @@
     <!-- Main content -->
     <section class="content">
         <div class="col-md-12">
+            <button class="btn btn-primary mb-3" id="btn-add">Create new Currency</button>
+
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Currencies Management</h3>
@@ -63,7 +67,7 @@
                     <input type="hidden" name="type" id="type" value="CREATE" />
                     <div class="form-group">
                         <label for="Name">Name</label>
-                        <input type="text" class="form-control" id="Name" name="Name" value="" placeholder="Name..."/>
+                        <input type="text" class="form-control" id="Name" name="Name" value="" placeholder="Name..." />
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -88,10 +92,10 @@
                         let _html = "";
                         for (let item of res.data) {
                             _html += `<tr>
-                                        <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
-                                         <td>${(item.Name) == null ? "" : item.Name}</td>
-                                        <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger'>Detele</button></td>
-                                     </tr>`
+                                                <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
+                                                 <td>${(item.Name) == null ? "" : item.Name}</td>
+                                                <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger btn-delete'>Detele</button></td>
+                                             </tr>`
                         }
                         $('#tbl_currency').html(_html);
                         var pages = '';
@@ -113,8 +117,9 @@
                     data: currency,
                     success: function (res) {
                         if (res.statusCode == 200) {
-                            $("#modifyModal").modal("hide");;
+                            $("#modifyModal").modal("hide");
                             currencyManager.load();
+                            toastr.success('Created Successfully');
                         }
                     }
 
@@ -127,6 +132,7 @@
                     data: currency,
                     success: function (res) {
                         $("#modifyModal").modal("hide");
+                        toastr.success('Updated Successfully');
                         currencyManager.load();
                     }
                 })
@@ -138,7 +144,17 @@
                     data: { id: id },
                     success: function (res) {
                         $("#Name").val(res.Name);
-                        $("#myModal").modal("show");
+                        $("#modifyModal").modal("show");
+                    }
+                })
+            },
+            delete: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: `/Admin/Currencies/Delete/${id}`,
+                    success: function (res) {
+                        currencyManager.load();
+                        toastr.success('Deleted Successfully');
                     }
                 })
             }
@@ -146,33 +162,45 @@
 
         $(function () {
             currencyManager.load();
+
             $("#btn-add").click(function () {
-                $("#myModal").modal("show");
-            })
+                $("#modifyModal").modal("show");
+            });
+
             $("#btnSave").click(function () {
                 var currency = {
                     Name: $("#Name").val(),
                 }
                 if ($("#type").val() == "EDIT") {
-                    currency.Id = $("#Id").val(),
+                    currency.CurrencyId = $("#Id").val(),
                         currencyManager.put(currency);
                 } else {
                     currencyManager.post(currency);
                 }
-            })
+            });
+
             $(document).on("click", ".item-page", function () {
                 let page = $(this).text();
                 let key = $("#key").val();
                 currencyManager.load(page, key);
-            })
+            });
+
             $("#key").keyup(function () {
                 let key = $("#key").val();
                 currencyManager.load(1, key);
-            })
+            });
+
             $(document).on("click", ".btn-edit", function () {
+                $(".modal-title").html("Update Currency");
                 $("#type").val("EDIT");
                 let currencyId = $(this).data("id");
+                $("#Id").val(currencyId);
                 currencyManager.get(currencyId);
+            });
+
+            $(document).on("click", ".btn-delete", function () {
+                let currencyId = $(this).data("id");
+                currencyManager.delete(currencyId);
             })
         })
 

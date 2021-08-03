@@ -45,6 +45,7 @@ namespace Backend.Areas.Admin.Controllers
                 data = data.Where(x => x.Name.Contains(key));
             }
             decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
+
             return Json(new
             {
                 totalPages = totalpage,
@@ -68,7 +69,7 @@ namespace Backend.Areas.Admin.Controllers
             return Json(new
             {
                 statusCode = 200,
-                message = "Thêm mới thành công",
+                message = "Success",
                 data = c
             }, JsonRequestBehavior.AllowGet);
         }
@@ -82,96 +83,38 @@ namespace Backend.Areas.Admin.Controllers
                 return Json(new
                 {
                     statusCode = 200,
-                    message = "Cập nhật thành công",
+                    message = "Success",
                     data = c
                 }, JsonRequestBehavior.AllowGet);
             }
+
             return Json(new
             {
-                statusCode = 402,
-                message = "Cập nhật lỗi",
+                statusCode = 400,
+                message = "Error",
                 data = c
             }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: Admin/Currencies/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
 
-        // POST: Admin/Currencies/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create([Bind(Include = "CurrencyId,Name")] Currencies currencies)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Currencies.Add(currencies);
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-
-            return View(currencies);
-        }
-
-        // GET: Admin/Currencies/Edit/5
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
-            }
-            Currencies currencies = db.Currencies.Find(id);
-            if (currencies == null)
-            {
-                return HttpNotFound();
-            }
-            return View(currencies);
-        }
-
-        // POST: Admin/Currencies/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for 
-        // more details see https://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "CurrencyId,Name")] Currencies currencies)
-        {
-            if (ModelState.IsValid)
-            {
-                db.Entry(currencies).State = EntityState.Modified;
-                db.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            return View(currencies);
-        }
 
         // GET: Admin/Currencies/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int id)
         {
-            if (id == null)
+            if (currencies.Delete(id))
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
             }
-            Currencies currencies = db.Currencies.Find(id);
-            if (currencies == null)
-            {
-                return HttpNotFound();
-            }
-            return View(currencies);
-        }
 
-        // POST: Admin/Currencies/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
-        {
-            Currencies currencies = db.Currencies.Find(id);
-            db.Currencies.Remove(currencies);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
         }
 
         protected override void Dispose(bool disposing)

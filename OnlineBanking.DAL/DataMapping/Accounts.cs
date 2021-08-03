@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -21,7 +22,7 @@ namespace OnlineBanking.DAL
         public int? Status { get; set; } // active, delete, lock
         public int RoleId { get; set; } // Quyền
         public int? NumberID { get; set; }
-
+        [JsonIgnore]
         [ForeignKey("RoleId")]
         public virtual Roles Role { get; set; }
 
