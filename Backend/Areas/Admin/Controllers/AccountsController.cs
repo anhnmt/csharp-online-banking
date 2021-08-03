@@ -19,7 +19,6 @@ namespace Backend.Areas.Admin.Controllers
         {
             users = new Repository<Accounts>();
         }
-        // GET: Admin/Accounts
         public ActionResult Index()
         {
             if (Session["email"] != null)
@@ -88,10 +87,10 @@ namespace Backend.Areas.Admin.Controllers
             };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
- 
+
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public ActionResult Create(Accounts accounts)
         {
             if (ModelState.IsValid)
@@ -112,7 +111,6 @@ namespace Backend.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public ActionResult Edit(Accounts acc)
         {
             if (ModelState.IsValid)
@@ -144,32 +142,27 @@ namespace Backend.Areas.Admin.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: Admin/Accounts/Delete/5
-        public ActionResult Delete(int? id)
+        public ActionResult Delete(int id)
         {
-            if (id == null)
+            if (users.Delete(id))
             {
-                return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
             }
-            Accounts accounts = db.Accounts.Find(id);
-            if (accounts == null)
+            return Json(new
             {
-                return HttpNotFound();
-            }
-            return View(accounts);
+                statusCode = 402,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
         }
 
-        // POST: Admin/Accounts/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public ActionResult DeleteConfirmed(int id)
+        public ActionResult ProfileAccount()
         {
-            Accounts accounts = db.Accounts.Find(id);
-            db.Accounts.Remove(accounts);
-            db.SaveChanges();
-            return RedirectToAction("Index");
+            return View();
         }
-
         protected override void Dispose(bool disposing)
         {
             if (disposing)
