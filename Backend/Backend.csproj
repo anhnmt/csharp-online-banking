@@ -4139,10 +4139,6 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="Areas\Admin\Views\_ViewStart.cshtml" />
-    <Content Include="Areas\Admin\Views\Currencies\Create.cshtml" />
-    <Content Include="Areas\Admin\Views\Currencies\Delete.cshtml" />
-    <Content Include="Areas\Admin\Views\Currencies\Details.cshtml" />
-    <Content Include="Areas\Admin\Views\Currencies\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Currencies\Index.cshtml" />
     <Content Include="Content\plugins\fontawesome\webfonts\fa-brands-400.eot" />
     <Content Include="Content\plugins\fontawesome\webfonts\fa-brands-400.ttf" />

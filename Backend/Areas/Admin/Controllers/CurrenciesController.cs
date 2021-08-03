@@ -45,6 +45,7 @@ namespace Backend.Areas.Admin.Controllers
                 data = data.Where(x => x.Name.Contains(key));
             }
             decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
+
             return Json(new
             {
                 totalPages = totalpage,
@@ -86,6 +87,7 @@ namespace Backend.Areas.Admin.Controllers
                     data = c
                 }, JsonRequestBehavior.AllowGet);
             }
+
             return Json(new
             {
                 statusCode = 402,

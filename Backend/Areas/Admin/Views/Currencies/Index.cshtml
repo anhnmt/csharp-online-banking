@@ -154,7 +154,7 @@
                     Name: $("#Name").val(),
                 }
                 if ($("#type").val() == "EDIT") {
-                    currency.Id = $("#Id").val(),
+                    currency.CurrencyId = $("#Id").val(),
                         currencyManager.put(currency);
                 } else {
                     currencyManager.post(currency);
@@ -170,8 +170,10 @@
                 currencyManager.load(1, key);
             })
             $(document).on("click", ".btn-edit", function () {
+                $(".modal-title").html("Update Currency");
                 $("#type").val("EDIT");
                 let currencyId = $(this).data("id");
+                $("#Id").val(currencyId);
                 currencyManager.get(currencyId);
             })
         })
