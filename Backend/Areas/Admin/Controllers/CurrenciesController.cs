@@ -30,14 +30,14 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "Home");
+                return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
 
-        public ActionResult GetData(int page = 1, string key = null)
+        public ActionResult GetData(int page = 1, string key = null,int pageSize = 5)
         {
             ViewBag.Accounts = "active";
-            int pageSize = 5;
+            
             var data = currencies.Get();
 
             if (!string.IsNullOrEmpty(key))
