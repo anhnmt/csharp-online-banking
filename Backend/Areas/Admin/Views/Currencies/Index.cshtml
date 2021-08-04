@@ -90,8 +90,6 @@
 </div>
 
 @section scripts{
-    <script src="~/Content/plugins/jquery-validation/jquery.validate.min.js"></script>
-
     <script>
         var currencyManager = {
             load: function (page = 1, key = null) {
@@ -231,7 +229,7 @@
                 currencyManager.delete(currencyId);
             });
 
-            $('#modifyModal').on('hidden.bs.modal', function (e) {
+            $('#modifyModal').on('shown.bs.modal', function () {
                 $("#formData").trigger("reset");
                 validator.resetForm();
             });
