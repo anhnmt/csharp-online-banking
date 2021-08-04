@@ -7,23 +7,30 @@ namespace Backend.Areas.Admin.Data
 {
     public enum UserStatus
     {
-        Actived = 1,
-        Locked = 2,
-        Deleted = 3
+        Actived = 0,
+        Locked = 1,
+        Deleted = 2
     }
 
     public enum BankAccountStatus
     {
-        Actived = 1,
-        Locked = 2,
-        NonActive = 3,
-        Deleted = 4
+        Actived = 0,
+        Locked = 1,
+        NonActive = 2,
+        Deleted = 3
     }
 
     public enum DefaultStatus
     {
-        Actived = 1,
-        Deleted = 2
+        Actived = 0,
+        Deleted = 1
+    }
+
+    public enum BankingActivity
+    {
+        Deposit = 0,
+        Withdrawl = 1,
+        TransferFunds = 2
     }
 
 
