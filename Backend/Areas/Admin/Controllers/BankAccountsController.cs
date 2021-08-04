@@ -38,6 +38,7 @@ namespace Backend.Areas.Admin.Controllers
                     data.Balance = money;
                 }
             }
+        
             if (bankaccounts.Edit(data))
             {
                 return Json(new
