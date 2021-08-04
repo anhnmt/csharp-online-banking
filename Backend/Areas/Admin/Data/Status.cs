@@ -20,5 +20,11 @@ namespace Backend.Areas.Admin.Data
         Deleted = 4
     }
 
+    public enum DefaultStatus
+    {
+        Actived = 1,
+        Deleted = 2
+    }
+
 
 }

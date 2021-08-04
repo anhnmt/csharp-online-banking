@@ -10,8 +10,10 @@ namespace OnlineBanking.DAL
     {
         [Key]
         public int CurrencyId { get; set; }
-        public string Name { get; set; }
 
+        [Required(AllowEmptyStrings = false)]
+        public string Name { get; set; }
+        public int Status { get; set; }
         public ICollection<BankAccounts> BankAccounts { get; set; }
     }
 }
