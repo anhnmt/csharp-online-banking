@@ -46,9 +46,9 @@ namespace OnlineBanking.DAL.Migrations
             );
 
             context.Currencies.AddOrUpdate(x => x.CurrencyId,
-                new Currencies() { CurrencyId = 1, Name = "VND" },
-                new Currencies() { CurrencyId = 2, Name = "USD" },
-                new Currencies() { CurrencyId = 3, Name = "EUR" }
+                new Currencies() { CurrencyId = 1, Name = "VND", Status = 1 },
+                new Currencies() { CurrencyId = 2, Name = "USD", Status = 1 },
+                new Currencies() { CurrencyId = 3, Name = "EUR", Status = 1 }
             );
 
 
