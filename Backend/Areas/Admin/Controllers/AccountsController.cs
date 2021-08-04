@@ -9,6 +9,7 @@ using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
+using OnlineBanking.DAL.Common;
 
 namespace Backend.Areas.Admin.Controllers
 {
@@ -46,7 +47,7 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
-                StatusName = ((UserStatus)x.Status).ToString(),
+                StatusName = ((AccountStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 Address = x.Address,
                 NumberID = x.NumberID,
@@ -81,7 +82,7 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
-                StatusName = ((UserStatus)x.Status).ToString(),
+                StatusName = ((AccountStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 RoleId = x.RoleId,
                 Address = x.Address,
@@ -93,7 +94,7 @@ namespace Backend.Areas.Admin.Controllers
         }
         public ActionResult GetStatus()
         {
-            var data = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().Select(v => v.ToString()).ToArray();
+            var data = Enum.GetValues(typeof(AccountStatus)).Cast<AccountStatus>().Select(v => v.ToString()).ToArray();
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -190,7 +191,7 @@ namespace Backend.Areas.Admin.Controllers
                     Phone = x.Phone,
                     Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                     Status = x.Status,
-                    StatusName = ((UserStatus)x.Status).ToString(),
+                    StatusName = ((AccountStatus)x.Status).ToString(),
                     RoleName = x.Role.Name,
                     RoleId = x.RoleId,
                     Address = x.Address,

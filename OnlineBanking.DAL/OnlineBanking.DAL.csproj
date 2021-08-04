@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Status.cs" />
+    <Compile Include="Common\Utils.cs" />
     <Compile Include="DataMapping\Accounts.cs" />
     <Compile Include="DataMapping\ApplicationDbContext.cs" />
     <Compile Include="DataMapping\BankAccounts.cs" />

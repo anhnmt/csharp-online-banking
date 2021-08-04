@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Backend.Areas.Admin.Data
+namespace OnlineBanking.DAL.Common
 {
-    public enum UserStatus
+    public enum AccountStatus
     {
         Actived = 0,
         Locked = 1,

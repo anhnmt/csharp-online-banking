@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
+using OnlineBanking.DAL.Common;
 
 namespace Backend.Areas.Admin.Controllers
 {
