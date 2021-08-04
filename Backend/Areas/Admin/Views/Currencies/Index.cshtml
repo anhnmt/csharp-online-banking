@@ -65,24 +65,24 @@
         <div class="modal-dialog">
             <!-- Modal content-->
             <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Create new Currency</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <form action="/" id="form" method="post">
+                <form id="formData">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create new Currency</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
                         <input type="hidden" name="Id" id="Id" value="" />
                         <input type="hidden" name="type" id="type" value="CREATE" />
                         <div class="form-group">
                             <label for="Name">Name</label>
                             <input type="text" class="form-control" id="Name" name="Name" value="" placeholder="Name..." />
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-                </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success toastrDefaultSuccess">Save</button>
+                        <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
             </div>
 
         </div>
@@ -90,6 +90,8 @@
 </div>
 
 @section scripts{
+    <script src="~/Content/plugins/jquery-validation/jquery.validate.min.js"></script>
+
     <script>
         var currencyManager = {
             load: function (page = 1, key = null) {
@@ -101,10 +103,10 @@
                         let _html = "";
                         for (let item of res.data) {
                             _html += `<tr>
-                                                <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
-                                                 <td>${(item.Name) == null ? "" : item.Name}</td>
-                                                <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger btn-delete'>Detele</button></td>
-                                             </tr>`
+                                                                                                            <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
+                                                                                                             <td>${(item.Name) == null ? "" : item.Name}</td>
+                                                                                                            <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger btn-delete'>Detele</button></td>
+                                                                                                         </tr>`
                         }
                         $('#tbl_currency').html(_html);
                         var pages = '';
@@ -129,6 +131,8 @@
                             $("#modifyModal").modal("hide");
                             currencyManager.load();
                             toastr.success('Created Successfully');
+                        } else {
+                            validator.showErrors(res.data);
                         }
                     }
 
@@ -140,9 +144,13 @@
                     url: "/Admin/Currencies/PutData",
                     data: currency,
                     success: function (res) {
-                        $("#modifyModal").modal("hide");
-                        toastr.success('Updated Successfully');
-                        currencyManager.load();
+                        if (res.statusCode == 200) {
+                            $("#modifyModal").modal("hide");
+                            toastr.success('Updated Successfully');
+                            currencyManager.load();
+                        } else {
+                            validator.showErrors(res.data);
+                        }
                     }
                 })
             },
@@ -169,23 +177,34 @@
             }
         }
 
-        $(function () {
-            currencyManager.load();
-
-            $("#btn-add").click(function () {
-                $("#modifyModal").modal("show");
-            });
-
-            $("#btnSave").click(function () {
+        var validator = $("#formData").validate({
+            rules: {
+                Name: "required",
+            },
+            submitHandler: function (form) {
                 var currency = {
                     Name: $("#Name").val(),
                 }
+
                 if ($("#type").val() == "EDIT") {
                     currency.CurrencyId = $("#Id").val(),
                         currencyManager.put(currency);
                 } else {
                     currencyManager.post(currency);
                 }
+
+                return;
+            }
+        });
+
+        $(function () {
+            currencyManager.load();
+
+            $("#btn-add").click(function () {
+                $(".modal-title").html("Create new Currency");
+                $("#modifyModal").modal("show");
+                $("#type").val("CREATE");
+                $("#Id").val("");
             });
 
             $(document).on("click", ".item-page", function () {
@@ -210,11 +229,12 @@
             $(document).on("click", ".btn-delete", function () {
                 let currencyId = $(this).data("id");
                 currencyManager.delete(currencyId);
-            })
+            });
 
             $('#modifyModal').on('hidden.bs.modal', function (e) {
-                $("#form").trigger("reset");
-            })
+                $("#formData").trigger("reset");
+                validator.resetForm();
+            });
         })
 
     </script>
