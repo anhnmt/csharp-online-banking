@@ -7,10 +7,9 @@ using System.Net;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
-using Backend.Areas.Admin.Data;
+using Backend.Areas.Admin;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
-using OnlineBanking.DAL.Common;
 
 namespace Backend.Areas.Admin.Controllers
 {

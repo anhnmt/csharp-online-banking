@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Backend.Areas.Admin.Data
+namespace OnlineBanking.DAL
 {
     public static class Utils
     {
@@ -15,5 +15,6 @@ namespace Backend.Areas.Admin.Data
         {
             return data != null;
         }
+        
     }
 }

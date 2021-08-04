@@ -88,7 +88,7 @@
                                 <thead>
                                     <tr>
                                         <th>No</th>
-                                        <th>Name</th>
+                                        <th>Account Number</th>
                                         <th>Balance</th>
                                         <th>CurrencyName </th>
                                         <th>Status </th>
@@ -320,6 +320,13 @@
             }
         }
         $(function () {
+            $(document).on("click", ".btn-detail", function () {
+                let bankId = $(this).data("id");
+                window.location.assign("/Admin/Transactions/ProfileAccountNumber/" + bankId)
+            })
+
+
+
             var AccountId = $("#AccountId").val();
             managerBank.load(AccountId);
             $(document).on("click", ".btn-add", function () {

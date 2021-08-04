@@ -1,6 +1,6 @@
 namespace OnlineBanking.DAL.Migrations
 {
-    using OnlineBanking.DAL.Common;
+    using OnlineBanking.DAL;
     using System;
     using System.Data.Entity;
     using System.Data.Entity.Migrations;

@@ -1,7 +1,6 @@
-﻿using Backend.Areas.Admin.Data;
+﻿using Backend.Areas.Admin;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
-using OnlineBanking.DAL.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +21,9 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
+
+        
+
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {
@@ -54,10 +56,37 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 404
             }, JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult GetBanlace(int bankId)
+        {
 
+            var data = bankaccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels { 
+                Balance = x.Balance,
+                BankId = x.BankAccountId,
+                Currency = x.Currency.Name
+            });
+            return Json(new
+            {
+                data = data,
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult GetInfoBankAccount(int name)
+        {
+            var data = bankaccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels { 
+                Name = x.Account.Name,
+                Id = x.BankAccountId
+            });
+            return Json(new
+            {
+                data = data,
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+        }
         public ActionResult GetData(int Account)
         {
-            //int AccountId = Convert.ToInt32(Account);
             ViewBag.Accounts = "active";
             var data = bankaccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
             {
