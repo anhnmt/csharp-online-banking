@@ -68,8 +68,9 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                if (currencies.Get(x => x.Name == c.Name && x.Status == (int)DefaultStatus.Actived) != null)
-                {
+                var check = currencies.Get(x => x.Name == c.Name && x.Status == (int)DefaultStatus.Actived);
+
+                if (Utils.IsAny(check)) {
                     errors.Add("Name", "Name is existed!");
 
                     return Json(new
