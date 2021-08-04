@@ -4,10 +4,13 @@ using System.Data;
 using System.Data.Entity;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
+using OnlineBanking.DAL.Common;
 
 namespace Backend.Areas.Admin.Controllers
 {
@@ -34,10 +37,10 @@ namespace Backend.Areas.Admin.Controllers
             }
         }
 
-        public ActionResult GetData(int page = 1, string key = null,int pageSize = 5)
+        public ActionResult GetData(int page = 1, string key = null, int pageSize = 5)
         {
             ViewBag.Accounts = "active";
-            
+
             var data = currencies.Get();
 
             if (!string.IsNullOrEmpty(key))
@@ -62,24 +65,45 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult PostData(Currencies c)
         {
-            if (ModelState.IsValid)
-            {
-                currencies.Add(c);
-            }
-            return Json(new
-            {
-                statusCode = 200,
-                message = "Success",
-                data = c
-            }, JsonRequestBehavior.AllowGet);
-        }
+            Dictionary<string, string> errors = new Dictionary<string, string>();
 
-        [HttpPost]
-        public ActionResult PutData(Currencies c)
-        {
             if (ModelState.IsValid)
             {
-                currencies.Edit(c);
+                var check = currencies.Get(x => x.Name == c.Name);
+
+                if (Utils.IsNullOrEmpty(check))
+                {
+                    var first = check.FirstOrDefault();
+
+                    if (first.Status == (int)DefaultStatus.Deleted)
+                    {
+                        c.CurrencyId = first.CurrencyId;
+                        c.Status = (int)DefaultStatus.Actived;
+                        currencies.Update(c);
+
+                        return Json(new
+                        {
+                            statusCode = 200,
+                            message = "Success",
+                            data = c
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        errors.Add("Name", "Name is dublicated!");
+
+                        return Json(new
+                        {
+                            statusCode = 400,
+                            message = "Error",
+                            data = errors
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                }
+
+                c.Status = (int)DefaultStatus.Actived;
+                currencies.Add(c);
+
                 return Json(new
                 {
                     statusCode = 200,
@@ -88,11 +112,67 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
             return Json(new
             {
                 statusCode = 400,
                 message = "Error",
-                data = c
+                data = errors
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult PutData(Currencies c)
+        {
+            Dictionary<string, string> errors = new Dictionary<string, string>();
+
+            if (ModelState.IsValid)
+            {
+                var check = currencies.Get(x => x.CurrencyId != c.CurrencyId && x.Name == c.Name);
+
+                if (Utils.IsNullOrEmpty(check))
+                {
+                    errors.Add("Name", "Name is dublicated!");
+
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error",
+                        data = errors
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                c.Status = (int)DefaultStatus.Actived;
+                currencies.Edit(c);
+
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success",
+                    data = c
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error",
+                data = errors
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -124,6 +204,11 @@ namespace Backend.Areas.Admin.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private bool existCurrencyId(int id)
+        {
+            return Utils.IsNullOrEmpty(currencies.Get(id));
         }
     }
 }

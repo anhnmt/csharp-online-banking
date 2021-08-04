@@ -1,6 +1,7 @@
 ﻿using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
+using OnlineBanking.DAL.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,10 +39,7 @@ namespace Backend.Areas.Admin.Controllers
                     data.Balance = money;
                 }
             }
-            if (true)
-            {
 
-            }
             if (bankaccounts.Edit(data))
             {
                 return Json(new
@@ -56,12 +54,12 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 404
             }, JsonRequestBehavior.AllowGet);
         }
-        
+
         public ActionResult GetData(int Account)
         {
             //int AccountId = Convert.ToInt32(Account);
             ViewBag.Accounts = "active";
-            var data = bankaccounts.Get().Where(a => a.AccountId== Account).Select(x => new BankAccountsViewModels
+            var data = bankaccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
             {
                 AccountId = x.AccountId,
                 BankAccountId = x.BankAccountId,
@@ -69,7 +67,7 @@ namespace Backend.Areas.Admin.Controllers
                 CurrencyName = x.Currency.Name,
                 Name = x.Name,
                 Balance = x.Balance,
-                Status =x.Status,
+                Status = x.Status,
                 StatusName = ((BankAccountStatus)x.Status).ToString()
             });
             return Json(new

@@ -50,6 +50,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Status.cs" />
+    <Compile Include="Common\Utils.cs" />
     <Compile Include="DataMapping\Accounts.cs" />
     <Compile Include="DataMapping\ApplicationDbContext.cs" />
     <Compile Include="DataMapping\BankAccounts.cs" />
@@ -57,9 +59,9 @@
     <Compile Include="DataMapping\Currencies.cs" />
     <Compile Include="DataMapping\Roles.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
-    <Compile Include="Migrations\202108021613569_Initial.cs" />
-    <Compile Include="Migrations\202108021613569_Initial.Designer.cs">
-      <DependentUpon>202108021613569_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202108041039401_Initial.cs" />
+    <Compile Include="Migrations\202108041039401_Initial.Designer.cs">
+      <DependentUpon>202108041039401_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -73,8 +75,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202108021613569_Initial.resx">
-      <DependentUpon>202108021613569_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202108041039401_Initial.resx">
+      <DependentUpon>202108041039401_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
