@@ -199,6 +199,7 @@
             currencyManager.load();
 
             $("#btn-add").click(function () {
+                $("#formData").trigger("reset");
                 $(".modal-title").html("Create new Currency");
                 $("#modifyModal").modal("show");
                 $("#type").val("CREATE");
@@ -217,6 +218,7 @@
             });
 
             $(document).on("click", ".btn-edit", function () {
+                $("#formData").trigger("reset");
                 $(".modal-title").html("Update Currency");
                 $("#type").val("EDIT");
                 let currencyId = $(this).data("id");
@@ -230,7 +232,6 @@
             });
 
             $('#modifyModal').on('shown.bs.modal', function () {
-                $("#formData").trigger("reset");
                 validator.resetForm();
             });
         })
