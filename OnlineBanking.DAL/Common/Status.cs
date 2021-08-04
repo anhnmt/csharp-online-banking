@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace OnlineBanking.DAL.Common
+namespace OnlineBanking.DAL
 {
     public enum AccountStatus
     {

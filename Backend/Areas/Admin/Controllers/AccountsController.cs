@@ -6,10 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
-using Backend.Areas.Admin.Data;
+using Backend.Areas.Admin;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
-using OnlineBanking.DAL.Common;
 
 namespace Backend.Areas.Admin.Controllers
 {
@@ -27,7 +26,6 @@ namespace Backend.Areas.Admin.Controllers
         {
             if (Session["email"] != null)
             {
-                ViewBag.UserManagement = "active";
                 return View();
             }
             else
@@ -35,6 +33,7 @@ namespace Backend.Areas.Admin.Controllers
                 return RedirectToAction("Login", "Home", new { area = "" });
             }
         }
+        
         public ActionResult GetData(int page =1,string key =null)
         {
             ViewBag.Accounts = "active";
@@ -182,6 +181,10 @@ namespace Backend.Areas.Admin.Controllers
             if (Session["email"] != null)
             {
                 var x = users.Get(id);
+                if (x == null)
+                {
+                    return View();
+                }
                 var data = new AccountViewModel
                 {
                     AccountId = x.AccountId,
