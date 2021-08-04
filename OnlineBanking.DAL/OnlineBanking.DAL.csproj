@@ -56,7 +56,9 @@
     <Compile Include="DataMapping\ApplicationDbContext.cs" />
     <Compile Include="DataMapping\BankAccounts.cs" />
     <Compile Include="DataMapping\BaseModel.cs" />
+    <Compile Include="DataMapping\Channels.cs" />
     <Compile Include="DataMapping\Currencies.cs" />
+    <Compile Include="DataMapping\Messages.cs" />
     <Compile Include="DataMapping\Roles.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
     <Compile Include="Migrations\202108041039401_Initial.cs" />

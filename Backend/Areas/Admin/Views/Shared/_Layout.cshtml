@@ -15,6 +15,7 @@
     <link href="~/Content/plugins/toastr/toastr.min.css" rel="stylesheet" />
     @RenderSection("css", required: false)
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
+    @RenderSection("customCss", required: false)
 
 </head>
 <body class="hold-transition sidebar-mini">
@@ -131,6 +132,14 @@
                                 <i class="nav-icon fas fa-money-bill-alt"></i>
                                 <p>
                                     Currency Management
+                                </p>
+                            </a>
+                        </li>
+                        <li class="nav-item ">
+                            <a href="@Url.Action("Index", "Channels")" class="nav-link @ViewBag.Channel">
+                                <i class="nav-icon fas fa-life-ring"></i>
+                                <p>
+                                    Chat Management
                                 </p>
                             </a>
                         </li>
