@@ -118,8 +118,6 @@
     <Compile Include="Areas\Admin\Controllers\CurrenciesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\RolesController.cs" />
-    <Compile Include="Areas\Admin\Data\Status.cs" />
-    <Compile Include="Areas\Admin\Data\Utils.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Global.asax.cs">
