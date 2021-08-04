@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
@@ -15,9 +16,11 @@ namespace Backend.Areas.Admin.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private IRepository<Accounts> users;
+        private IRepository<Roles> roles;
         public AccountsController()
         {
             users = new Repository<Accounts>();
+            roles = new Repository<Roles>();
         }
         public ActionResult Index()
         {
@@ -43,14 +46,14 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
+                StatusName = ((UserStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 Address = x.Address,
                 NumberID = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-
-            int pageSize = 2;
+            int pageSize = 5;
             if (!string.IsNullOrEmpty(key))
             {
                 data = data.Where(x => x.Email.Contains(key));
@@ -78,6 +81,7 @@ namespace Backend.Areas.Admin.Controllers
                 Phone = x.Phone,
                 Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
                 Status = x.Status,
+                StatusName = ((UserStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 RoleId = x.RoleId,
                 Address = x.Address,
@@ -87,7 +91,20 @@ namespace Backend.Areas.Admin.Controllers
             };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
+        public ActionResult GetStatus()
+        {
+            var data = Enum.GetValues(typeof(UserStatus)).Cast<UserStatus>().Select(v => v.ToString()).ToArray();
 
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+         public ActionResult GetRole()
+        {
+            //var data = roles.Get().Select(x => new RoleViewModels { 
+            //    RoleId = x.RoleId,
+            //    Name = x.Name
+            //});
+            return Json(roles.Get(), JsonRequestBehavior.AllowGet);
+        }
 
         [HttpPost]
         //[ValidateAntiForgeryToken]
@@ -159,9 +176,35 @@ namespace Backend.Areas.Admin.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult ProfileAccount()
+        public ActionResult ProfileAccount(int id)
         {
-            return View();
+            if (Session["email"] != null)
+            {
+                var x = users.Get(id);
+                var data = new AccountViewModel
+                {
+                    AccountId = x.AccountId,
+                    Name = x.Name,
+                    Email = x.Email,
+                    Password = x.Password,
+                    Phone = x.Phone,
+                    Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
+                    Status = x.Status,
+                    StatusName = ((UserStatus)x.Status).ToString(),
+                    RoleName = x.Role.Name,
+                    RoleId = x.RoleId,
+                    Address = x.Address,
+                    NumberID = x.NumberID,
+                    CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
+                    UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
+                };
+                return View(data);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Home", new { area = "" });
+            }
+            
         }
         protected override void Dispose(bool disposing)
         {

@@ -1,4 +1,4 @@
-﻿
+﻿@model OnlineBanking.DAL.AccountViewModel
 @{
     ViewBag.Title = "ProfileAccount";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -10,12 +10,12 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Profile Account </h1>
+                    <h1>Account Profile</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
                         <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Profile Account</li>
+                        <li class="breadcrumb-item active">Account Profile</li>
                     </ol>
                 </div>
             </div>
@@ -24,22 +24,91 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="col-md-3">
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Profile Account</h3>
-                </div>
-                <div class="card-body">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">Account Profile</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-horizontal">
+                            <input type="hidden" name="Id" id="AccountId" value="@Model.AccountId" />
+                            <div class="form-group">
+                                <strong>Id: </strong> @Model.AccountId
+                            </div>
+                            <div class="form-group">
+                                <strong>Name: </strong> @Model.Name
+                            </div>
+                            <div class="form-group">
+                                <strong>Email: </strong> @Model.Email
+                            </div>
+                            <div class="form-group">
+                                <strong>Birthday: </strong>@Model.Birthday
+                            </div>
+                            <div class="form-group">
+                                <strong>Address: </strong>@Model.Address
+                            </div>
+                            <div class="form-group">
+                                <strong>Phone: </strong>@Model.Phone
+                            </div>
+                            <div class="form-group">
+                                <strong>NumberID: </strong>@Model.NumberID
+                            </div>
+                            <div class="form-group">
+                                <strong>Status: </strong>@Model.StatusName
+                            </div>
+                            <div class="form-group">
+                                <strong>RoleId: </strong> @Model.RoleName
+                            </div>
+                            <div class="form-group">
+                                <strong>CreatedAt: </strong>@Model.CreatedAt
+                            </div>
+                            <div class="form-group">
+                                <strong>UpdatedAt: </strong> @Model.UpdatedAt
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
 
+                    </div>
 
+                    <!-- /.card-body -->
                 </div>
-                <div class="card-footer d-flex justify-content-center">
-                    
-                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Total Account Number</h3>
+                    </div>
 
-                <!-- /.card-body -->
+                    <div class="card-body">
+                        <a href="#" class="btn btn-primary btn-sm mb-3 btn-add">New Account Number</a>
+                        <div class="form-horizontal">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Name</th>
+                                        <th>Balance</th>
+                                        <th>CurrencyName </th>
+                                        <th>Status </th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbl_banks"></tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+
+                    </div>
+
+                    <!-- /.card-body -->
+                </div>
             </div>
         </div>
+
         <!-- Default box -->
         <!-- /.card -->
 
@@ -47,4 +116,249 @@
 
     <!-- /.content -->
 </div>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Update Infomation Account</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="Id" id="Id" value="@Model.AccountId" />
+                <input type="hidden" name="type" id="type" value="CREATE" />
+                <form method="post" id="Form">
+                    <div class="form-group">
+                        <label for="exampleInputName">Account Number</label>
+                        <input type="text" class="form-control" id="Name" placeholder="Account Number...">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Email</label>
+                        <input type="text" class="form-control" id="Balance" placeholder="Balance...">
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">Currency</label>
+                                <select class="form-control" id="CurrencyId" name="CurrencyId">
+                                </select>
+                                <span class="error text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">Status</label>
+                                <select class="form-control" id="Status" name="Status">
+                                </select>
+                                <span class="error text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="MoneyManament" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-MoneyManament">Update Infomation Account</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="BankAccountId" id="BankAccountId" value="" />
+                <input type="hidden" name="type" id="type" value="CREATE" />
+                <form method="post" id="Form2">
+                    <div class="form-group">
+                        <label for="exampleInputName">Account Number</label>
+                        <label for="exampleInputClass">Currency</label>
+                        <select class="form-control" id="AccountNumberManament" placeholder="Account Number...">
+                        </select>
+                        <span class="error text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Balance</label>
+                        <input type="text" class="form-control" id="BalanceManament" placeholder="Balance...">
+                        <span class="error text-danger"></span>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+@section scripts{
+    <script>
+        function loadStatus(status = null) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/BankAccounts/GetStatus",
+                success: function (res) {
+                    var html;
+                    $.each(res, function (key, value) {
+                        html += "<option value = '" + key + "' " + ((parseInt(status)) - 1 == key ? 'selected' : '') + ">" + value + " </option>";
+                    });
+                    $('#Status').html(html);
+                }
+            })
+        }
+        function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/Currencies/GetData",
+                data: { page: page, key: key, pageSize: pageSize},
+                success: function (res) {
+                    var html;
+                    $.each(res.data, function (key, value) {
+                        html += "<option value = '" + value.CurrencyId + "' " + (CurrencyId == value.CurrencyId ? 'selected' : '') + ">" + value.Name + " </option>";
+                    });
+                    $('#CurrencyId').html(html);
+                }
+            })
+        }
+        function loadAccountNumber(accountId) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/BankAccounts/GetData",
+                data: { Account: accountId },
+                success: function (res) {
+                    console.log(res)
+                    var html;
+                    $.each(res.data, function (key, value) {
+                        html += "<option value = '" + value.BankAccountId + "'  >" + value.Name + " </option>";
+                    });
+                    $('#AccountNumberManament').html(html);
+                }
+            })
+        }
 
+        var managerBank = {
+            load: function (accountId) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/BankAccounts/GetData",
+                    data: { Account : accountId },
+                    success: function (res) {
+                        console.log(res)
+                        let _html = "";
+                        let ii = 0;
+                        for (let item of res.data) {
+                            _html += `<tr>
+                                        <td>${ii}</td>
+                                        <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td>${(item.Balance) == null ? "" : item.Balance}</td>
+                                        <td>${(item.CurrencyName) == null ? "" : item.CurrencyName}</td>
+                                        <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                        <td class="btn-group">
+                                            <button data-id="${item.BankAccountId}" class='btn btn-info btn-manager'>Money Managment</button>
+                                            <button data-id="${item.BankAccountId}" class='btn btn-primary btn-detail'>Detail</button>
+                                            <button data-id="${item.BankAccountId}" class='btn btn-warning btn-edit'>Edit</button>
+                                            <button data-id="${item.BankAccountId}" class='btn btn-danger'>Detele</button></td>
+                                    </tr>`
+                            ii++;
+                        }
+                        $('#tbl_banks').html(_html);
+                        
+                    }
+                });
+            },
+            post: function (bank) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/BankAccounts/Create",
+                    data: bank,
+                    success: function (res) {
+                        console.log(bank)
+                        if (res.statusCode == 200) {
+                            $("#myModal").modal("hide");
+                            managerBank.load();
+                            toastr.success('Created Successfully')
+                        }
+                    }
+
+                })
+            },
+            put: function (bank) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/BankAccounts/Edit",
+                    data: bank,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $("#myModal").modal("hide");
+                            managerBank.load();
+                            toastr.success('Updated Successfully')
+                        }
+                    }
+
+                })
+            },
+            receiveMoney: function (bankId,balance) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/BankAccounts/ReceiveMoney",
+                    data: { id: bankId, money: balance},
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $("#MoneyManament").modal("hide");
+                            var AccountId = $("#AccountId").val();
+                            managerBank.load(AccountId);
+                            toastr.success('Transferred Successfully');
+                        }
+                    }
+
+                })
+            }
+        }
+        $(function () {
+            var AccountId = $("#AccountId").val();
+            managerBank.load(AccountId);
+            $(document).on("click", ".btn-add", function () {
+                loadStatus();
+                loadCurrency();
+                $("#myModal").modal("show");
+                $(".modal-title").html("Create Account Number");
+            })
+            $(document).on("click", ".btn-manager", function () {
+                $("#type").val("TRANSFER");
+                loadStatus();
+                loadCurrency();
+                loadAccountNumber(AccountId);
+                $("#MoneyManament").modal("show");
+                $(".modal-MoneyManament").html("Money management");
+
+            })
+
+            $(document).on("click", "#btnSave", function () {
+                var today = new Date();
+                var bank = {
+                    AccountId: $("#Id").val(),
+                    CurrencyId: $("#CurrencyId").val(),
+                    Status: parseInt(($("#Status").val())) + 1,
+                    Balance: $("#Balance").val(),
+                    Name: $("#Name").val()
+                };
+                if ($("#type").val() == "EDIT") {
+                    bank.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                    bank.BankAccountId = $("#Id").val(),
+                    managerBank.put(user);
+                } else if ($("#type").val() == "TRANSFER") {
+                    let accountNumber = $("#AccountNumberManament").val();
+                    let balance = $("#BalanceManament").val();
+                    managerBank.receiveMoney(accountNumber, balance);
+                } else {
+                    bank.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                    managerBank.post(bank);
+                }
+               
+            })
+        })
+    </script>
+}

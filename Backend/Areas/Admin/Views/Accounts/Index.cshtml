@@ -27,7 +27,7 @@
     <!-- Main content -->
     <section class="content">
         <div class="col-md-12">
-            <a href="#" class="btn btn-primary mb-3 btn-add">New User</a>
+            <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">User Management</h3>
@@ -42,17 +42,11 @@
                     <table class="table table-hover" id="datatables">
                         <thead>
                             <tr>
-                                <th>AccountId</th>
+                                <th>No</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Phone</th>
-                                <th>Birthday </th>
-                                <th>Address </th>
-                                <th>RoleId </th>
-                                <th>NumberID </th>
+                                <th>RoleName </th>
                                 <th>Status </th>
-                                <th>CreatedAt </th>
-                                <th>UpdatedAt </th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -92,27 +86,27 @@
                 <form method="post" id="Form">
                     <div class="form-group">
                         <label for="exampleInputName">Name</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Input Name">
+                        <input type="text" class="form-control" id="Name" placeholder="Name...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputName">Email</label>
-                        <input type="text" class="form-control" id="Email" placeholder="Input Email">
+                        <input type="text" class="form-control" id="Email" placeholder="Email...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputName">Password</label>
-                        <input type="text" class="form-control" id="Password" placeholder="Input Password">
+                        <input type="text" class="form-control" id="Password" placeholder="Password...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputName">Phone</label>
-                        <input type="text" class="form-control" id="Phone" placeholder="Input Phone">
+                        <input type="text" class="form-control" id="Phone" placeholder="Phone...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputClass">Address</label>
-                        <input type="text" class="form-control" id="Address" placeholder="Input Address">
+                        <input type="text" class="form-control" id="Address" placeholder="Address...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
@@ -120,7 +114,7 @@
                             <div class="col-md-6">
                                 <label for="exampleInputAge">Birthday</label>
                                 <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" name="Birthday" id="Birthday">
+                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" name="Birthday" id="Birthday" placeholder="Birthday...">
                                     <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
                                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                                     </div>
@@ -129,21 +123,28 @@
                             <span class="error text-danger"></span>
                             <div class="col-md-6">
                                 <label for="exampleInputClass">NumberID</label>
-                                <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
+                                <input type="text" class="form-control" id="NumberID" placeholder="NumberID...">
                                 <span class="error text-danger"></span>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputClass">RoleId</label>
-                        <input type="text" class="form-control" id="RoleId" placeholder="Input RoleId">
-                        <span class="error text-danger"></span>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">Role</label>
+                                <select class="form-control" id="RoleId" name="RoleId">
+                                </select>
+                                <span class="error text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">Status</label>
+                                <select class="form-control" id="Status" name="Status">
+                                </select>
+                                <span class="error text-danger"></span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="exampleInputClass">Status</label>
-                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
-                        <span class="error text-danger"></span>
-                    </div>
+                    
                 </form>
             </div>
             <div class="modal-footer">
@@ -162,6 +163,35 @@
 @section scripts{
 
     <script>
+        function loadStatus(status=null) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Accounts/GetStatus",
+                    success: function (res) {
+                        console.log(res)
+                        var html;
+                        $.each(res, function (key, value) {
+                            html += "<option value = '" + key + "' " + ((parseInt(status))-1 == key ? 'selected' : '') + ">" + value + " </option>";
+                        });
+                        $('#Status').html(html);
+                    }
+                })
+            }
+        function loadRole(roleId=null) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Accounts/GetRole",
+                    success: function (res) {
+                        console.log(res)
+                        var html;
+                        $.each(res, function (key, value) {
+                            html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                        });
+                        $('#RoleId').html(html);
+                    }
+                })
+            }
+        
         var managerAcc = {
             load: function (page = 1, key = null) {
                 $.ajax({
@@ -170,22 +200,18 @@
                     data: { page: page, key: key },
                     success: function (res) {
                         let _html = "";
+                        var ii = 1;
                         for (let item of res.data) {
-                            var Ida = item.AccountId;
+                            
                             _html += `<tr>
-                                                                <td>${(item.AccountId) == null ? "" : item.AccountId}</td>
-                                                                <td>${(item.Name) == null ? "" : item.Name}</td>
-                                                                <td>${(item.Email) == null ? "" : item.Email}</td>
-                                                                <td>${(item.Phone) == null ? "" : item.Phone}</td>
-                                                                <td>${(item.Birthday) == null ? "" : item.Birthday}</td>
-                                                                <td>${(item.Address) == null ? "" : item.Address}</td>
-                                                                <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
-                                                                <td>${(item.NumberID) == null ? "" : item.NumberID}</td>
-                                                                <td>${(item.Status) == null ? "" : item.Status}</td>
-                                                                <td>${(item.CreatedAt) == null ? "" : iteUrl.CreatedAt}</td>
-                                                                <td>${(item.UpdatedAt) == null ? "" : item.UpdatedAt}</td>
-                                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
-                                                             </tr>`
+                                        <td>${ii}</td>
+                                        <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td>${(item.Email) == null ? "" : item.Email}</td>
+                                        <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
+                                        <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                        <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                    </tr>`
+                            ii++;
                         }
                         $('#tbl_user').html(_html);
                         var pages = '';
@@ -213,10 +239,10 @@
                         $("#Password").val(res.Password);
                         $("#Phone").val(res.Phone);
                         $("#Address").val(res.Address);
-                        $("#Birthday").val((res.Birthday) == null ? "" : (new Date((parseInt((res.Birthday).replace(/\D/g, ''))))).toLocaleDateString());
+                        $("#Birthday").val((res.Birthday));
                         $("#NumberID").val(res.NumberID);
-                        $("#RoleId").val(res.RoleId);
-                        $("#Status").val(res.Status);
+                        loadRole(res.RoleId);
+                        loadStatus(res.Status);
                         $("#myModal").modal("show");
                     }
                 })
@@ -253,6 +279,7 @@
             }
         }
         $(function () {
+           
             managerAcc.load();
 
             $(document).on("click", ".btn-edit", function () {
@@ -262,11 +289,15 @@
             })
 
             $(document).on("click", ".btn-add", function () {
+                loadRole(1);
+                loadStatus(1);
+                $(".modal-title").html("Create Account");
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
             })
             $(document).on("click", ".btn-detail", function () {
-                window.location.assign("/Admin/Accounts/ProfileAccount")
+                let userId = $(this).data("id");
+                window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
             })
 
             $(document).on("click", "#btnSave", function () {
@@ -281,13 +312,14 @@
                     NumberID: $("#NumberID").val(),
                     RoleId: $("#RoleId").val(),
                     Address: $("#Address").val(),
-                    Status: $("#Status").val(),
-                    UpdatedAt: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+                    Status: parseInt(($("#Status").val())) + 1
                 }
                 if ($("#type").val() == "EDIT") {
-                    user.AccountId = $("#Id").val(),
+                    user.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+                    user.AccountId = $("#Id").val();
                     managerAcc.put(user);
                 } else {
+                    user.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
                     managerAcc.post(user);
                 }
             })
