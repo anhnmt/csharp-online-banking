@@ -105,7 +105,14 @@ namespace Backend.Controllers
         }
         public ActionResult Login()
         {
-            return View();
+            if (Session["email"] != null)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            else
+            {
+                return View();
+            }
         }
         [HttpPost]
         public ActionResult Login(string email, string password)
