@@ -101,10 +101,10 @@
                         let _html = "";
                         for (let item of res.data) {
                             _html += `<tr>
-                                                                                                            <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
-                                                                                                             <td>${(item.Name) == null ? "" : item.Name}</td>
-                                                                                                            <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger btn-delete'>Detele</button></td>
-                                                                                                         </tr>`
+                                        <td>${(item.CurrencyId) == null ? "" : item.CurrencyId}</td>
+                                            <td>${(item.Name) == null ? "" : item.Name}</td>
+                                        <td class="btn-group"><button data-toggle="modal" data-target="#modifyModal" data-id="${item.CurrencyId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.CurrencyId}" class='btn btn-danger btn-delete'>Detele</button></td>
+                                    </tr>`
                         }
                         $('#tbl_currency').html(_html);
                         var pages = '';
