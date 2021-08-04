@@ -171,7 +171,7 @@
                         console.log(res)
                         var html;
                         $.each(res, function (key, value) {
-                            html += "<option value = '" + key + "' " + ((parseInt(status))-1 == key ? 'selected' : '') + ">" + value + " </option>";
+                            html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
                         });
                         $('#Status').html(html);
                     }
@@ -312,7 +312,7 @@
                     NumberID: $("#NumberID").val(),
                     RoleId: $("#RoleId").val(),
                     Address: $("#Address").val(),
-                    Status: parseInt(($("#Status").val())) + 1
+                    Status: parseInt(($("#Status").val()))
                 }
                 if ($("#type").val() == "EDIT") {
                     user.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();

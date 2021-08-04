@@ -278,7 +278,8 @@
                         console.log(bank)
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
-                            managerBank.load();
+                            var AccountId = $("#AccountId").val();
+                            managerBank.load(AccountId);
                             toastr.success('Created Successfully')
                         }
                     }
@@ -293,7 +294,8 @@
                     success: function (res) {
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
-                            managerBank.load();
+                            var AccountId = $("#AccountId").val();
+                            managerBank.load(AccountId);
                             toastr.success('Updated Successfully')
                         }
                     }
