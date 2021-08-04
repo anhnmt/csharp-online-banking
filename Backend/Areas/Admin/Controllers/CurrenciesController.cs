@@ -68,17 +68,36 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var check = currencies.Get(x => x.Name == c.Name && x.Status == (int)DefaultStatus.Actived);
+                var check = currencies.Get(x => x.Name == c.Name);
 
-                if (Utils.IsAny(check)) {
-                    errors.Add("Name", "Name is existed!");
+                if (Utils.IsNullOrEmpty(check))
+                {
+                    var first = check.FirstOrDefault();
 
-                    return Json(new
+                    if (first.Status == (int)DefaultStatus.Deleted)
                     {
-                        statusCode = 400,
-                        message = "Error",
-                        data = errors
-                    }, JsonRequestBehavior.AllowGet);
+                        c.CurrencyId = first.CurrencyId;
+                        c.Status = (int)DefaultStatus.Actived;
+                        currencies.Update(c);
+
+                        return Json(new
+                        {
+                            statusCode = 200,
+                            message = "Success",
+                            data = c
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    else
+                    {
+                        errors.Add("Name", "Name is dublicated!");
+
+                        return Json(new
+                        {
+                            statusCode = 400,
+                            message = "Error",
+                            data = errors
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                 }
 
                 c.Status = (int)DefaultStatus.Actived;
@@ -117,7 +136,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 var check = currencies.Get(x => x.CurrencyId != c.CurrencyId && x.Name == c.Name && x.Status == (int)DefaultStatus.Actived);
 
-                if (Utils.IsAny(check))
+                if (Utils.IsNullOrEmpty(check))
                 {
                     errors.Add("Name", "Name is dublicated!");
 
@@ -184,6 +203,11 @@ namespace Backend.Areas.Admin.Controllers
                 db.Dispose();
             }
             base.Dispose(disposing);
+        }
+
+        private bool existCurrencyId(int id)
+        {
+            return Utils.IsNullOrEmpty(currencies.Get(id));
         }
     }
 }
