@@ -34,5 +34,7 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Currencies> Currencies { get; set; }
         public virtual DbSet<Roles> Roles { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
+        public virtual DbSet<Channels> Channels { get; set; }
+        public virtual DbSet<Messages> Messages { get; set; }
     }
 }
