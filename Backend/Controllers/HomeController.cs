@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using OnlineBanking.DAL.Common;
 using System.Text.RegularExpressions;
 
 namespace Backend.Controllers
@@ -33,9 +32,9 @@ namespace Backend.Controllers
         }
         public ActionResult PageNotFound()
         {
-          
-                return View();
-           
+
+            return View();
+
 
         }
         public ActionResult InfoAccountData()
@@ -226,7 +225,7 @@ namespace Backend.Controllers
                 }
             }
             errors.Add("Email", "Email is not exists!");
-                
+
             foreach (var k in ModelState.Keys)
                 foreach (var err in ModelState[k].Errors)
                 {
@@ -251,29 +250,57 @@ namespace Backend.Controllers
         {
             return View();
         }
-        [HttpPost]
-        public ActionResult Register(Accounts acc)
+
+        public ActionResult CheckRegister(RegisterViewModel Register)
         {
-            DateTime time = DateTime.Now;
-            acc.CreatedAt = time;
-            acc.RoleId = 0;
-            acc.AttemptLogin = 0;
-            if (ModelState.IsValid)
+            Dictionary<string, string> errors = new Dictionary<string, string>();
+            bool addtionCheck = true;
+            IRepository<Accounts> users = new Repository<Accounts>();
+
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+            if (Register.RePassword != Register.Password)
             {
-                try
-                {
-                    if (accounts.Add(acc))
-                    {
-                        return RedirectToAction("Login");
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-                return View(acc);
+                errors.Add("RePassword", "Confirm Password is not the same as Password");
+                addtionCheck = false;
             }
-            return View(acc);
+            if (users.CheckDuplicate(x => x.Email == Register.Email))
+            {
+                errors.Add("Email", "Email has been used!");
+                addtionCheck = false;
+            }
+
+            if (ModelState.IsValid && addtionCheck == true)
+            {
+                Accounts accounts = new Accounts
+                {
+                    Name = Register.Name,
+                    Email = Register.Email,
+                    Password = Register.Password,
+                    AttemptLogin = 0,
+                    RoleId = 3,
+                    Status = ((int)AccountStatus.Actived)
+                };
+                users.Add(accounts);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Error",
+                    url = "Home/Login",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error",
+                data = errors
+            }, JsonRequestBehavior.AllowGet);
         }
 
     }

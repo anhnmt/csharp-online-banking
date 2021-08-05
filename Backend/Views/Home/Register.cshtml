@@ -28,46 +28,51 @@
             </div>
             <div class="card-body">
                 <p class="login-box-msg">Register a new membership</p>
-
-                @using (Html.BeginForm())
-                {
-                   
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="Full name" name="Name">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-user"></span>
+                <form method="post" id="formData">
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="Name" placeholder="Full name" name="Name">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-user"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
-                        <input type="email" class="form-control" placeholder="Email" name="Email">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="Email" placeholder="Email" name="Email">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-envelope"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
-                        <input type="password" class="form-control" placeholder="Password" name="Password">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="Password" placeholder="Password" name="Password">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="input-group mb-3">
-                        <input type="password" class="form-control" placeholder="Retype password">
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-lock"></span>
+                    <div class="form-group">
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="RePassword" placeholder="Confirm Password" name="RePassword">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <span class="fas fa-lock"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col-8">
                             <div class="icheck-primary">
-                                <input type="checkbox" id="agreeTerms" name="terms" value="agree">
+                                <input type="checkbox" id="agreeTerms" name="Term" value="agree" required>
                                 <label for="agreeTerms">
                                     I agree to the <a href="#">terms</a>
                                 </label>
@@ -79,7 +84,8 @@
                         </div>
                         <!-- /.col -->
                     </div>
-                }
+                </form>
+
 
                 <a href="@Url.Action("Login","Home")" class="text-center">I already have a membership</a>
             </div>
@@ -89,10 +95,58 @@
     <!-- /.register-box -->
     <!-- jQuery -->
     <script src="~/Content/plugins/jquery/jquery.min.js"></script>
+    <script src="~/Content/plugins/jquery-validation/jquery.validate.min.js"></script>
     <!-- Bootstrap 4 -->
     <script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
     <script src="~/Content/dist/js/adminlte.min.js"></script>
+    <script src="~/Content/js/custom-validate.js"></script>
+    <script>
+        var validator = $("#formData").validate({
+            rules: {
+                Name: {
+                    required: true,
+                },
+                Email: {
+                    required: true,
+                    email: true,
+                },
+                Password: {
+                    required: true,
+                    minlength: 6,
+                },
+                RePassword: {
+                    required: true,
+                    minlength: 6,
+                    equalTo: "#Password",
+                },
+                Term: {
+                    required: true,
+                }
+            },
+            submitHandler: function (form) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/CheckRegister",
+                    data: {
+                        Name: $("#Name").val(),
+                        Email: $("#Email").val(),
+                        Password: $("#Password").val(),
+                        RePassword: $("#RePassword").val(),
+                        Term: $("#Term").val(),
+                    },
+                    success: function (res) {
+                        console.log(res.data);
+                        if (res.statusCode == 400) {
+                            validator.showErrors(res.data);
+                        } else if (res.statusCode == 200) {
+                            window.location.replace(`/${res.url}`);
+                        }
+                    }
+                })
+            }
+        });
+    </script>
 </body>
 </html>
 

@@ -71,6 +71,7 @@
     <Compile Include="ViewModel\BalanceViewModels.cs" />
     <Compile Include="ViewModel\BankAccountsViewModels.cs" />
     <Compile Include="ViewModel\GetInfoBankAccountViewModels.cs" />
+    <Compile Include="ViewModel\RegisterViewModel.cs" />
     <Compile Include="ViewModel\RoleViewModels.cs" />
     <Compile Include="ViewModel\TransactionsViewModels.cs" />
     <Compile Include="ViewModel\UpdateAccountViewModels.cs" />
