@@ -41,14 +41,23 @@ namespace Backend.Controllers
         {
             if (Session["email"] != null)
             {
-                ViewBag.InfoAccount = "active";
                 int userId = int.Parse(Session["userId"].ToString());
-                IRepository<Accounts> users = new Repository<Accounts>();
-                Accounts acc = users.Get(userId);
+                Accounts acc = accounts.Get(userId);
+                ProfileViewModel account = new ProfileViewModel
+                {
+                    Name = acc.Name,
+                    Email = acc.Email,
+                    Phone = acc.Phone,
+                    Birthday = acc.Birthday?.ToString("yyyy-MM-dd"),
+                    RoleName = acc.RoleId != 2 ? acc.Role.Name : null,
+                    NumberID = acc.NumberID,
+                    StatusName = ((AccountStatus)acc.Status).ToString(),
+                    Address = acc.Address,
+                };
                 return Json(
                     new
                     {
-                        data = acc,
+                        data = account,
                         message = "Success",
                         statusCode = 200
                     }, JsonRequestBehavior.AllowGet);
@@ -70,20 +79,21 @@ namespace Backend.Controllers
                 return RedirectToAction("Login");
             }
         }
+
         [HttpPost]
-        public ActionResult UpdateInfo(Accounts acc)
+        public ActionResult UpdateInfo(ProfileViewModel acc)
         {
+            Dictionary<string, string> errors = new Dictionary<string, string>();
             if (ModelState.IsValid)
             {
-                Accounts acc1 = accounts.Get(acc.AccountId);
+                Accounts acc1 = accounts.Get(Session["userId"]);
                 acc1.Name = acc.Name;
                 acc1.Email = acc.Email;
-                acc1.Birthday = acc.Birthday;
+                acc1.Phone = acc.Phone;
+                acc1.Birthday = DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberID = acc.NumberID;
-                acc1.Status = acc.Status;
-                acc1.Phone = acc.Phone;
-                acc1.UpdatedAt = acc.UpdatedAt;
+                acc1.UpdatedAt = DateTime.Now;
                 accounts.Edit(acc1);
 
                 return Json(new
@@ -92,17 +102,36 @@ namespace Backend.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
             return Json(new
             {
                 statusCode = 402,
                 message = "Error",
-                data = acc
+                data = errors
             }, JsonRequestBehavior.AllowGet);
 
         }
         public ActionResult FindId(int id)
         {
-            return Json(accounts.Get(id), JsonRequestBehavior.AllowGet);
+            Accounts acc = accounts.Get(id);
+            AccountViewModel account = new AccountViewModel
+            {
+                Name = acc.Name,
+                Email = acc.Email,
+                Phone = acc.Phone,
+                Birthday = acc.Birthday?.ToString("dd/MM/yyyy"),
+                RoleName = acc.Role.Name,
+                NumberID = acc.NumberID,
+                StatusName = ((AccountStatus)acc.Status).ToString(),
+                Address = acc.Address,
+            };
+            return Json(account, JsonRequestBehavior.AllowGet);
         }
         public ActionResult Login()
         {

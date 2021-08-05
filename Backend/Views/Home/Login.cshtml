@@ -110,7 +110,6 @@
                     url: "/Home/CheckLogin",
                     data: { Email: $("#Email").val(), Password: $("#Password").val()},
                     success: function (res) {
-                        console.log(res);
                         if (res.statusCode == 400) {
                             validator.showErrors(res.data);
                         } else if (res.statusCode == 200) {

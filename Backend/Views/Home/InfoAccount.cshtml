@@ -6,96 +6,115 @@
     <link href="~/Content/plugins/toastr/toastr.css" rel="stylesheet" />
 }
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Thông tin tài khoản</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Thông tin tài khoản</li>
-                    </ol>
-                </div>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Profile</h1>
             </div>
-        </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-
-        <!-- Default box -->
-        <div class="col-md-4">
-            <div class="card card-info">
-                <div class="card-header">
-                    <h3 class="card-title">Info Account </h3>
-                </div>
-                <div class="card-body">
-
-
-                </div>
-                <div class="card-footer text-center">
-                    <a type="submit" href="#" class="btn btn-primary btn-block toastrDefaultSuccess" id="update">Update Infomation</a>
-                </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                    <li class="breadcrumb-item active">User Profile</li>
+                </ol>
             </div>
         </div>
+    </div><!-- /.container-fluid -->
+</section>
 
-        <!-- /.card -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-3">
 
-    </section>
-    <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
+                <!-- Profile Image -->
+                <div class="card card-primary card-outline">
+                    <div class="card-body box-profile">
+                        <div class="text-center">
+                            <img class="profile-user-img img-fluid img-circle" src="~/Content/dist/img/user4-128x128.jpg" alt="User profile picture">
+                        </div>
 
-            <!-- Modal content-->
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Update Infomation Account</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h3 class="profile-username text-center" id="TextName">Name</h3>
+
+                        <p class="text-muted text-center" id="RoleName">Role</p>
+
+                        <ul class="list-group list-group-unbordered mb-3">
+                            <li class="list-group-item">
+                                <b>Email</b> <a class="float-right" id="TextEmail"></a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Phone</b> <a class="float-right" id="TextPhone"></a>
+                            </li>
+                            <li class="list-group-item">
+                                <b>Status</b> <a class="float-right" id="TextStatus"></a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.card-body -->
                 </div>
-                <div class="modal-body">
-                    <input type="hidden" name="Id" id="Id" value="" />
-                    <div class="form-group">
-                        <label for="exampleInputName">Name</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Input Name">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputName">Email</label>
-                        <input type="text" class="form-control" id="Email" placeholder="Input Email">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputAge">Birthday</label>
-                        <input type="text" class="form-control" id="Birthday" placeholder="Input Birthday">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputClass">Address</label>
-                        <input type="text" class="form-control" id="Address" placeholder="Input Address">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputClass">NumberID</label>
-                        <input type="text" class="form-control" id="NumberID" placeholder="Input NumberID">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputClass">Status</label>
-                        <input type="text" class="form-control" id="Status" placeholder="Input Status">
-                        <span class="error text-danger"></span>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-                </div>
+                <!-- /.card -->
             </div>
-
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="card">
+                    <div class="card-header p-2">
+                        <h4 class="card-title">Update information</h4>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <form class="form-horizontal">
+                            <div class="form-group row">
+                                <label for="Name" class="col-sm-2 col-form-label">Name</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="Name" placeholder="Name" name="Name">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Email" class="col-sm-2 col-form-label">Email</label>
+                                <div class="col-sm-10">
+                                    <input type="email" class="form-control" id="Email" placeholder="Email" name="Email">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="inputName2" class="col-sm-2 col-form-label">Phone</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="Phone" placeholder="Phone" name="Phone">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Birthday" class="col-sm-2 col-form-label">Birthday</label>
+                                <div class="col-sm-10">
+                                    <input type="date" class="form-control" id="Birthday" name="Birthday">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="NumberId" class="col-sm-2 col-form-label">Number Id</label>
+                                <div class="col-sm-10">
+                                    <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="Number Id">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Address" class="col-sm-2 col-form-label">Address</label>
+                                <div class="col-sm-10">
+                                    <textarea class="form-control" id="Address" placeholder="Address" name="Address"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="offset-sm-2 col-sm-10">
+                                    <button type="button" id="btnUpdate" class="btn btn-warning">Update</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div><!-- /.card-body -->
+                </div>
+                <!-- /.nav-tabs-custom -->
+            </div>
+            <!-- /.col -->
         </div>
-    </div>
-    <!-- /.content -->
+        <!-- /.row -->
+    </div><!-- /.container-fluid -->
+</section>
+<!-- /.content -->
 
 @section scripts{
     <script src="~/Content/plugins/toastr/toastr.min.js"></script>
@@ -106,63 +125,17 @@
                     type: "GET",
                     url: "/Home/InfoAccountData",
                     success: function (response) {
-                        let _html = `
-                                            <div class="form-horizontal">
-                                                <div class="form-group">
-                                                    <strong>Id: </strong> ${response.data.AccountId}
-                                                    <input type="hidden" name="Id" id="Id" value="${response.data.AccountId}" />
-                                                </div>
-                                                <div class="form-group">
-                                                    <strong>Name: </strong> ${response.data.Name}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>Email: </strong> ${response.data.Email}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>Birthday: </strong>${(response.data.Birthday) == null ? "..." : response.data.Birthday}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>Address: </strong>${(response.data.Address) == null ? "..." : response.data.Address}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>Phone: </strong>${(response.data.Phone) == null ? "..." : response.data.Phone}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>NumberID: </strong>${(response.data.NumberID) == null ? "..." : response.data.NumberID}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>Status: </strong>${(response.data.Status) == null ? "..." : response.data.Status}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>RoleId: </strong> ${(response.data.RoleId) == null ? "..." : response.data.RoleId}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>CreatedAt: </strong> ${(response.data.CreatedAt) == null ? "..." : (new Date((parseInt((response.data.CreatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
-                                                </div>
-                                               <div class="form-group">
-                                                    <strong>UpdatedAt: </strong> ${(response.data.UpdatedAt) == null ? "..." : (new Date((parseInt((response.data.UpdatedAt).replace(/\D/g, ''))))).toLocaleDateString()}
-                                                </div>
-                                            </div>
-                                        `;
-                        $('.card-body').html(_html);
-                    }
-                })
-            },
-            get: function (id) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Home/FindId",
-                    data: { id: id },
-                    success: function (res) {
-                        $("#Id").val(res.AccountId);
-                        $("#Name").val(res.Name);
-                        $("#Email").val(res.Email);
-                        $("#Birthday").val(res.Birthday);
-                        $("#Address").val(res.Address);
-                        $("#NumberID").val(res.NumberID);
-                        $("#Phone").val(res.Phone);
-                        $("#Status").val(res.Status);
-                        $("#myModal").modal("show");
+                        $("#Name").val(response.data.Name);
+                        $("#Email").val(response.data.Email);
+                        $("#Phone").val(response.data.Phone);
+                        $("#Birthday").val(response.data.Birthday);
+                        $("#NumberID").val(response.data.NumberId);
+                        $("#Address").val(response.data.Address);
+                        $("#TextName").html(response.data.Name);
+                        $("#TextEmail").html(response.data.Email);
+                        $("#TextPhone").html(response.data.Phone);
+                        $("#TextStatus").html(response.data.StatusName);
+                        $("#RoleName").html(response.data.RoleName);
                     }
                 })
             },
@@ -172,8 +145,8 @@
                     url: "/Home/UpdateInfo",
                     data: user,
                     success: function (res) {
+                        console.log(res);
                         if (res.statusCode == 200) {
-                            $("#myModal").modal("hide");;
                             accounts.load();
                             toastr.success('Update Successfully')
                         }
@@ -184,24 +157,15 @@
         }
         $(function () {
             accounts.load();
-            $("#update").click(function () {
-                let userId = $("#Id").val();
-                let a = accounts.get(userId);
-            })
-            $("#btnSave").click(function () {
-                var today = new Date();
+            $("#btnUpdate").click(function () {
                 var user = {
                     Name: $("#Name").val(),
                     Email: $("#Email").val(),
-                    Birthday: $("#Birthday").val(),
-                    Address: $("#Address").val(),
                     Phone: $("#Phone").val(),
+                    Birthday: $("#Birthday").val(),
                     NumberID: $("#NumberID").val(),
-                    Status: $("#Status").val(),
-                    UpdatedAt: today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate()
+                    Address: $("#Address").val(),
                 }
-                let userId = $("#Id").val();
-                user.AccountId = userId;
                 console.log(user);
                 accounts.put(user);
             })
