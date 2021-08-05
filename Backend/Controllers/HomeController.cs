@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using OnlineBanking.DAL.Common;
+using System.Text.RegularExpressions;
 
 namespace Backend.Controllers
 {
@@ -114,32 +116,130 @@ namespace Backend.Controllers
                 return View();
             }
         }
-        [HttpPost]
-        public ActionResult Login(string email, string password)
+
+        //[HttpPost]
+        //public ActionResult Login(string email, string password)
+        //{
+        //    IRepository<Accounts> users = new Repository<Accounts>();
+        //    if (users.CheckDuplicate(x => x.Email == email))
+        //    {
+        //        var obj = users.Get(x => x.Email == email).FirstOrDefault();
+        //        if (password == obj.Password && obj.Status != ((int)AccountStatus.Locked) && obj.AttemptLogin < 3)
+        //        {
+        //            Session["userId"] = obj.AccountId;
+        //            Session["email"] = email;
+
+        //            obj.AttemptLogin = 0;
+        //            users.Update(obj);
+
+        //            if (obj.RoleId == 1)
+        //            {
+        //                Session["rold"] = "Admin";
+        //                return RedirectToAction("Index", "Admin/Home");
+        //            }
+        //            if (obj.RoleId == 2)
+        //            {
+        //                Session["rold"] = "TeleSopport";
+        //                return RedirectToAction("Index", "Admin/Home");
+        //            }
+        //            return RedirectToAction("Index", "Home");
+        //        }
+        //        else if (obj.AttemptLogin == 3)
+        //        {
+        //            obj.Status = ((int)AccountStatus.Locked);
+        //            users.Update(obj);
+        //        }
+        //        else
+        //        {
+        //            obj.AttemptLogin++;
+        //            users.Update(obj);
+        //        }
+        //    }
+        //    return View();
+        //}
+
+        public ActionResult CheckLogin(string email, string password)
         {
+            Dictionary<string, string> errors = new Dictionary<string, string>();
             IRepository<Accounts> users = new Repository<Accounts>();
-            if (users.CheckDuplicate(x => x.Email == email && x.Password == password))
+            if (users.CheckDuplicate(x => x.Email == email))
             {
-                var obj = users.Get(x => x.Email == email && x.Password == password).FirstOrDefault();
-                Session["userId"] = obj.AccountId;
-                Session["email"] = email;
-
-
-                if (obj.RoleId == 1)
+                var obj = users.Get(x => x.Email == email).FirstOrDefault();
+                if (password == obj.Password && obj.Status != ((int)AccountStatus.Locked) && obj.AttemptLogin < 3)
                 {
-                    Session["rold"] = "Admin";
-                    return RedirectToAction("Index", "Admin/Home");
-                }
-                if (obj.RoleId == 2)
-                {
-                    Session["rold"] = "TeleSopport";
-                    return RedirectToAction("Index", "Admin/Home");
-                }
+                    Session["userId"] = obj.AccountId;
+                    Session["email"] = email;
 
-                return RedirectToAction("Index", "Home");
+                    obj.AttemptLogin = 0;
+                    users.Update(obj);
+
+                    if (obj.RoleId == 1)
+                    {
+                        Session["rold"] = "Admin";
+                        return Json(new
+                        {
+                            statusCode = 200,
+                            message = "Success",
+                            url = "Admin/Home"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    if (obj.RoleId == 2)
+                    {
+                        Session["rold"] = "TeleSopport";
+                        return Json(new
+                        {
+                            statusCode = 200,
+                            message = "Success",
+                            url = "Admin/Home"
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success",
+                        url = "Home"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else if (obj.AttemptLogin == 3)
+                {
+                    obj.Status = ((int)AccountStatus.Locked);
+                    users.Update(obj);
+                    errors.Add("Email", "Your account is locked because you entered the wrong password more than 3 times!");
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error",
+                        data = errors
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    obj.AttemptLogin++;
+                    users.Update(obj);
+                    errors.Add("Password", "Your password is wrong!");
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error",
+                        data = errors
+                    }, JsonRequestBehavior.AllowGet);
+                }
             }
-            return View();
-
+            errors.Add("Email", "Email is not exists!");
+                
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error",
+                data = errors
+            }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult Logout()
@@ -156,6 +256,8 @@ namespace Backend.Controllers
         {
             DateTime time = DateTime.Now;
             acc.CreatedAt = time;
+            acc.RoleId = 0;
+            acc.AttemptLogin = 0;
             if (ModelState.IsValid)
             {
                 try

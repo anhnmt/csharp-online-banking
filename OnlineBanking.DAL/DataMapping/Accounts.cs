@@ -12,15 +12,22 @@ namespace OnlineBanking.DAL
     {
         [Key]
         public int AccountId { get; set; }
+        [Required]
         public string Name { get; set; }
+        [Required]
         public string Email { get; set; }
+        [Required]
+        [MinLength(6)]
         public string Password { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
         public DateTime? Birthday { get; set; }
         public int? Status { get; set; } // active, delete, lock
+        [DefaultValue(0)]
         public int RoleId { get; set; } // Quyền
         public int? NumberID { get; set; }
+        [DefaultValue(0)]
+        public int AttemptLogin { get; set; }
         [ForeignKey("RoleId")]
         public virtual Roles Role { get; set; }
 
