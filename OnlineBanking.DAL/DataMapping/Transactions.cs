@@ -15,7 +15,8 @@ namespace OnlineBanking.DAL
         public int ToId { get; set; }
         public int Status { get; set; }
         public double Amount { get; set; }
-        public double Balanced { get; set; }
+        public double BalancedTo { get; set; }
+        public double BalancedFrom { get; set; }
         public string Messages { get; set; }
 
         [ForeignKey("FromId")]

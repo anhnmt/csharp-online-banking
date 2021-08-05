@@ -161,9 +161,6 @@
                     success: function (res) {
                         let _html = "";
                         var ii = 1;
-                        //let data = res.data.sort(function (a, b) {
-                        //    return b.CreatedAt.localeCompare(a.CreatedAt);
-                        //});
                         console.log(res)
                         for (let item of res.data) {
                             
@@ -171,8 +168,8 @@
                                         <td>${ii}</td>
                                         <td>${(item.CreatedAt) == null ? "" : item.CreatedAt}</td>
                                         <td>${(item.Messages) == null ? "" : item.Messages}</td>
-                                        <td>${(item.Amount) == null ? "" : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.Amount)}</td>
-                                        <td>${(item.Balanced) == null ? "" : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.Balanced)}</td>
+                                        <td>${(item.Amount) == null ? "" : ((item.FromId == fromId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.Amount)}</td>
+                                        <td>${((item.FromId == fromId) ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.BalancedFrom) : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.BalancedTo)) }</td>
                                         <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
                                         <td class="btn-group"><button data-id="${item.TransactionId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.TransactionId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.TransactionId}" class='btn btn-danger'>Detele</button></td>
                                     </tr>`
@@ -200,6 +197,7 @@
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
                             let fromId = $("#fromId").val();
+                            console.log(res)
                             managerTran.load(fromId);
                             toastr.success('Created Successfully')
                         }
@@ -240,7 +238,7 @@
                 document.getElementById('infoSource').hidden = false;
                 document.getElementById('infoSource').innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: dataBalance[0].Currency }).format(dataBalance[0].Balance);
             });
-            $(document).on('blur', '#ToId', function () {
+            $(document).on('blur keydown', '#ToId', function () {
                 let dataInfoBankAccount;
                 if (this.value.length == 0) {
                     document.getElementById('text2').hidden = true;
