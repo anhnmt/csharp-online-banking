@@ -34,7 +34,7 @@ namespace Backend.Hubs
 
             if (!Utils.IsNullOrEmpty(account))
             {
-                Clients.All.addNewMessageToPage(account.Name, message + "--" + System.Web.HttpContext.Current.Session["userId"].ToString());
+                Clients.All.addNewMessageToPage(account.Name, message);
             }
 
 
