@@ -2233,6 +2233,7 @@
     <Content Include="Areas\Admin\Views\Channels\Details.cshtml" />
     <Content Include="Areas\Admin\Views\Channels\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Channels\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Transactions\ProfileAccountNumber.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
