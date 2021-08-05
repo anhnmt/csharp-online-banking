@@ -148,6 +148,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Hubs\ChatHub.cs" />
+    <Compile Include="Hubs\ConnectionMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
   </ItemGroup>
@@ -2228,15 +2229,12 @@
     <Content Include="Content\plugins\fontawesome\webfonts\fa-solid-900.woff2" />
     <Content Include="Areas\Admin\Views\Accounts\ProfileAccount.cshtml" />
     <Content Include="Areas\Admin\Views\BankAccounts\Index.cshtml" />
-    <Content Include="Areas\Admin\Views\Channels\Create.cshtml" />
-    <Content Include="Areas\Admin\Views\Channels\Delete.cshtml" />
-    <Content Include="Areas\Admin\Views\Channels\Details.cshtml" />
-    <Content Include="Areas\Admin\Views\Channels\Edit.cshtml" />
     <Content Include="Areas\Admin\Views\Channels\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Transactions\ProfileAccountNumber.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="Scripts\ChatHub.js" />
     <Content Include="Scripts\jquery-3.4.1.js" />
     <Content Include="Scripts\jquery-3.4.1.min.js" />
     <Content Include="Scripts\jquery-3.4.1.slim.js" />
