@@ -197,6 +197,7 @@ namespace Backend.Controllers
                 {
                     Session["userId"] = obj.AccountId;
                     Session["email"] = email;
+                    Session["name"] = obj.Name;
 
                     obj.AttemptLogin = 0;
                     users.Update(obj);
