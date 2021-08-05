@@ -74,7 +74,7 @@ namespace Backend.Areas.Admin.Controllers
         }
         public ActionResult GetData(int fromId,int page = 1, string key = null)
         {
-            var data = transactions.Get().Where(x => x.FromId == fromId).OrderByDescending(x=> x.CreatedAt).Select(x=> new TransactionsViewModels {
+            var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId).OrderByDescending(x=> x.CreatedAt).Select(x=> new TransactionsViewModels {
                 TransactionId = x.TransactionId,
                 FromId = x.FromId,
                 ToId = x.ToId,
@@ -83,8 +83,8 @@ namespace Backend.Areas.Admin.Controllers
                 Balanced = x.Balanced,
                 Status = x.Status,
                 StatusName = ((BankingActivity)x.Status).ToString(),
-                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
-                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy"),
+                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:ss"),
+                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:ss"),
             });
             int pageSize = 5;
             if (!string.IsNullOrEmpty(key))
