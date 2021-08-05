@@ -46,7 +46,8 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "admin@gmail.com",
                     Password = "123456",
                     RoleId = 1,
-                    Status = ((int)AccountStatus.Actived)
+                    Status = ((int)AccountStatus.Actived),
+                    AttemptLogin = 0,
                 },
                 new Accounts()
                 {
@@ -55,7 +56,8 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "tele@gmail.com",
                     Password = "123456",
                     RoleId = 2,
-                    Status = ((int)AccountStatus.Actived)
+                    Status = ((int)AccountStatus.Actived),
+                    AttemptLogin = 0,
                 },
                 new Accounts()
                 {
@@ -64,7 +66,8 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "tele2@gmail.com",
                     Password = "123456",
                     RoleId = 2,
-                    Status = ((int)AccountStatus.Actived)
+                    Status = ((int)AccountStatus.Actived),
+                    AttemptLogin = 0,
                 },
                 new Accounts()
                 {
@@ -73,7 +76,8 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "user@gmail.com",
                     Password = "123456",
                     RoleId = 3,
-                    Status = ((int)AccountStatus.Actived)
+                    Status = ((int)AccountStatus.Actived),
+                    AttemptLogin = 0,
                 },
                 new Accounts()
                 {
@@ -82,7 +86,8 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "user2@gmail.com",
                     Password = "123456",
                     RoleId = 3,
-                    Status = ((int)AccountStatus.Actived)
+                    Status = ((int)AccountStatus.Actived),
+                    AttemptLogin = 0,
                 }
             );
 
