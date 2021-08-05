@@ -25,15 +25,25 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult Transfers(Transactions tran)
         {
             var sourceAccount = bankaccounts.Get(tran.FromId);
+
             var receiverAccount = bankaccounts.Get(tran.ToId);
+            if (receiverAccount == null)
+            {
+                return Json(new
+                {
+                    data = "Số tài khoản không tồn tại",
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
             var balaceSource = sourceAccount.Balance;
-            if (balaceSource < tran.Balanced)
+            if (balaceSource < tran.Amount)
             {
                 return Json(new
                 {
                     data = "Số dư không đủ",
-                    message = "Success",
-                    statusCode = 200
+                    message = "Error",
+                    statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
             sourceAccount.Balance = balaceSource - tran.Amount;
@@ -42,8 +52,8 @@ namespace Backend.Areas.Admin.Controllers
                 return Json(new
                 {
                     data = "Lỗi trừ tiền tài khoản nguồn",
-                    message = "Success",
-                    statusCode = 200
+                    message = "Error",
+                    statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
             receiverAccount.Balance = receiverAccount.Balance + tran.Amount;
@@ -52,14 +62,15 @@ namespace Backend.Areas.Admin.Controllers
                 return Json(new
                 {
                     data = "Lỗi cộng tiền tài khoản đích",
-                    message = "Success",
-                    statusCode = 200
+                    message = "Error",
+                    statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
             tran.Status = 1;
             tran.CreatedAt = DateTime.Now;
             tran.UpdatedAt = DateTime.Now;
-            tran.Balanced = sourceAccount.Balance;
+            tran.BalancedFrom = sourceAccount.Balance;
+            tran.BalancedTo = receiverAccount.Balance;
             if (string.IsNullOrEmpty(tran.Messages))
             {
                 tran.Messages = "Tranfers from " + tran.FromId + " to " + tran.ToId;
@@ -80,7 +91,8 @@ namespace Backend.Areas.Admin.Controllers
                 ToId = x.ToId,
                 Amount = x.Amount,
                 Messages = x.Messages,
-                Balanced = x.Balanced,
+                BalancedFrom = x.BalancedFrom,
+                BalancedTo = x.BalancedTo,
                 Status = x.Status,
                 StatusName = ((BankingActivity)x.Status).ToString(),
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:ss"),

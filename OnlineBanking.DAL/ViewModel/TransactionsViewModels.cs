@@ -14,7 +14,8 @@ namespace OnlineBanking.DAL
         public int Status { get; set; }
         public string StatusName { get; set; }
         public double Amount { get; set; }
-        public double Balanced { get; set; }
+        public double BalancedTo { get; set; }
+        public double BalancedFrom { get; set; }
         public string Messages { get; set; }
         public string CreatedAt { get; set; }
         public string UpdatedAt { get; set; }

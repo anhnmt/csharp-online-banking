@@ -90,7 +90,7 @@ namespace Backend.Controllers
                 acc1.Name = acc.Name;
                 acc1.Email = acc.Email;
                 acc1.Phone = acc.Phone;
-                acc1.Birthday = DateTime.Parse(acc.Birthday);
+                acc1.Birthday = (acc.Birthday == null) ? DateTime.Parse("01-01-1970") : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberID = acc.NumberID;
                 acc1.UpdatedAt = DateTime.Now;

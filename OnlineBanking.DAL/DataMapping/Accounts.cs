@@ -21,6 +21,7 @@ namespace OnlineBanking.DAL
         public string Password { get; set; }
         public string Phone { get; set; }
         public string Address { get; set; }
+        [DefaultValue("01-01-1970")]
         public DateTime? Birthday { get; set; }
         public int? Status { get; set; } // active, delete, lock
         [DefaultValue(0)]
