@@ -136,7 +136,6 @@
                         Term: $("#Term").val(),
                     },
                     success: function (res) {
-                        console.log(res.data);
                         if (res.statusCode == 400) {
                             validator.showErrors(res.data);
                         } else if (res.statusCode == 200) {
