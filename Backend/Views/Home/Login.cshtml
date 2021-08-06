@@ -20,8 +20,13 @@
     <link rel="stylesheet" href="~/Content/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/Content/style.css">
 </head>
 <body class="hold-transition login-page">
+    <!-- Preloader -->
+    <div class="preloader flex-column justify-content-center align-items-center">
+        <img src="~/Content/dist/img/loading.gif" alt="AdminLTELogo" height="100" width="100">
+    </div>
     <div class="login-box">
         <!-- /.login-logo -->
         <div class="card card-outline card-primary">
@@ -69,7 +74,7 @@
                     </div>
                 </form>
 
-                
+
                 <!-- /.social-auth-links -->
 
                 <p class="mb-1">
@@ -108,14 +113,22 @@
                 $.ajax({
                     type: "POST",
                     url: "/Home/CheckLogin",
-                    data: { Email: $("#Email").val(), Password: $("#Password").val()},
+                    data: { Email: $("#Email").val(), Password: $("#Password").val() },
                     success: function (res) {
-                        if (res.statusCode == 400) {
-                            validator.showErrors(res.data);
-                        } else if (res.statusCode == 200) {
-                            window.location.replace(`/${res.url}`);
-                        }
-                    }
+                        setTimeout(() => {
+                            if (res.statusCode == 400) {
+                                validator.showErrors(res.data);
+                                $(".preloader").css('height', 0);
+                                $(".preloader").children().hide();
+                            } else if (res.statusCode == 200) {
+                                window.location.replace(`/${res.url}`);
+                            }
+                        }, 1000);
+                    },
+                    beforeSend: function () {
+                        $(".preloader").css('height', "100%");
+                        $(".preloader").children().show();
+                    },
                 })
             }
         });

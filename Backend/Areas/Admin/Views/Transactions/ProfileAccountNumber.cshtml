@@ -190,7 +190,7 @@
             },
             post: function (tran) {
                 $.ajax({
-                    type: "GET",
+                    type: "POST",
                     url: "/Admin/Transactions/Transfers",
                     data: tran,
                     success: function (res) {
@@ -200,6 +200,9 @@
                             console.log(res)
                             managerTran.load(fromId);
                             toastr.success('Created Successfully')
+                        } else {
+                            console.log(res)
+                            toastr.error('Created Fail')
                         }
                     }
                 })
@@ -264,7 +267,11 @@
                     ToId: $("#BankId").val(),
                     Amount: $("#Amount").val()
                 }
-                managerTran.post(tran);
+                //managerTran.post(tran);
+                for (var i = 0; i < 10; i++) {
+                    setTimeout(managerTran.post(tran),5000);
+                }
+                
                 
             })
         })
