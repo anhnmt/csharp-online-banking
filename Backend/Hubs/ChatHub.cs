@@ -17,7 +17,8 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-        public static ConcurrentDictionary<string, List<string>> sessionConnections = new ConcurrentDictionary<string, List<string>>();
+        public static ConcurrentDictionary<string, List<string>> allSessions = new ConcurrentDictionary<string, List<string>>();
+        public static ConcurrentDictionary<string, List<string>> channelSessions = new ConcurrentDictionary<string, List<string>>();
         private static List<Accounts> _accounts = new List<Accounts>();
         private static List<Channels> _channels = new List<Channels>();
         private IRepository<Accounts> accountRepo;
@@ -37,32 +38,33 @@ namespace Backend.Hubs
             {
                 var accountId = getIntegerAccountId();
 
-                var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+                var account = findAccountByAccountId(accountId);
 
                 if (!Utils.IsNullOrEmpty(account))
                 {
                     userSendMessage(account, message);
                 }
             }
-
-
-            //Clients.Caller.showErrorMessage("The user is no longer connected.");
-            //foreach (var connectionId in _connections.GetConnections(who))
-            //{
-            //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
-            //}
         }
 
         public void Reply(int accountId, string message)
         {
             if (!Utils.IsNullOrEmpty(message))
             {
-                var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+                var account = findAccountByAccountId(accountId);
 
                 if (!Utils.IsNullOrEmpty(account))
                 {
                     userSendMessage(account, message);
                 }
+            }
+        }
+
+        public void ConnectChannel(string channelId)
+        {
+            if (!Utils.IsNullOrEmpty(channelId))
+            {
+                addChannelSession(channelId, Context.ConnectionId);
             }
         }
 
@@ -92,6 +94,8 @@ namespace Backend.Hubs
                 channelRepo.Add(channel);
             }
 
+            addChannelSession(account.AccountId.ToString(), Context.ConnectionId);
+
             var messageObj = new Messages
             {
                 AccountId = account.AccountId,
@@ -102,7 +106,7 @@ namespace Backend.Hubs
 
             if (messageRepo.Add(messageObj))
             {
-                sendMessageToChannel(channel.ChannelId, messageObj);
+                sendMessageToAdmin(channel.ChannelId, account, messageObj);
             }
 
         }
@@ -112,39 +116,76 @@ namespace Backend.Hubs
             return channelRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
         }
 
-        private void sendMessageToChannel(int channelId, Messages message)
+        private Accounts findAccountByAccountId(int accountId)
         {
-            Clients.All.addNewMessageToPage(message.AccountId, message.Content);
-
-            //Clients.Caller.showErrorMessage("The user is no longer connected.");
-            //foreach (var connectionId in _connections.GetConnections(who))
-            //{
-            //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
-            //}
+            return accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
         }
 
-        private void sendMessageToAccountId(int accountId)
+        private void sendMessageToAdmin(int channelId, Accounts account, Messages message)
         {
-            Clients.All.addNewMessageToPage("", "");
+
+            List<Accounts> _accounts = accountRepo.Get(x => x.RoleId == 1 || x.RoleId == 2 || x.AccountId == account.AccountId).ToList();
+            //Clients.Caller.showErrorMessage("The user is no longer connected.");
+
+            if (!Utils.IsNullOrEmpty(_accounts))
+            {
+                _accounts.ForEach(x =>
+                {
+                    allSessions.TryGetValue(x.AccountId.ToString(), out List<string> existingConnectionAccounts);
+
+                    if (!Utils.IsNullOrEmpty(existingConnectionAccounts))
+                    {
+                        existingConnectionAccounts.ForEach(connectionId =>
+                        {
+                            Clients.Client(connectionId).addNewMessageToPage(account.Name, message.Content);
+                        });
+                    }
+                });
+            }
         }
 
         private void addConnection(string connection)
         {
             var accountId = getAccountId();
 
-            sessionConnections.TryGetValue(accountId, out List<string> existingConnectionAccounts);
+            allSessions.TryGetValue(accountId, out List<string> existingConnections);
 
-            // happens on the very first connection from the user
-            if (existingConnectionAccounts == null)
+            if (existingConnections == null)
             {
-                existingConnectionAccounts = new List<string>();
+                existingConnections = new List<string>();
             }
 
-            // First add to a List of existing user connections (i.e. multiple web browser tabs)
-            existingConnectionAccounts.Add(connection);
+            existingConnections.Add(connection);
 
-            // Add to the global dictionary of connected users
-            sessionConnections.TryAdd(accountId, existingConnectionAccounts);
+            allSessions.TryAdd(accountId, existingConnections);
+
+            addChannelSession(accountId, connection);
+        }
+
+        private void addChannelSession(string accountId, string connection)
+        {
+            removeConnection(channelSessions, connection);
+
+            var account = findAccountByAccountId(int.Parse(accountId));
+
+            if (!Utils.IsNullOrEmpty(account))
+            {
+                var channel = findChannelByAccountId(account.AccountId);
+
+                if (!Utils.IsNullOrEmpty(channel))
+                {
+                    channelSessions.TryGetValue(channel.ChannelId.ToString(), out List<string> existingConnections);
+
+                    if (existingConnections == null)
+                    {
+                        existingConnections = new List<string>();
+                    }
+
+                    existingConnections.Add(connection);
+
+                    channelSessions.TryAdd(channel.ChannelId.ToString(), existingConnections);
+                }
+            }
         }
 
         public override Task OnReconnected()
@@ -160,7 +201,8 @@ namespace Backend.Hubs
         {
             var connection = Context.ConnectionId;
 
-            removeConnection(connection);
+            removeConnection(allSessions, connection);
+            removeConnection(channelSessions, connection);
 
             return base.OnDisconnected(stopCalled);
         }
@@ -177,20 +219,20 @@ namespace Backend.Hubs
         private List<string> getConnectionByAccountId(string accountId)
         {
             List<string> connectionAccounts;
-            sessionConnections.TryGetValue(accountId, out connectionAccounts);
+            allSessions.TryGetValue(accountId, out connectionAccounts);
 
             return connectionAccounts;
         }
 
 
-        private KeyValuePair<string, List<string>> getConnectedAccount(string connection)
+        private KeyValuePair<string, List<string>> getConnectionKey(ConcurrentDictionary<string, List<string>> sessions, string connection)
         {
-            return sessionConnections.FirstOrDefault(x => x.Value.Contains(connection));
+            return sessions.FirstOrDefault(x => x.Value.Contains(connection));
         }
 
-        private void removeConnection(string connection)
+        private void removeConnection(ConcurrentDictionary<string, List<string>> sessions, string connection)
         {
-            var account = getConnectedAccount(connection);
+            var account = getConnectionKey(sessions, connection);
 
             if (!Utils.IsNullOrEmpty(account))
             {
@@ -203,7 +245,10 @@ namespace Backend.Hubs
                 }
                 else
                 {
-                    sessionConnections.TryRemove(key, out value);
+                    if (!Utils.IsNullOrEmpty(key))
+                    {
+                        sessions.TryRemove(key, out value);
+                    }
                 }
             }
         }
