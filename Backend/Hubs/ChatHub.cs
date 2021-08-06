@@ -48,6 +48,8 @@ namespace Backend.Hubs
 
         public void Reply(int channelId, string message)
         {
+            AddChannelSession(channelId.ToString(), Context.ConnectionId);
+
             if (!Utils.IsNullOrEmpty(message))
             {
                 var account = FindAccountByAccountId(GetIntegerAccountId());
@@ -60,14 +62,6 @@ namespace Backend.Hubs
             }
         }
 
-        public void ConnectChannel(string channelId)
-        {
-            if (!Utils.IsNullOrEmpty(channelId))
-            {
-                AddChannelSession(channelId, Context.ConnectionId);
-            }
-        }
-
         public IEnumerable<Accounts> GetOnlineUsers()
         {
             return _accounts;
@@ -75,8 +69,6 @@ namespace Backend.Hubs
 
         private void sendListOnline()
         {
-
-
             Clients.All.onlineList();
         }
 
@@ -103,15 +95,6 @@ namespace Backend.Hubs
 
         private void AdminReplyMessage(Channels channel, Accounts account, string message)
         {
-            if (Utils.IsNullOrEmpty(channel))
-            {
-                channel = new Channels
-                {
-                    AccountId = account.AccountId
-                };
-                channelRepo.Add(channel);
-            }
-
             AddChannelSession(channel.ChannelId.ToString(), Context.ConnectionId);
 
             var messageObj = new Messages
@@ -238,7 +221,7 @@ namespace Backend.Hubs
 
         private void AddChannelSession(string accountId, string connection)
         {
-            RemoveConnection(channelSessions, connection);
+            RemoveConnection(channelSessions, accountId);
 
             var account = FindAccountByAccountId(int.Parse(accountId));
 
