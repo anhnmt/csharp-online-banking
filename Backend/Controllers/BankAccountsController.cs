@@ -7,7 +7,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Backend.Areas.Admin.Controllers
+namespace Backend.Controllers
 {
     public class BankAccountsController : Controller
     {
@@ -75,6 +75,15 @@ namespace Backend.Areas.Admin.Controllers
                 Name = x.Account.Name,
                 Id = x.BankAccountId
             });
+            if (data.FirstOrDefault() == null)
+            {
+                return Json(new
+                {
+                    data = data,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
             return Json(new
             {
                 data = data,

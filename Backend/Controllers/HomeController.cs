@@ -12,9 +12,11 @@ namespace Backend.Controllers
     public class HomeController : Controller
     {
         private IRepository<Accounts> accounts;
+        private IRepository<BankAccounts> bankaccounts;
         public HomeController()
         {
             accounts = new Repository<Accounts>();
+            bankaccounts = new Repository<BankAccounts>();
         }
         public ActionResult Index()
         {
@@ -27,6 +29,69 @@ namespace Backend.Controllers
             {
                 return RedirectToAction("Login");
             }
+        }
+        public ActionResult GetDataBankAccount(int Account)
+        {
+            ViewBag.Accounts = "active";
+            var data = bankaccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
+            {
+                AccountId = x.AccountId,
+                BankAccountId = x.BankAccountId,
+                CurrencyId = x.CurrencyId,
+                CurrencyName = x.Currency.Name,
+                Name = x.Name,
+                Balance = x.Balance,
+                Status = x.Status,
+                StatusName = ((BankAccountStatus)x.Status).ToString()
+            });
+            return Json(new
+            {
+                data = data,
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+
+        }
+        [HttpPost]
+        public ActionResult CreateBankAccount(BankAccounts bank)
+        {
+            if (ModelState.IsValid)
+            {
+                bank.Balance = 0;
+                Random random = new Random();
+                string number = string.Empty;
+                check_number:
+                for (int i = 0; i < 11; i++)
+                {
+                    number += random.Next(10).ToString();
+                }
+                while (true)
+                {
+                    if (bankaccounts.Get().Where(x => x.Name == number).FirstOrDefault() != null)
+                    {
+                        goto check_number;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                bank.Name = number;
+                bank.Status = 2;
+                bank.CreatedAt = DateTime.Now;
+                bankaccounts.Add(bank);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error",
+                data = bank
+            }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult PageNotFound()
         {

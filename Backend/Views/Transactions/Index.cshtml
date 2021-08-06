@@ -1,0 +1,209 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Funds Transfer</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+                    <li class="breadcrumb-item active">Funds Transfer</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="col-md-12">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Funds Transfer</h3>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="type" id="type" value="CREATE" />
+                <form method="post" id="Form">
+                    <div class="form-group">
+                        <label for="exampleInputName">Source Account</label>
+                        <select class="form-control" id="FromId" placeholder="Account Number...">
+                            <option value="" selected >Choose here</option>
+                        </select>
+                        <span class="text-dark font-weight-bold" id="text1" style="display: none">Balance: </span>
+                        <span class="text-danger font-weight-bold" id="infoSource"  style="display: none"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Receiver Infomation </label>
+                        <input type="text" class="form-control" id="ToId" placeholder="Receiver Account..." disabled>
+                        <input type="hidden" class="form-control" id="BankId">
+                        <span class="text-dark font-weight-bold" id="text2"  style="display: none">Name: </span>
+                        <span class="text-danger font-weight-bold" id="infoReceiver"  style="display: none"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Amount </label>
+                        <input type="text" class="form-control" id="Amount" placeholder="Amount..." disabled>
+                        <span class="text-danger font-weight-bold"></span>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+    <!-- Default box -->
+    <!-- /.card -->
+
+</section>
+@section scripts{
+    <script>
+        function loadAccountNumber(accountId) {
+            let data;
+            $.ajax({
+                type: "GET",
+                url: "/BankAccounts/GetData",
+                data: { Account: accountId },
+                async: false,
+                success: function (res) {
+                    console.log(res)
+                    var html;
+                    $.each(res.data, function (key, value) {
+                        html += "<option value = '" + value.BankAccountId + "'  >" + value.Name + " </option>";
+                    });
+                    $('#FromId').append(html);
+                    data = res.data;
+                }
+            });
+            return data;
+        }
+        function loadBalance(bankId) {
+            let data;
+            $.ajax({
+                type: "POST",
+                url: "/BankAccounts/GetBanlace",
+                data: { bankId: bankId },
+                async: false,
+                success: function (res) {
+                    data = res.data;
+                }
+
+            });
+            return data;
+        }
+        function transfer (tran) {
+            $.ajax({
+                type: "POST",
+                url: "/Transactions/Transfers",
+                data: tran,
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        $("#myModal").modal("hide");
+                        let fromId = $("#fromId").val();
+                        console.log(res)
+                        toastr.success('Created Successfully')
+                        sleep(3000).then(() => {
+                            let bankId = $("#FromId").val();
+                            window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
+                        });
+                    } else {
+                        console.log(res)
+                        toastr.error(res.data)
+                    }
+                }
+            })
+        }
+        function loadInfoBankAccount(name) {
+            let data;
+            $.ajax({
+                type: "GET",
+                url: "/BankAccounts/GetInfoBankAccount",
+                data: { name: name },
+                async: false,
+                success: function (res) {
+                    if (res.statusCode == 200) {
+                        data = res;
+                    } else {
+                        data = res;
+                        console.log(res);
+                        toastr.error(res.message);
+                    }
+                }
+
+            });
+            return data;
+        }
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+        $(function () {
+            loadAccountNumber("@Session["userId"]");
+            $("#Form").trigger("reset");
+
+            $(document).on('change', '#FromId', function () {
+                if ($("#FromId").val() == "") {
+                    $('#text1').css('display', 'none');
+                    $('#infoSource').css('display', 'none');
+                    $('#ToId').prop('disabled', true);
+                    $('#Amount').prop('disabled', true);
+                } else {
+                    let dataBalance = loadBalance(this.value)
+                    $('#text1').css('display', 'inline-block');
+                    $('#infoSource').css('display', 'inline-block');
+                    $('#infoSource').html(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: dataBalance[0].Currency }).format(dataBalance[0].Balance));
+                    $('#ToId').prop('disabled', false);
+                    $('#Amount').prop('disabled', false);
+                }
+            });
+            $(document).on('blur', '#ToId', function () {
+                let dataInfoBankAccount;
+                if (this.value.length == 0) {
+                    $('#text2').css('display', 'none');
+                    $('#infoReceiver').css('display', 'none');
+                } else {
+                    dataInfoBankAccount = loadInfoBankAccount(this.value);
+                    $('#text2').css('display', 'inline-block');
+                }
+                if (dataInfoBankAccount.statusCode == 200) {
+                    $("#BankId").val(dataInfoBankAccount.data[0].Id);
+                    $('#infoReceiver').css('display', 'inline-block');
+                    $('#infoReceiver').html(dataInfoBankAccount.data[0].Name);
+                } else {
+                    $("#BankId").val("");
+                    $('#infoReceiver').css('display', 'inline-block');
+                    $('#infoReceiver').html("Account doesn't exist");
+                }
+            });
+            $(document).on("keyup", "#Amount", function () {
+                if ($("#Amount").val()[0] == "0") {
+                    toastr.error("Nhập sai")
+                    $("#Amount").val("")
+                }
+            })
+            $(document).on("click", "#btnSave", function () {
+                var today = new Date();
+                var tran = {
+                    FromId: $("#FromId").val(),
+                    ToId: $("#BankId").val(),
+                    Amount: $("#Amount").val()
+                }
+                if (tran.Amount[0] == "0") {
+                    toastr.error("Nhập sai")
+                } else {
+                    transfer(tran)
+                }
+
+            })
+           
+        })
+    </script>
+    }
+<!-- /.content -->

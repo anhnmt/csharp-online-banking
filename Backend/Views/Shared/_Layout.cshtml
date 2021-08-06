@@ -14,8 +14,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="~/Content/plugins/fontawesome/css/all.min.css">
     <!-- Theme style -->
+    <link href="~/Content/plugins/toastr/toastr.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="~/Content/style.css">
+
     @RenderSection("css", required: false)
     <style>
         .chat-popup {
@@ -81,7 +83,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <a href="index3.html" class="nav-link active">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a href="#" class="nav-link">Funds Transfer</a>
+                            <a href="@Url.Action("Index","Transactions")" class="nav-link">Funds Transfer</a>
                         </li>
                     </ul>
                 </div>
@@ -256,6 +258,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Bootstrap 4 -->
     <script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- AdminLTE App -->
+    <script src="~/Content/plugins/toastr/toastr.min.js"></script>
     <script src="~/Content/dist/js/adminlte.min.js"></script>
     <!-- AdminLTE for demo purposes -->
     <script src="~/Content/dist/js/demo.js"></script>
