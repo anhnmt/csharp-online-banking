@@ -15,9 +15,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="~/Content/plugins/fontawesome/css/all.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
+    <link rel="stylesheet" href="~/Content/style.css">
     @RenderSection("css", required: false)
 </head>
 <body class="hold-transition sidebar-collapse layout-top-nav">
+    <!-- Preloader -->
+    <div class="preloader flex-column justify-content-center align-items-center">
+        <img class="animation__shake" src="~/Content/dist/img/AdminLTELogo.png" alt="AdminLTELogo" height="60" width="60">
+    </div>
     <div class="wrapper">
         <!-- Navbar -->
         <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
