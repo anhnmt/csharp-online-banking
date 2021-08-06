@@ -13,7 +13,7 @@ namespace OnlineBanking.DAL
         public int BankAccountId { get; set; }
         public int AccountId { get; set; }
         public int CurrencyId { get; set; }
-        public int Name { get; set; }
+        public string Name { get; set; }
         public double Balance { get; set; }
         public int Status { get; set; }
 

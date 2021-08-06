@@ -7,13 +7,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Blank Page</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Blank Page</li>
-                    </ol>
+                    <h1>Home</h1>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -21,7 +15,9 @@
 
     <!-- Main content -->
     <section class="content">
-        <div class="col-md-4">
+        
+        <div class="col-md-12">
+            <a href="#" class="btn btn-primary mb-3 btn-add">Create New Account</a>
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">Account Number</h3>
@@ -29,7 +25,7 @@
                 <div class="card-body">
                     <table class="table">
                         <tr>
-                            <th>Name</th>
+                            <th>Account Number</th>
                             <th>CurrencyId</th>
                             <th>Balance</th>
                             <th>Status </th>
@@ -47,35 +43,118 @@
         <!-- /.card -->
 
     </section>
+    <div class="modal fade" id="myModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-MoneyManament">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="BankAccountId" id="BankAccountId" value="" />
+                    <input type="hidden" name="type" id="type" value="CREATE" />
+                    <form method="post" id="Form2">
+                        <div class="form-group">
+                            <div class="col-md-6">
+                                <label for="exampleInputClass">Currency</label>
+                                <select class="form-control" id="CurrencyId" name="CurrencyId">
+                                </select>
+                                <span class="error text-danger"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- /.content -->
 @section scripts{
     <script>
-        var managerAcc = {
-            load: function () {
+        function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/Currencies/GetData",
+                data: { page: page, key: key, pageSize: pageSize },
+                success: function (res) {
+                    var html;
+                    $.each(res.data, function (key, value) {
+                        html += "<option value = '" + value.CurrencyId + "' " + (CurrencyId == value.CurrencyId ? 'selected' : '') + ">" + value.Name + " </option>";
+                    });
+                    $('#CurrencyId').html(html);
+                }
+            })
+        }
+        var managerAccBank = {
+            load: function (accountId) {
                 $.ajax({
                     type: "GET",
-                    url: "/Admin/User/GetData",
+                    url: "/Home/GetDataBankAccount",
+                    data: { Account: accountId },
                     success: function (res) {
                         let _html = "";
                         for (let item of res.data) {
                             _html += `<tr>
                                             <td>${item.Name}</td>
-                                            <td>${item.CurrencyId}</td>
-                                            <td>${item.Balance}</td>
-                                            <td>${item.Status}</td>
-                                            <td><button data-id="${item.Id}" class='btn btn-warning btn-edit'>Sửa</button> | <button  class='btn btn-danger'>Xóa</button></td>
+                                            <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: item.CurrencyName }).format(item.Balance)}</td>
+                                            <td>${item.CurrencyName}</td>
+                                            <td>${item.StatusName}</td>
+                                            <td><button data-id="${item.BankAccountId}" class='btn btn-detail btn-primary'>Detail</button></td>
                                           </tr>`
                         }
                         $('#tbl_user').html(_html);
                         var pages = '';
-                        
-                        $(".pagination").html(pages);
                     }
                 });
-            }
+            },
+            post: function (bank) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/CreateBankAccount",
+                    data: bank,
+                    success: function (res) {
+                        console.log(bank)
+                        if (res.statusCode == 200) {
+                            $("#myModal").modal("hide");
+                            managerAccBank.load("@Session["userId"]");
+                            toastr.success('Created Successfully')
+                        }
+                    }
+                })
+            },
         }
         $(function () {
-            managerAcc.load();
+            managerAccBank.load("@Session["userId"]");
+            $(document).on("click", ".btn-add", function () {
+                loadCurrency();
+                $("#myModal").modal("show");
+                $(".modal-title").html("Create Account Number");
+            })
+            $(document).on("click", "#btnSave", function () {
+                var today = new Date();
+                var bank = {
+                    AccountId: "@Session["userId"]",
+                    CurrencyId: $("#CurrencyId").val()
+                };
+                if ($("#type").val() == "EDIT") {
+                    bank.BankAccountId = $("#Id").val(),
+                        managerBank.put(user);
+                } else if ($("#type").val() == "TRANSFER") {
+                    let accountNumber = $("#AccountNumberManament").val();
+                    let balance = $("#BalanceManament").val();
+                    managerBank.receiveMoney(accountNumber, balance);
+                } else {
+                    managerAccBank.post(bank);
+                }
+            })
+            $(document).on("click", ".btn-detail", function () {
+                let bankId = $(this).data("id");
+                window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
+            })
+
         })
     </script>
     }
