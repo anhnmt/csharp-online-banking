@@ -17,9 +17,9 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-        public static ConcurrentDictionary<string, string> adminSessions = new ConcurrentDictionary<string, string>();
-        public static ConcurrentDictionary<string, string> userSessions = new ConcurrentDictionary<string, string>();
-        public static ConcurrentDictionary<string, string> channelSessions = new ConcurrentDictionary<string, string>();
+        public static ConcurrentDictionary<string, List<string>> adminSessions = new ConcurrentDictionary<string, List<string>>();
+        public static ConcurrentDictionary<string, List<string>> userSessions = new ConcurrentDictionary<string, List<string>>();
+        public static ConcurrentDictionary<string, List<string>> channelSessions = new ConcurrentDictionary<string, List<string>>();
         private static List<Accounts> _accounts = new List<Accounts>();
         private static List<Channels> _channels = new List<Channels>();
         private IRepository<Accounts> accountRepo;
@@ -84,14 +84,8 @@ namespace Backend.Hubs
         private void UserSendMessage(Accounts account, string message)
         {
             var channel = FindChannelByAccountId(account.AccountId);
-            if (Utils.IsNullOrEmpty(channel))
-            {
-                channel = new Channels();
-                channel.AccountId = account.AccountId;
-                channelRepo.Add(channel);
-            }
 
-            AddChannelSession(account.AccountId.ToString(), Context.ConnectionId);
+            AddChannelSession(channel.ChannelId.ToString(), Context.ConnectionId);
 
             var messageObj = new Messages
             {
@@ -118,7 +112,7 @@ namespace Backend.Hubs
                 channelRepo.Add(channel);
             }
 
-            AddChannelSession(account.AccountId.ToString(), Context.ConnectionId);
+            AddChannelSession(channel.ChannelId.ToString(), Context.ConnectionId);
 
             var messageObj = new Messages
             {
@@ -130,7 +124,7 @@ namespace Backend.Hubs
 
             if (messageRepo.Add(messageObj))
             {
-                SendMessageToAdmin(channel.ChannelId, account, messageObj);
+                ReplyMessageToUser(channel.ChannelId, account, messageObj);
             }
         }
 
@@ -141,7 +135,18 @@ namespace Backend.Hubs
 
         private Channels FindChannelByAccountId(int accountId)
         {
-            return channelRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+            var channel = channelRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+
+            if (Utils.IsNullOrEmpty(channel))
+            {
+                channel = new Channels
+                {
+                    AccountId = accountId
+                };
+                channelRepo.Add(channel);
+            }
+
+            return channel;
         }
 
         private Accounts FindAccountByAccountId(int accountId)
@@ -157,15 +162,22 @@ namespace Backend.Hubs
             if (!Utils.IsNullOrEmpty(_accounts))
             {
                 List<string> adminConnections = new List<string>();
-                //var output = new Object { Name = account.Name, Content = message.Content };
+
+                adminConnections.Add(Context.ConnectionId);
 
                 _accounts.ForEach(x =>
                 {
-                    adminSessions.TryGetValue(x.AccountId.ToString(), out string connectionId);
+                    adminSessions.TryGetValue(x.AccountId.ToString(), out List<string> existingConnections);
 
-                    if (!Utils.IsNullOrEmpty(connectionId) && !adminConnections.Contains(connectionId))
+                    if (!Utils.IsNullOrEmpty(existingConnections))
                     {
-                        adminConnections.Add(connectionId);
+                        existingConnections.ForEach(connectionId =>
+                        {
+                            if (!adminConnections.Contains(connectionId))
+                            {
+                                adminConnections.Add(connectionId);
+                            }
+                        });
                     }
                 });
 
@@ -174,23 +186,54 @@ namespace Backend.Hubs
                     adminConnections.ForEach(connectionId =>
                     {
                         Clients.Client(connectionId).addNewMessageToPage(account.Name, message.Content);
-                        Clients.Client(connectionId).reloadChatData();
                     });
                 }
-            }
 
-            Clients.Client(Context.ConnectionId).addNewMessageToPage(account.Name, message.Content);
+                Clients.All.reloadChatData();
+            }
         }
 
-        private void AddConnection(ConcurrentDictionary<string, string> sessions, string connection)
+        private void ReplyMessageToUser(int channelId, Accounts account, Messages message)
+        {
+            List<string> channelConnections = new List<string>();
+
+            channelConnections.Add(Context.ConnectionId);
+
+            channelSessions.TryGetValue(channelId.ToString(), out List<string> existingConnections);
+
+            if (!Utils.IsNullOrEmpty(existingConnections))
+            {
+                existingConnections.ForEach(connectionId =>
+                {
+                    if (!channelConnections.Contains(connectionId))
+                    {
+                        channelConnections.Add(connectionId);
+                    }
+                });
+            }
+
+            if (!Utils.IsNullOrEmpty(channelConnections))
+            {
+                channelConnections.ForEach(connection =>
+                {
+                    Clients.Client(connection).addNewMessageToPage(account.Name, message.Content);
+                });
+
+                Clients.All.reloadChatData();
+            }
+        }
+
+        private void AddConnection(ConcurrentDictionary<string, List<string>> sessions, string connection)
         {
             var accountId = GetAccountId();
 
-            sessions.TryGetValue(accountId, out string existingConnections);
+            sessions.TryGetValue(accountId, out List<string> existingConnections);
 
-            sessions.TryAdd(accountId, connection);
+            if (existingConnections == null) existingConnections = new List<string>();
 
-            //AddChannelSession(accountId, connection);
+            existingConnections.Add(connection);
+
+            sessions.TryAdd(accountId, existingConnections);
         }
 
         private void AddChannelSession(string accountId, string connection)
@@ -205,9 +248,13 @@ namespace Backend.Hubs
 
                 if (!Utils.IsNullOrEmpty(channel))
                 {
-                    channelSessions.TryGetValue(channel.ChannelId.ToString(), out string existingConnections);
+                    channelSessions.TryGetValue(channel.ChannelId.ToString(), out List<string> existingConnections);
 
-                    channelSessions.TryAdd(channel.ChannelId.ToString(), connection);
+                    if (existingConnections == null) existingConnections = new List<string>();
+
+                    existingConnections.Add(connection);
+
+                    channelSessions.TryAdd(channel.ChannelId.ToString(), existingConnections);
                 }
             }
         }
@@ -254,6 +301,10 @@ namespace Backend.Hubs
                 else
                 {
                     AddConnection(userSessions, connection);
+
+                    var channel = FindChannelByAccountId(account.AccountId);
+
+                    AddChannelSession(channel.ChannelId.ToString(), connection);
                 }
             }
         }
@@ -267,50 +318,38 @@ namespace Backend.Hubs
         {
             return Context.QueryString["userId"].ToString();
         }
-        private string GetConnectionByAccountId(ConcurrentDictionary<string, string> sessions, string accountId)
+        private List<string> GetConnectionByAccountId(ConcurrentDictionary<string, List<string>> sessions, string accountId)
         {
-            string connectionAccounts;
+            List<string> connectionAccounts;
             sessions.TryGetValue(accountId, out connectionAccounts);
 
             return connectionAccounts;
         }
 
-        private List<string> FilterDuplicateConnections(string connections)
-        {
-            var keys = new List<string>();
-            var values = new List<string>();
-
-            //connections.ToList().ForEach(x =>
-            //{
-            //    var session = GetConnectionKey(allSessions, x);
-
-            //    if (!keys.Contains(session.Key))
-            //    {
-            //        values.Add(x);
-            //    }
-            //});
-
-            //connections.Where(x => GetConnectionKey(channelSessions, x).Key == x.Key);
-
-            return values;
-        }
-
-        private KeyValuePair<string, string> GetConnectionKey(ConcurrentDictionary<string, string> sessions, string connection)
+        private KeyValuePair<string, List<string>> GetConnectionKey(ConcurrentDictionary<string, List<string>> sessions, string connection)
         {
             return sessions.FirstOrDefault(x => x.Value.Contains(connection));
         }
 
-        private void RemoveConnection(ConcurrentDictionary<string, string> sessions, string connection)
+        private void RemoveConnection(ConcurrentDictionary<string, List<string>> sessions, string connection)
         {
             var account = GetConnectionKey(sessions, connection);
 
             if (!Utils.IsNullOrEmpty(account))
             {
                 var key = account.Key;
+                var value = account.Value;
 
-                if (!Utils.IsNullOrEmpty(key))
+                if (!Utils.IsNullOrEmpty(value))
                 {
-                    sessions.TryRemove(key, out string value);
+                    value.Remove(connection);
+                }
+                else
+                {
+                    if (!Utils.IsNullOrEmpty(key))
+                    {
+                        sessions.TryRemove(key, out value);
+                    }
                 }
             }
         }
