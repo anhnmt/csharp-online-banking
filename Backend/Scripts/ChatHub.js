@@ -39,9 +39,9 @@ $(function () {
 
         $('#chat').submit(function () {
             if ($('#message').val() !== "") {
-            hub.server.send($('#message').val());
-            // Clear text box and reset focus for next comment.
-            $('#message').val('').focus();
+                hub.server.send($('#message').val());
+                // Clear text box and reset focus for next comment.
+                $('#message').val('').focus();
             }
             event.preventDefault();
         });

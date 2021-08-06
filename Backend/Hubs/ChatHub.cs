@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
+using Newtonsoft.Json;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 using System;
@@ -20,21 +21,28 @@ namespace Backend.Hubs
         private static List<Accounts> _accounts = new List<Accounts>();
         private static List<Channels> _channels = new List<Channels>();
         private IRepository<Accounts> accountRepo;
+        private IRepository<Channels> channelRepo;
+        private IRepository<Messages> messageRepo;
 
         public ChatHub()
         {
             this.accountRepo = new Repository<Accounts>();
+            this.channelRepo = new Repository<Channels>();
+            this.messageRepo = new Repository<Messages>();
         }
 
         public void Send(string message)
         {
-            var accountId = getIntegerAccountId();
-
-            var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
-
-            if (!Utils.IsNullOrEmpty(account))
+            if (!Utils.IsNullOrEmpty(message))
             {
-                Clients.All.addNewMessageToPage(account.Name, message);
+                var accountId = getIntegerAccountId();
+
+                var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+
+                if (!Utils.IsNullOrEmpty(account))
+                {
+                    userSendMessage(account, message);
+                }
             }
 
 
@@ -43,6 +51,19 @@ namespace Backend.Hubs
             //{
             //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
             //}
+        }
+
+        public void Reply(int accountId, string message)
+        {
+            if (!Utils.IsNullOrEmpty(message))
+            {
+                var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+
+                if (!Utils.IsNullOrEmpty(account))
+                {
+                    userSendMessage(account, message);
+                }
+            }
         }
 
         public IEnumerable<Accounts> GetOnlineUsers()
@@ -54,17 +75,64 @@ namespace Backend.Hubs
         {
             var connection = Context.ConnectionId;
 
-            addConnection(Context.ConnectionId);
+            addConnection(connection);
 
             return base.OnConnected();
+        }
+
+
+        // Handler message from user
+        private void userSendMessage(Accounts account, string message)
+        {
+            var channel = findChannelByAccountId(account.AccountId);
+            if (Utils.IsNullOrEmpty(channel))
+            {
+                channel = new Channels();
+                channel.AccountId = account.AccountId;
+                channelRepo.Add(channel);
+            }
+
+            var messageObj = new Messages
+            {
+                AccountId = account.AccountId,
+                ChannelId = channel.ChannelId,
+                Content = message,
+                Timestamp = DateTime.Now
+            };
+
+            if (messageRepo.Add(messageObj))
+            {
+                sendMessageToChannel(channel.ChannelId, messageObj);
+            }
+
+        }
+
+        private Channels findChannelByAccountId(int accountId)
+        {
+            return channelRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
+        }
+
+        private void sendMessageToChannel(int channelId, Messages message)
+        {
+            Clients.All.addNewMessageToPage(message.AccountId, message.Content);
+
+            //Clients.Caller.showErrorMessage("The user is no longer connected.");
+            //foreach (var connectionId in _connections.GetConnections(who))
+            //{
+            //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
+            //}
+        }
+
+        private void sendMessageToAccountId(int accountId)
+        {
+            Clients.All.addNewMessageToPage("", "");
         }
 
         private void addConnection(string connection)
         {
             var accountId = getAccountId();
-            List<string> existingConnectionAccounts;
 
-            sessionConnections.TryGetValue(accountId, out existingConnectionAccounts);
+            sessionConnections.TryGetValue(accountId, out List<string> existingConnectionAccounts);
 
             // happens on the very first connection from the user
             if (existingConnectionAccounts == null)
@@ -83,7 +151,7 @@ namespace Backend.Hubs
         {
             var connection = Context.ConnectionId;
 
-            //addConnection(connection);
+            addConnection(connection);
 
             return base.OnReconnected();
         }
