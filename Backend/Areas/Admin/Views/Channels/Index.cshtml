@@ -67,31 +67,9 @@
                     </div>
                     <div class="card-body p-0">
                         <ul class="nav nav-pills flex-column">
-                            <li class="nav-item active">
+                            <li class="nav-item active" id="list-online">
                                 <a href="#" class="nav-link">
                                     <i class="fas fa-inbox"></i> Inbox
-                                    <span class="badge bg-primary float-right">12</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-envelope"></i> Sent
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-file-alt"></i> Drafts
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="fas fa-filter"></i> Junk
-                                    <span class="badge bg-warning float-right">65</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-trash-alt"></i> Trash
                                 </a>
                             </li>
                         </ul>
@@ -107,7 +85,7 @@
 
                         <div class="card-tools">
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control form-control-sm" placeholder="Search Email" name="key" id="key" aria-controls="">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search message" name="key" id="key" aria-controls="">
                                 <div class="input-group-append">
                                     <div class="btn btn-primary">
                                         <i class="fas fa-search"></i>
@@ -125,6 +103,7 @@
                                     <th>No</th>
                                     <th>User Name</th>
                                     <th>Last Message</th>
+                                    <th>Last Updated</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -207,6 +186,7 @@
                                         <td>#${ii}</td>
                                         <td>${(item.AccountName) == null ? "" : item.AccountName}</td>
                                         <td>${(item.LastMessages) == null ? "" : item.LastMessages}</td>
+                                        <td>${(item.LastUpdated) == null ? "" : item.LastUpdated}</td>
                                         <td class="btn-group">
                                             <a href="/Admin/Accounts/ProfileAccount/${item.AccountId}" class='btn btn-primary btn-detail'>View profile</a>
                                             <button data-id="${item.ChannelId}" class='btn btn-success btn-reply'>Reply</button>
@@ -271,6 +251,22 @@
                 $('#discussion')
                     .append(msg)
                     .animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.reloadChatData = function () {
+                managerChannel.load();
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.onlineList = function (data) {
+                let _html = "";
+                for (let item of res.data) {
+                    _html += `<a href="#" class="nav-link">
+                            <i class="fas fa-inbox"></i> item
+                        </a>`;
+                }
+                $('#list-online').html(_html);
             };
 
             connection.hub.start().done(function () {

@@ -40,32 +40,38 @@ namespace Backend.Areas.Admin.Controllers
 
             var data = channels.Get();
 
-            if (!string.IsNullOrEmpty(key))
-            {
-                data = data.Where(x => x.AccountId.ToString().Contains(key) || x.ChannelId.ToString().Contains(key));
-            }
-
             decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
 
-            return Json(new
-            {
-                totalPages = totalpage,
-                currentPage = page,
-                data = data.OrderByDescending(x => x.CreatedAt).Select(x =>
+            // 
+
+            var result = data
+                .Select(x =>
                 {
-                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId).OrderByDescending(y => y.Timestamp).LastOrDefault();
+                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId).OrderByDescending(y => y.Timestamp).FirstOrDefault();
 
                     return new ChannelViewModels
                     {
                         ChannelId = x.ChannelId,
                         AccountId = x.AccountId,
                         AccountName = x.Account.Name,
-                        LastMessages = (!Utils.IsNullOrEmpty(lastMessage) ? lastMessage.Content : ""),
-                        CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:ss"),
-                        UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:ss"),
+                        LastMessages = lastMessage?.Content,
+                        LastUpdated = lastMessage?.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss"),
+                        CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
+                        UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                     };
 
-                }).Skip((page - 1) * pageSize).Take(pageSize)
+                }).Where(x => !Utils.IsNullOrEmpty(x.LastMessages));
+
+            if (!string.IsNullOrEmpty(key))
+            {
+                result = result.Where(x => x.AccountId.ToString().Contains(key) || x.ChannelId.ToString().Contains(key));
+            }
+
+            return Json(new
+            {
+                totalPages = totalpage,
+                currentPage = page,
+                data = result.OrderByDescending(x => x.LastUpdated).Skip((page - 1) * pageSize).Take(pageSize)
             }, JsonRequestBehavior.AllowGet);
         }
     }
