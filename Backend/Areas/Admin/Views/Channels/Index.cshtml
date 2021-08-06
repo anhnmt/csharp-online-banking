@@ -12,6 +12,7 @@
             right: 0;
             margin-right: 10px;
             width: 450px;
+            z-index: 3;
         }
 
         .direct-chat-messages {
@@ -66,31 +67,9 @@
                     </div>
                     <div class="card-body p-0">
                         <ul class="nav nav-pills flex-column">
-                            <li class="nav-item active">
+                            <li class="nav-item active" id="list-online">
                                 <a href="#" class="nav-link">
                                     <i class="fas fa-inbox"></i> Inbox
-                                    <span class="badge bg-primary float-right">12</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-envelope"></i> Sent
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-file-alt"></i> Drafts
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="fas fa-filter"></i> Junk
-                                    <span class="badge bg-warning float-right">65</span>
-                                </a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="#" class="nav-link">
-                                    <i class="far fa-trash-alt"></i> Trash
                                 </a>
                             </li>
                         </ul>
@@ -106,7 +85,7 @@
 
                         <div class="card-tools">
                             <div class="input-group input-group-sm">
-                                <input type="text" class="form-control" placeholder="Search Mail">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search message" name="key" id="key" aria-controls="">
                                 <div class="input-group-append">
                                     <div class="btn btn-primary">
                                         <i class="fas fa-search"></i>
@@ -118,181 +97,24 @@
                     </div>
                     <!-- /.card-header -->
                     <div class="card-body p-0">
-                        <div class="mailbox-controls">
-                            <!-- Check all button -->
-                            <button type="button" class="btn btn-default btn-sm checkbox-toggle">
-                                <i class="far fa-square"></i>
-                            </button>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default btn-sm"><i class="far fa-trash-alt"></i></button>
-                                <button type="button" class="btn btn-default btn-sm"><i class="fas fa-reply"></i></button>
-                                <button type="button" class="btn btn-default btn-sm"><i class="fas fa-share"></i></button>
-                            </div>
-                            <!-- /.btn-group -->
-                            <button type="button" class="btn btn-default btn-sm"><i class="fas fa-sync-alt"></i></button>
-                            <div class="float-right">
-                                1-50/200
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-chevron-left"></i></button>
-                                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-chevron-right"></i></button>
-                                </div>
-                                <!-- /.btn-group -->
-                            </div>
-                            <!-- /.float-right -->
-                        </div>
-                        <div class="table-responsive mailbox-messages">
-                            <table class="table table-hover table-striped">
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check1">
-                                                <label for="check1"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"></td>
-                                        <td class="mailbox-date">5 mins ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check2">
-                                                <label for="check2"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
-                                        <td class="mailbox-date">28 mins ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check3">
-                                                <label for="check3"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
-                                        <td class="mailbox-date">11 hours ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check4">
-                                                <label for="check4"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"></td>
-                                        <td class="mailbox-date">15 hours ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check5">
-                                                <label for="check5"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
-                                        <td class="mailbox-date">Yesterday</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check6">
-                                                <label for="check6"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
-                                        <td class="mailbox-date">2 days ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check7">
-                                                <label for="check7"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star-o text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"><i class="fas fa-paperclip"></i></td>
-                                        <td class="mailbox-date">2 days ago</td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <div class="icheck-primary">
-                                                <input type="checkbox" value="" id="check8">
-                                                <label for="check8"></label>
-                                            </div>
-                                        </td>
-                                        <td class="mailbox-star"><a href="#"><i class="fas fa-star text-warning"></i></a></td>
-                                        <td class="mailbox-name"><a href="read-mail.html">Alexander Pierce</a></td>
-                                        <td class="mailbox-subject">
-                                            <b>AdminLTE 3.0 Issue</b> - Trying to find a solution to this problem...
-                                        </td>
-                                        <td class="mailbox-attachment"></td>
-                                        <td class="mailbox-date">2 days ago</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <!-- /.table -->
-                        </div>
-                        <!-- /.mail-box-messages -->
+                        <table class="table table-hover" id="datatables">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>User Name</th>
+                                    <th>Last Message</th>
+                                    <th>Last Updated</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl_channel"></tbody>
+
+                        </table>
                     </div>
-                    <!-- /.card-body -->
-                    <div class="card-footer p-0">
-                        <div class="mailbox-controls">
-                            <!-- Check all button -->
-                            <button type="button" class="btn btn-default btn-sm checkbox-toggle">
-                                <i class="far fa-square"></i>
-                            </button>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default btn-sm"><i class="far fa-trash-alt"></i></button>
-                                <button type="button" class="btn btn-default btn-sm"><i class="fas fa-reply"></i></button>
-                                <button type="button" class="btn btn-default btn-sm"><i class="fas fa-share"></i></button>
-                            </div>
-                            <!-- /.btn-group -->
-                            <button type="button" class="btn btn-default btn-sm"><i class="fas fa-sync-alt"></i></button>
-                            <div class="float-right">
-                                1-50/200
-                                <div class="btn-group">
-                                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-chevron-left"></i></button>
-                                    <button type="button" class="btn btn-default btn-sm"><i class="fas fa-chevron-right"></i></button>
-                                </div>
-                                <!-- /.btn-group -->
-                            </div>
-                            <!-- /.float-right -->
-                        </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <ul class="pagination" id="pagination">
+                            <li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>
+                        </ul>
                     </div>
                 </div>
                 <!-- /.card -->
@@ -300,7 +122,7 @@
             <!-- /.col -->
 
 
-            <div class="card direct-chat direct-chat-warning chat-popup" style="display: block;">
+            <div class="card direct-chat chat-popup direct-chat-primary" style="display: none;">
                 <div class="card-header d-flex align-items-center justify-content-between">
                     <h3 class="card-title">
                         Direct Chat
@@ -326,7 +148,7 @@
                         <div class="input-group">
                             <input type="text" id="message" name="message" placeholder="Type Message ..." class="form-control">
                             <span class="input-group-append">
-                                <button type="submit" class="btn btn-warning">Send</button>
+                                <button type="submit" class="btn btn-primary">Send</button>
                             </span>
                         </div>
                     </form>
@@ -345,13 +167,140 @@
     <!--Reference the autogenerated SignalR hub script. -->
     <script src="~/signalr/hubs"></script>
     <!--SignalR script to update the chat page and send messages.-->
-    <script src="~/Scripts/ChatHub.js"></script>
 
     <script>
         $.connection.hub.qs = { "userId": '@Session["userId"]', "name": '@Session["name"]' };
-        $(document).on("click", ".mailbox-messages tr", function () {
-            $(".chat-popup").show();
+
+        var managerChannel = {
+            load: function (page = 1, key = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Channels/GetData",
+                    data: { page: page, key: key },
+                    success: function (res) {
+                        let _html = "";
+                        var ii = 1;
+                        for (let item of res.data) {
+
+                            _html += `<tr>
+                                        <td>#${ii}</td>
+                                        <td>${(item.AccountName) == null ? "" : item.AccountName}</td>
+                                        <td>${(item.LastMessages) == null ? "" : item.LastMessages}</td>
+                                        <td>${(item.LastUpdated) == null ? "" : item.LastUpdated}</td>
+                                        <td class="btn-group">
+                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId}" class='btn btn-primary btn-detail'>View profile</a>
+                                            <button data-id="${item.ChannelId}" class='btn btn-success btn-reply'>Reply</button>
+                                        </td>
+                                    </tr>`
+                            ii++;
+                        }
+                        $('#tbl_channel').html(_html);
+
+                        var pages = '';
+                        for (var i = 1; i <= res.totalPages; i++) {
+                            if (i == res.currentPage) {
+                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            } else {
+                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            }
+                        }
+                        $(".pagination").html(pages);
+                    }
+                });
+            },
+        };
+
+
+        $(function () {
+            managerChannel.load();
+
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                managerChannel.load(1, key);
+            });
+
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                managerChannel.load(page, key);
+            });
+
+            var connection = $.connection;
+            var chatHub = connection.chatHub;
+            var user = connection.hub.qs.name;
+
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.addNewMessageToPage = function (name, message) {
+                var msg = `
+                        <div class="direct-chat-msg ${user == name ? 'right' : ''} ">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name ${user == name ? 'float-right' : 'float-left'}">${htmlEncode(name)}</span>
+                                <span class="direct-chat-timestamp ${user == name ? 'float-left' : 'float-right'}">23 Jan 2:05 pm</span>
+                            </div>
+                            <!-- /.direct-chat-infos -->
+                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                ${htmlEncode(message)}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                        </div>`;
+                // Add the message to the page.
+                $('#discussion')
+                    .append(msg)
+                    .animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.reloadChatData = function () {
+                managerChannel.load();
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.onlineList = function (data) {
+                let _html = "";
+                for (let item of res.data) {
+                    _html += `<a href="#" class="nav-link">
+                            <i class="fas fa-inbox"></i> item
+                        </a>`;
+                }
+                $('#list-online').html(_html);
+            };
+
+            connection.hub.start().done(function () {
+                var connectionId = connection.hub.id;
+
+                $('#chat').submit(function () {
+                    if ($('#message').val() !== "") {
+                        chatHub.server.send($('#message').val());
+                        // Clear text box and reset focus for next comment.
+                        $('#message').val('').focus();
+                    }
+                    event.preventDefault();
+                });
+            });
+
+            connection.hub.disconnected(function () {
+                setTimeout(function () {
+                    connection.hub.start();
+                }, 3000); // Restart connection
+            });
+
+            $(document).on("click", ".btn-reply", function () {
+                $(".chat-popup").show();
+                $('#message').focus();
+
+                let channelId = $(this).data("id");
+                chatHub.server.connectChannel(channelId);
+            });
+
+            $(".direct-chat .btn-remove").click(function () {
+                $(".chat-icon").show();
+                $(".direct-chat").hide();
+            });
+
         });
     </script>
-
 }

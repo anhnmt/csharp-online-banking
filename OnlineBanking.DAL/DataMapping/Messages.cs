@@ -10,6 +10,10 @@ namespace OnlineBanking.DAL
 {
     public class Messages
     {
+        public Messages()
+        {
+        }
+
         [Key]
         public int MessageId { get; set; }
 
