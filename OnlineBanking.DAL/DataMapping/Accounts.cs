@@ -26,7 +26,7 @@ namespace OnlineBanking.DAL
         public int? Status { get; set; } // active, delete, lock
         [DefaultValue(0)]
         public int RoleId { get; set; } // Quyền
-        public int? NumberID { get; set; }
+        public string NumberID { get; set; }
         [DefaultValue(0)]
         public int AttemptLogin { get; set; }
         [ForeignKey("RoleId")]

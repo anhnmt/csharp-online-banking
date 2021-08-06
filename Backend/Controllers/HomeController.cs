@@ -84,13 +84,49 @@ namespace Backend.Controllers
         public ActionResult UpdateInfo(ProfileViewModel acc)
         {
             Dictionary<string, string> errors = new Dictionary<string, string>();
-            if (ModelState.IsValid)
+            bool check = true;
+            int userId = (int) Session["userId"];
+
+            if (!String.IsNullOrEmpty(acc.Birthday))
+            {
+                if (DateTime.TryParse(acc.Birthday, out DateTime dateTime))
+                {
+                    var today = DateTime.Today;
+                    var age = today.Year - DateTime.Parse(acc.Birthday).Year;
+                    if (age < 18)
+                    {
+                        check = false;
+                        errors.Add("Birthday", "Your age must be greater than 18");
+                    }
+                }
+                else
+                {
+                    check = false;
+                    errors.Add("Birthday", "Your birthday is not valid!");
+                }
+            }
+            if (accounts.CheckDuplicate(x => x.Email == acc.Email && x.AccountId != userId))
+            {
+                check = false;
+                errors.Add("Email", "Your email has been used!");
+            }
+            if (!String.IsNullOrEmpty(acc.Phone) && accounts.CheckDuplicate(x => x.Phone == acc.Phone && x.AccountId != userId))
+            {
+                check = false;
+                errors.Add("Phone", "Your phone has been used!");
+            }
+            if (!String.IsNullOrEmpty(acc.NumberID) && accounts.CheckDuplicate(x => x.NumberID == acc.NumberID && x.AccountId != userId))
+            {
+                check = false;
+                errors.Add("NumberID", "Your NumberId has been used!");
+            }
+            if (ModelState.IsValid && check)
             {
                 Accounts acc1 = accounts.Get(Session["userId"]);
                 acc1.Name = acc.Name;
                 acc1.Email = acc.Email;
                 acc1.Phone = acc.Phone;
-                acc1.Birthday = (acc.Birthday == null) ? DateTime.Parse("01-01-1970") : DateTime.Parse(acc.Birthday);
+                acc1.Birthday = String.IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberID = acc.NumberID;
                 acc1.UpdatedAt = DateTime.Now;
@@ -111,7 +147,7 @@ namespace Backend.Controllers
                 }
             return Json(new
             {
-                statusCode = 402,
+                statusCode = 400,
                 message = "Error",
                 data = errors
             }, JsonRequestBehavior.AllowGet);
@@ -144,47 +180,6 @@ namespace Backend.Controllers
                 return View();
             }
         }
-
-        //[HttpPost]
-        //public ActionResult Login(string email, string password)
-        //{
-        //    IRepository<Accounts> users = new Repository<Accounts>();
-        //    if (users.CheckDuplicate(x => x.Email == email))
-        //    {
-        //        var obj = users.Get(x => x.Email == email).FirstOrDefault();
-        //        if (password == obj.Password && obj.Status != ((int)AccountStatus.Locked) && obj.AttemptLogin < 3)
-        //        {
-        //            Session["userId"] = obj.AccountId;
-        //            Session["email"] = email;
-
-        //            obj.AttemptLogin = 0;
-        //            users.Update(obj);
-
-        //            if (obj.RoleId == 1)
-        //            {
-        //                Session["rold"] = "Admin";
-        //                return RedirectToAction("Index", "Admin/Home");
-        //            }
-        //            if (obj.RoleId == 2)
-        //            {
-        //                Session["rold"] = "TeleSopport";
-        //                return RedirectToAction("Index", "Admin/Home");
-        //            }
-        //            return RedirectToAction("Index", "Home");
-        //        }
-        //        else if (obj.AttemptLogin == 3)
-        //        {
-        //            obj.Status = ((int)AccountStatus.Locked);
-        //            users.Update(obj);
-        //        }
-        //        else
-        //        {
-        //            obj.AttemptLogin++;
-        //            users.Update(obj);
-        //        }
-        //    }
-        //    return View();
-        //}
 
         public ActionResult CheckLogin(string email, string password)
         {
@@ -314,6 +309,7 @@ namespace Backend.Controllers
                     Password = Register.Password,
                     AttemptLogin = 0,
                     RoleId = 3,
+                    Birthday = DateTime.Parse("1970-01-01"),
                     Status = ((int)AccountStatus.Actived)
                 };
                 users.Add(accounts);
