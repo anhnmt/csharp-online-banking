@@ -21,11 +21,5 @@ namespace OnlineBanking.DAL
         {
             return data == null;
         }
-
-        public static string getSession(string key)
-        {
-            return data == null;
-        }
-
     }
 }

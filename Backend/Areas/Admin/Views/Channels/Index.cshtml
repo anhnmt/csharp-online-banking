@@ -348,7 +348,7 @@
     <script src="~/Scripts/ChatHub.js"></script>
 
     <script>
-        $.connection.hub.qs = { "userId": '@Session["userId"]' };
+        $.connection.hub.qs = { "userId": '@Session["userId"]', "name": '@Session["name"]' };
         $(document).on("click", ".mailbox-messages tr", function () {
             $(".chat-popup").show();
         });
