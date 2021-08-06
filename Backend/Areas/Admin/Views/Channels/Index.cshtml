@@ -146,6 +146,7 @@
                 <div class="card-footer" style="display: block;">
                     <form action="#" method="post" id="chat" onsubmit="return false;">
                         <div class="input-group">
+                            <input type="hidden" id="channel" name="channel">
                             <input type="text" id="message" name="message" placeholder="Type Message ..." class="form-control">
                             <span class="input-group-append">
                                 <button type="submit" class="btn btn-primary">Send</button>
@@ -270,11 +271,9 @@
             };
 
             connection.hub.start().done(function () {
-                var connectionId = connection.hub.id;
-
                 $('#chat').submit(function () {
                     if ($('#message').val() !== "") {
-                        chatHub.server.send($('#message').val());
+                        chatHub.server.reply($('#channel').val(), $('#message').val());
                         // Clear text box and reset focus for next comment.
                         $('#message').val('').focus();
                     }
@@ -293,6 +292,7 @@
                 $('#message').focus();
 
                 let channelId = $(this).data("id");
+                $("#channel").val(channelId);
                 chatHub.server.connectChannel(channelId);
             });
 
