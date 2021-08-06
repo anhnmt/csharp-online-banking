@@ -29,6 +29,27 @@ namespace OnlineBanking.DAL
                         .WillCascadeOnDelete(false);
         }
 
+        public override int SaveChanges()
+        {
+            var entries = ChangeTracker
+                .Entries()
+                .Where(e => e.Entity is BaseModel && (
+                        e.State == EntityState.Added
+                        || e.State == EntityState.Modified));
+
+            foreach (var entityEntry in entries)
+            {
+                ((BaseModel)entityEntry.Entity).UpdatedAt = DateTime.Now;
+
+                if (entityEntry.State == EntityState.Added)
+                {
+                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.Now;
+                }
+            }
+
+            return base.SaveChanges();
+        }
+
         public virtual DbSet<Accounts> Accounts { get; set; }
         public virtual DbSet<BankAccounts> BankAccounts { get; set; }
         public virtual DbSet<Currencies> Currencies { get; set; }

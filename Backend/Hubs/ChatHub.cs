@@ -35,7 +35,6 @@ namespace Backend.Hubs
         {
             if (!Utils.IsNullOrEmpty(message))
             {
-
                 var accountId = getIntegerAccountId();
 
                 var account = accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
@@ -65,13 +64,6 @@ namespace Backend.Hubs
                     userSendMessage(account, message);
                 }
             }
-
-
-            //Clients.Caller.showErrorMessage("The user is no longer connected.");
-            //foreach (var connectionId in _connections.GetConnections(who))
-            //{
-            //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
-            //}
         }
 
         public IEnumerable<Accounts> GetOnlineUsers()
@@ -92,17 +84,12 @@ namespace Backend.Hubs
         // Handler message from user
         private void userSendMessage(Accounts account, string message)
         {
-            // check role user
-            //if (account.RoleId == 3)
-            //{
             var channel = findChannelByAccountId(account.AccountId);
             if (Utils.IsNullOrEmpty(channel))
             {
+                channel = new Channels();
                 channel.AccountId = account.AccountId;
-                if (channelRepo.Add(channel))
-                {
-                    channel = findChannelByAccountId(account.AccountId);
-                }
+                channelRepo.Add(channel);
             }
 
             var messageObj = new Messages
@@ -115,9 +102,8 @@ namespace Backend.Hubs
 
             if (messageRepo.Add(messageObj))
             {
-                sendMessageToChannelId(channel.ChannelId, messageObj);
+                sendMessageToChannel(channel.ChannelId, messageObj);
             }
-            //}
 
         }
 
@@ -126,9 +112,15 @@ namespace Backend.Hubs
             return channelRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
         }
 
-        private void sendMessageToChannelId(int channelId, Messages message)
+        private void sendMessageToChannel(int channelId, Messages message)
         {
-            Clients.All.addNewMessageToPage("", "");
+            Clients.All.addNewMessageToPage(message.AccountId, message.Content);
+
+            //Clients.Caller.showErrorMessage("The user is no longer connected.");
+            //foreach (var connectionId in _connections.GetConnections(who))
+            //{
+            //    Clients.Client(connectionId).addChatMessage(name + ": " + message);
+            //}
         }
 
         private void sendMessageToAccountId(int accountId)
