@@ -22,66 +22,79 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
+        private JsonResult TransfersQueue(Transactions tran)
+        {
+            tran.Status = 0;
+            Queue<Transactions> BankQueue = new Queue<Transactions>();
+            BankQueue.Enqueue(tran);
+            do
+            {
+                Transactions BankDequeue = BankQueue.Dequeue();
+                var sourceAccount = bankaccounts.Get(BankDequeue.FromId);
+                var receiverAccount = bankaccounts.Get(BankDequeue.ToId);
+                if (receiverAccount == null)
+                {
+                    return Json(new
+                    {
+                        data = "Số tài khoản không tồn tại",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                var balaceSource = sourceAccount.Balance;
+                if (balaceSource < BankDequeue.Amount)
+                {
+                    return Json(new
+                    {
+                        data = "Số dư không đủ",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                sourceAccount.Balance = balaceSource - BankDequeue.Amount;
+                if (bankaccounts.Edit(sourceAccount) != true)
+                {
+                    return Json(new
+                    {
+                        data = "Lỗi trừ tiền tài khoản nguồn",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                receiverAccount.Balance = receiverAccount.Balance + BankDequeue.Amount;
+                if (bankaccounts.Edit(receiverAccount) != true)
+                {
+                    return Json(new
+                    {
+                        data = "Lỗi cộng tiền tài khoản đích",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                BankDequeue.Status = 1;
+                BankDequeue.CreatedAt = DateTime.Now;
+                BankDequeue.UpdatedAt = DateTime.Now;
+                BankDequeue.BalancedFrom = sourceAccount.Balance;
+                BankDequeue.BalancedTo = receiverAccount.Balance;
+                if (string.IsNullOrEmpty(BankDequeue.Messages))
+                {
+                    BankDequeue.Messages = "Tranfers from " + BankDequeue.FromId + " to " + BankDequeue.ToId;
+                }
+                transactions.Add(BankDequeue);
+                return Json(new
+                {
+                    data = "Chuyển khoản thành công",
+                    message = "Success",
+                    statusCode = 200
+                });
+            } while (BankQueue.Count != 0);
+           
+        }
+        [HttpPost]
         public ActionResult Transfers(Transactions tran)
         {
-            var sourceAccount = bankaccounts.Get(tran.FromId);
+            return TransfersQueue(tran);
 
-            var receiverAccount = bankaccounts.Get(tran.ToId);
-            if (receiverAccount == null)
-            {
-                return Json(new
-                {
-                    data = "Số tài khoản không tồn tại",
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
-            var balaceSource = sourceAccount.Balance;
-            if (balaceSource < tran.Amount)
-            {
-                return Json(new
-                {
-                    data = "Số dư không đủ",
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
-            sourceAccount.Balance = balaceSource - tran.Amount;
-            if (bankaccounts.Edit(sourceAccount) != true)
-            {
-                return Json(new
-                {
-                    data = "Lỗi trừ tiền tài khoản nguồn",
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
-            receiverAccount.Balance = receiverAccount.Balance + tran.Amount;
-            if (bankaccounts.Edit(receiverAccount) != true)
-            {
-                return Json(new
-                {
-                    data = "Lỗi cộng tiền tài khoản đích",
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
-            tran.Status = 1;
-            tran.CreatedAt = DateTime.Now;
-            tran.UpdatedAt = DateTime.Now;
-            tran.BalancedFrom = sourceAccount.Balance;
-            tran.BalancedTo = receiverAccount.Balance;
-            if (string.IsNullOrEmpty(tran.Messages))
-            {
-                tran.Messages = "Tranfers from " + tran.FromId + " to " + tran.ToId;
-            }
-            transactions.Add(tran);
-            return Json(new
-            {
-                data = "Chuyển khoản thành công",
-                message = "Success",
-                statusCode = 200
-            }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetData(int fromId,int page = 1, string key = null)
         {
@@ -95,8 +108,8 @@ namespace Backend.Areas.Admin.Controllers
                 BalancedTo = x.BalancedTo,
                 Status = x.Status,
                 StatusName = ((BankingActivity)x.Status).ToString(),
-                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:ss"),
-                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:ss"),
+                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
+                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
             });
             int pageSize = 5;
             if (!string.IsNullOrEmpty(key))

@@ -27,15 +27,10 @@ namespace Backend.Controllers
             {
                 return RedirectToAction("Login");
             }
-
-
         }
         public ActionResult PageNotFound()
         {
-
             return View();
-
-
         }
         public ActionResult InfoAccountData()
         {

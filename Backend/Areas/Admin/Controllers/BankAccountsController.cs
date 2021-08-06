@@ -21,9 +21,6 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
-
-        
-
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {
