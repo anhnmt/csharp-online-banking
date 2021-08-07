@@ -282,7 +282,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.newMessage = function (messageView) {
-                console.log(messageView);
                 var msg = `
                         <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''} ">
                             <div class="direct-chat-infos clearfix">
@@ -305,7 +304,41 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
                 $('#discussion')
                     .append(msg)
-                    .animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                    .ready(function () {
+                        $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                    });
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.historyMessages = function (historyMessages) {
+                $('#discussion').html("")
+                var msg = "";
+
+                for (let messageView of historyMessages) {
+                    msg += `
+                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''} ">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
+                                    ${htmlEncode(messageView.AccountName)}
+                                </span>
+                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
+                                    ${messageView.Timestamp}
+                                </span>
+                            </div>
+                            <!-- /.direct-chat-infos -->
+                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+
+                            <!-- /.direct-chat-img -->
+                            <div class="direct-chat-text">
+                                ${htmlEncode(messageView.Content)}
+                            </div>
+                            <!-- /.direct-chat-text -->
+                        </div>`;
+                }
+
+                $('#discussion').html(msg).ready(function () {
+                    $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                });
             };
 
             connection.hub.start().done(function () {
@@ -324,6 +357,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     $(".direct-chat").show();
                     $(this).hide();
                     $('#message').focus();
+                    $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
                 });
 
                 $(".direct-chat .btn-remove").click(function () {

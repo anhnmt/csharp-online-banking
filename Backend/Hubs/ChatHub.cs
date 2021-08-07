@@ -28,7 +28,7 @@ namespace Backend.Hubs
         /// Mapping SignalR connections to application users.
         /// (We don't want to share connectionId)
         /// </summary>
-        private readonly static ConcurrentDictionary<string, string> _ConnectionsMap = new ConcurrentDictionary<string, string>();
+        private readonly static ConnectionMapping<string> _ConnectionsMap = new ConnectionMapping<string>();
         #endregion
 
         private IRepository<Accounts> accountRepo;
@@ -106,22 +106,27 @@ namespace Backend.Hubs
             return 0;
         }
 
-        //public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
-        //{
-        //    if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
-        //    {
-        //        var messageHistory = messageRepo.Get().Where(m => m.Channel.ChannelId == channelId)
-        //        .OrderByDescending(m => m.Timestamp)
-        //        .Take(20)
-        //        .AsEnumerable()
-        //        .Reverse()
-        //        .Select(x => new MessageViewModel(x));
+        public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
+        {
+            if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
+            {
+                var messageHistory = messageRepo.Get().Where(m => m.Channel.ChannelId == channelId)
+                .OrderByDescending(m => m.Timestamp)
+                .Take(10)
+                .AsEnumerable()
+                .Reverse()
+                .Select(x =>
+                {
+                    var account = FindAccountByAccountId(x.AccountId);
 
-        //        return messageHistory;
-        //    }
+                    return new MessageViewModel(x, account?.Name);
+                });
 
-        //    return null;
-        //}
+                return messageHistory;
+            }
+
+            return null;
+        }
 
         //private void sendListOnline()
         //{
@@ -152,6 +157,7 @@ namespace Backend.Hubs
                         var channel = FindChannelByAccountId(accountId);
                         userViewModel.CurrentChannelId = channel.ChannelId;
                         Groups.Add(connection, channel.ChannelId.ToString());
+                        Clients.Client(connection).historyMessages(GetMessageHistory(channel.ChannelId));
                     }
 
                     var tempAccount = _Connections.Where(u => u.AccountId == accountId).FirstOrDefault();
@@ -160,7 +166,7 @@ namespace Backend.Hubs
                     _Connections.Add(userViewModel);
                     Clients.All.UpdateUser(userViewModel);
 
-                    _ConnectionsMap.TryAdd(accountId.ToString(), connection);
+                    _ConnectionsMap.Add(accountId.ToString(), connection);
                 }
             }
             catch (Exception ex)
@@ -180,6 +186,7 @@ namespace Backend.Hubs
 
         public override Task OnDisconnected(bool stopCalled)
         {
+            var connection = Context.ConnectionId;
             var accountId = GetIntegerAccountId();
 
             try
@@ -191,7 +198,7 @@ namespace Backend.Hubs
                 Clients.All.UpdateUser(tempAccount);
 
                 // Remove mapping
-                _ConnectionsMap.TryRemove(tempAccount.AccountId.ToString(), out string value);
+                _ConnectionsMap.Remove(tempAccount.AccountId.ToString(), connection);
 
             }
             catch (Exception ex)
@@ -202,33 +209,37 @@ namespace Backend.Hubs
             return base.OnDisconnected(stopCalled);
         }
         #endregion
+
         public Task Join(int channelId)
         {
             try
             {
+                var connection = Context.ConnectionId;
                 var account = _Connections.Where(u => u.AccountId == GetIntegerAccountId()).FirstOrDefault();
 
-                //if (!Utils.IsNullOrEmpty(account))
-                //{
-                if (account.CurrentChannelId != channelId)
+                if (!Utils.IsNullOrEmpty(account))
                 {
-                    // Join to new chat room
-                    Leave(account.CurrentChannelId);
-                    Groups.Add(Context.ConnectionId, channelId.ToString());
-                    _Connections.Remove(account);
+                    if (account.CurrentChannelId != channelId)
+                    {
+                        // Join to new chat room
+                        Leave(account.CurrentChannelId);
+                        Groups.Add(connection, channelId.ToString());
+                        _Connections.Remove(account);
 
-                    account.CurrentChannelId = channelId;
+                        account.CurrentChannelId = channelId;
 
-                    _Connections.Add(account);
-                    Clients.All.UpdateUser(account);
+                        _Connections.Add(account);
+                        Clients.All.UpdateUser(account);
 
-                    return Groups.Add(Context.ConnectionId, channelId.ToString());
+                        Clients.Client(connection).historyMessages(GetMessageHistory(channelId));
+
+                        return Groups.Add(connection, channelId.ToString());
+                    }
                 }
-                //}
             }
             catch (Exception ex)
             {
-                Clients.Caller.onError("You failed to join the chat room!" + ex.Message);
+                Clients.Caller.onError("You failed to join the channel!" + ex.Message);
             }
 
             return null;
