@@ -353,7 +353,9 @@
                                     </a>
                                 </div>
                             </li>
+
                         </ul>
+                        
                     </div>
                 </nav>
             </div>
@@ -398,12 +400,7 @@
             <!-- row -->
 
             <div class="container-fluid">
-                @RenderSection("Breadcrumb", required: false)
-
-                <!-- row -->
-                <div class="row">
-                    @RenderBody();
-                </div>
+                @RenderBody()
             </div>
         </div>
         <div class="footer">
