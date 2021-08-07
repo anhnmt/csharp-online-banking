@@ -22,6 +22,11 @@ function htmlEncode(value) {
     return encodedValue;
 }
 
+function momentFromNow(value) {
+    var time = moment(value).format("DD/MM/YYYY HH:mm:ss");
+    return moment(time).fromNow() ?? "";
+}
+
 var Vora = function () {
 
     /* Search Bar ============ */

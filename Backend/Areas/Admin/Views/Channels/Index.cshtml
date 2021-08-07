@@ -123,7 +123,7 @@
                         for (let item of res.data) {
                             if ($("#channel").val() == item.ChannelId) {
                                 $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">${item.AccountName ?? ''}</a>`);
-                                $("#user-timestamp").html(moment(item.LastUpdated ?? "").fromNow());
+                                $("#user-timestamp").html(momentFromNow(item.LastUpdated ?? ""));
                             }
 
                             _html += `
@@ -135,7 +135,7 @@
                                     <div class="media-body w-25">
                                         <div class="d-flex mb-sm-2 mb-0">
                                             <h6 class="text-black font-w600 fs-16 mb-0">${item.AccountName ?? ""}</h6>
-                                            <span class="ml-auto fs-14">${moment(item.LastUpdated ?? "").fromNow()}</span>
+                                            <span class="ml-auto fs-14">${momentFromNow(item.LastUpdated ?? "")}</span>
                                         </div>
                                         <p class="text-black text-truncate">${item.LastMessages ?? ""}</p>
                                     </div>
@@ -242,7 +242,7 @@
                     let timestamp = $(this).data("timestamp");
 
                     $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${account ?? '0'}" onclick="return false;">${name ?? ''}</a>`);
-                    $("#user-timestamp").html(moment(timestamp ?? "").fromNow());
+                    $("#user-timestamp").html(momentFromNow(timestamp ?? ""));
 
                     $("#channel").val(channelId);
                     chatHub.server.join(channelId);
@@ -310,7 +310,7 @@
                                 <p class="mb-1">
                                     ${htmlEncode(messageView.Content)}
                                 </p>
-                                <span class="fs-12">${moment(messageView.Timestamp ?? "").fromNow()}</span>
+                                <span class="fs-12">${momentFromNow(messageView.Timestamp ?? "")}</span>
                             </div>
                             ${accountId == messageView.AccountId ? image : '' }
                         </div>`;
