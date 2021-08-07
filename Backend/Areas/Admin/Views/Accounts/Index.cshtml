@@ -5,6 +5,9 @@
 }
 @section css{
     <link href="~/Content/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/Content/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
 }
 <div class="content-wrapper">
     <!-- Content Header (Page header) -->
@@ -35,11 +38,11 @@
                 <div class="card-body">
 
 
-                    <div class="form-inline">
+                    @*<div class="form-inline">
                         <label>Search : </label>
                         <input type="search" class="form-control form-control-sm" placeholder="Input Email" name="key" id="key" aria-controls="">
-                    </div>
-                    <table class="table table-hover" id="datatables">
+                    </div>*@
+                    <table class="table table-bordered table-striped dataTable dtr-inline" id="datatables">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -56,9 +59,9 @@
 
                 </div>
                 <div class="card-footer d-flex justify-content-center">
-                    <ul class="pagination" id="pagination">
+                    @*<ul class="pagination" id="pagination">
                         <li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>
-                    </ul>
+                    </ul>*@
                 </div>
 
                 <!-- /.card-body -->
@@ -144,14 +147,14 @@
                             </div>
                         </div>
                     </div>
-                    
+
                 </form>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
             </div>
-            
+
         </div>
 
     </div>
@@ -159,39 +162,52 @@
 @section AdminlteJs{
     <script src="~/Content/plugins/moment/moment.min.js"></script>
     <script src="~/Content/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
+    <!-- DataTables  & Plugins -->
+    <script src="~/Content/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Content/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="~/Content/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/jszip/jszip.min.js"></script>
+    <script src="~/Content/plugins/pdfmake/pdfmake.min.js"></script>
+    <script src="~/Content/plugins/pdfmake/vfs_fonts.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.print.min.js"></script>
+    <script src="~/Content/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
 }
 @section scripts{
 
     <script>
-        function loadStatus(status=null) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Accounts/GetStatus",
-                    success: function (res) {
-                        console.log(res)
-                        var html;
-                        $.each(res, function (key, value) {
-                            html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
-                        });
-                        $('#Status').html(html);
-                    }
-                })
-            }
-        function loadRole(roleId=null) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Accounts/GetRole",
-                    success: function (res) {
-                        console.log(res)
-                        var html;
-                        $.each(res, function (key, value) {
-                            html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
-                        });
-                        $('#RoleId').html(html);
-                    }
-                })
-            }
-        
+        function loadStatus(status = null) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/Accounts/GetStatus",
+                success: function (res) {
+                    console.log(res)
+                    var html;
+                    $.each(res, function (key, value) {
+                        html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
+                    });
+                    $('#Status').html(html);
+                }
+            })
+        }
+        function loadRole(roleId = null) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/Accounts/GetRole",
+                success: function (res) {
+                    console.log(res)
+                    var html;
+                    $.each(res, function (key, value) {
+                        html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                    });
+                    $('#RoleId').html(html);
+                }
+            })
+        }
+
         var managerAcc = {
             load: function (page = 1, key = null) {
                 $.ajax({
@@ -202,15 +218,15 @@
                         let _html = "";
                         var ii = 1;
                         for (let item of res.data) {
-                            
+
                             _html += `<tr>
-                                        <td>${ii}</td>
-                                        <td>${(item.Name) == null ? "" : item.Name}</td>
-                                        <td>${(item.Email) == null ? "" : item.Email}</td>
-                                        <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
-                                        <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
-                                        <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
-                                    </tr>`
+                                                <td>${ii}</td>
+                                                <td>${(item.Name) == null ? "" : item.Name}</td>
+                                                <td>${(item.Email) == null ? "" : item.Email}</td>
+                                                <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
+                                                <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                            </tr>`
                             ii++;
                         }
                         $('#tbl_user').html(_html);
@@ -279,8 +295,55 @@
             }
         }
         $(function () {
-           
-            managerAcc.load();
+
+            //managerAcc.load();
+
+            $('#datatables').DataTable({
+                "paging": true,
+                "ordering": true,
+                "autoWidth": false,
+                "responsive": true,
+                "processing": true,
+                "filter": true,
+                "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+                "ajax": "/Admin/Accounts/GetData",
+                "order": [
+                    [0, 'asc']
+                ],
+                "columns": [
+                    {
+                        data: 'AccountId',
+                        className: 'align-middle text-center'
+                    },
+                    {
+                        data: 'Name',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: 'Email',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: 'RoleName',
+                        className: 'align-middle',
+                        "searchable": false,
+                        "orderable": false
+                    },
+                    {
+                        data: 'StatusName',
+                        className: 'align-middle text-center',
+                        "searchable": false,
+                        "orderable": false
+                    },
+                    {
+                        data: 'AccountId',
+                        "render": function (data, type, row) {
+                            return "<button data-id=" + row.AccountId
+                                + " class='btn btn-primary btn-detail'>Detail</button><button data-id=" + row.AccountId + " class='btn btn-warning btn-edit'>Edit</button><button data-id=" + row.AccountId + " class='btn btn-danger'>Detele</button>";
+                        }
+                    },
+                ]
+            })
 
             $(document).on("click", ".btn-edit", function () {
                 $("#type").val("EDIT");

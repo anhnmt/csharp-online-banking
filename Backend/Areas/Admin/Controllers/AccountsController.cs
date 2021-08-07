@@ -34,7 +34,7 @@ namespace Backend.Areas.Admin.Controllers
             }
         }
         
-        public ActionResult GetData(int page =1,string key =null)
+        public ActionResult GetData()
         {
             ViewBag.Accounts = "active";
             var data = users.Get().Select(x => new AccountViewModel
@@ -53,16 +53,16 @@ namespace Backend.Areas.Admin.Controllers
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-            int pageSize = 5;
-            if (!string.IsNullOrEmpty(key))
-            {
-                data = data.Where(x => x.Email.Contains(key));
-            }
-            decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
+            //int pageSize = 5;
+            //if (!string.IsNullOrEmpty(key))
+            //{
+            //    data = data.Where(x => x.Email.Contains(key));
+            //}
+            //decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
             return Json(new { 
-                totalPages = totalPages,
-                currentPage = page,
-                data = data.Skip((page - 1) * pageSize).Take(pageSize),
+                //totalPages = totalPages,
+                //currentPage = page,
+                data = data.ToList(),
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
