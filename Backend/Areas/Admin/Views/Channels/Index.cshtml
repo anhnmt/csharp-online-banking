@@ -4,14 +4,12 @@
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-@section breadcrumb {
-    <div class="page-titles">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-            <li class="breadcrumb-item active"><a href="@Url.Action("Index", "Channels")">Messages</a></li>
-        </ol>
-    </div>
-}
+<div class="page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+        <li class="breadcrumb-item active"><a href="@Url.Action("Index", "Channels")">Messages</a></li>
+    </ol>
+</div>
 
 <div class="row">
     <div class="col-xl-5">
@@ -31,92 +29,13 @@
                                         Unread
                                     </a>
                                 </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#Archived" role="tab" aria-selected="true">
-                                        Archived
-                                    </a>
-                                </li>
                             </ul>
                         </div>
                     </div>
-                    <div class="card-body message-bx dlab-scroll height520 ps ps--active-y" id="message-bx">
+                    <div class="card-body message-bx dlab-scroll height640 ps ps--active-y" id="message-bx">
                         <div class="tab-content">
                             <div class="tab-pane fade show active" id="AllMessage" role="tabpanel">
-                                <div class="media mb-4">
-                                    <div class="image-bx">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/2.png" alt="" class="rounded-circle mr-sm-4 mr-2 img-1">
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black mb-0 font-w600 fs-16">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Roberto Charloz</h6>
-                                            <span class="ml-auto fs-14">2m ago</span>
-                                        </div>
-                                        <p class="text-black">Hey, check my design update last night. Tell me what you think and if that is OK. I hear client said they want to change the layout concept</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/4.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Laura Chyan</h6>
-                                            <span class="ml-auto fs-14">5m ago</span>
-                                        </div>
-                                        <p class="text-black">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Keanu Tipes</h6>
-                                            <span class="ml-auto fs-14">41m ago</span>
-                                        </div>
-                                        <p class="text-black">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/6.png" alt="" class="rounded-circle img-1 mr-sm-4 mr-2">
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
-                                <div class="media">
-                                    <div class="image-bx">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/7.png" alt="" class="rounded-circle img-1 mr-sm-4 mr-2">
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
+
                             </div>
                             <div class="tab-pane fade" id="Unread" role="tabpanel">
                                 <div class="media mb-4">
@@ -132,104 +51,9 @@
                                         <p class="text-black">Hey, check my design update last night. Tell me what you think and if that is OK. I hear client said they want to change the layout concept</p>
                                     </div>
                                 </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Keanu Tipes</h6>
-                                            <span class="ml-auto fs-14">41m ago</span>
-                                        </div>
-                                        <p class="text-black">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/6.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
-                                <div class="media">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/7.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="Archived" role="tabpanel">
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/4.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Laura Chyan</h6>
-                                            <span class="ml-auto fs-14">5m ago</span>
-                                        </div>
-                                        <p class="text-black">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Keanu Tipes</h6>
-                                            <span class="ml-auto fs-14">41m ago</span>
-                                        </div>
-                                        <p class="text-black">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut</p>
-                                    </div>
-                                </div>
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/6.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-2">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
-                                <div class="media">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/7.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Olivia Rellaq</h6>
-                                            <span class="ml-auto fs-14">25m ago</span>
-                                        </div>
-                                        <p class="text-black">Nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</p>
-                                    </div>
-                                </div>
                             </div>
                         </div>
                         <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 496px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 241px;"></div></div>
-                    </div>
-                    <div class="card-footer pt-0 border-0">
                     </div>
                 </div>
             </div>
@@ -251,66 +75,19 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-body dlab-scroll height520 ps ps--active-y" id="chartBox">
-                        <div class="media mb-4 justify-content-end align-items-end">
-                            <div class="message-sent">
-                                <p class="mb-1">
-                                    sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet
-                                </p>
-                                <span class="fs-12">9.30 AM</span>
-                            </div>
-                            <div class="image-bx ml-sm-4 ml-2 mb-4">
-                                <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">
-                                <span class="active"></span>
-                            </div>
-                        </div>
-                        <div class="media mb-4  justify-content-end align-items-end">
-                            <div class="message-sent">
-                                <p class="mb-1">
-                                    nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea
-                                </p>
-                                <span class="fs-12">9.30 AM</span>
-                            </div>
-                            <div class="image-bx ml-sm-4 ml-2 mb-4">
-                                <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">
-                                <span class="active"></span>
-                            </div>
-                        </div>
-                        <div class="media mb-4  justify-content-start align-items-start">
-                            <div class="image-bx mr-sm-4 mr-2">
-                                <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                <span class="active"></span>
-                            </div>
-                            <div class="message-received">
-                                <p class="mb-1">
-                                    Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptat
-                                </p>
-                                <span class="fs-12">4.30 AM</span>
-                            </div>
-                        </div>
-                        <div class="media justify-content-start align-items-start">
-                            <div class="image-bx mr-sm-4 mr-2">
-                                <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                <span class="active"></span>
-                            </div>
-                            <div class="message-received">
-                                <p class="mb-1">
-                                    Hey, check my design update last night. Tell me what you think and if that is OK. I hear client said they want to change the layout concept
-                                </p>
-                                <span class="fs-12">4.30 AM</span>
-                            </div>
-                        </div>
-                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 616px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 506px;"></div></div>
+                    <div class="card-body dlab-scroll height520 ps ps--active-y" id="discussion">
+                        @*<div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 616px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 506px;"></div></div>*@
                     </div>
                     <div class="card-footer border-0 type-massage">
-                        <div class="input-group">
-                            <textarea class="form-control" placeholder="Type message..."></textarea>
-                            <div class="input-group-append">
-                                <button type="button" class="btn shadow-none pr-0"><i class="las la-paperclip scale5"></i></button>
-                                <button type="button" class="btn shadow-none"><i class="las la-image scale5"></i></button>
-                                <button type="button" class="btn btn-primary light rounded">SEND</button>
+                        <form id="chat" onsubmit="return false;">
+                            <div class="input-group">
+                                <textarea id="message" name="message" class="form-control" placeholder="Type message..."></textarea>
+                                <div class="input-group-append">
+                                    <input type="hidden" id="channel" name="channel" value="0">
+                                    <button type="submit" class="btn btn-primary light rounded">SEND</button>
+                                </div>
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -326,7 +103,11 @@
     <!--SignalR script to update the chat page and send messages.-->
 
     <script>
-        $.connection.hub.qs = { "userId": '@Session["userId"]', "name": '@Session["name"]' };
+        $.connection.hub.qs = { "userId": '@Session["userId"]' };
+
+        var connection = $.connection;
+        var chatHub = connection.chatHub;
+        var accountId = connection.hub.qs.userId;
 
         var managerChannel = {
             load: function (page = 1, key = null) {
@@ -335,41 +116,46 @@
                     url: "/Admin/Channels/GetData",
                     data: { page: page, key: key },
                     success: function (res) {
-                        console.log(res)
+
                         let _html = "";
                         var ii = 1;
                         for (let item of res.data) {
+                            _html += `
+                                <div class="media mb-4 btn-reply" data-channel="${item.ChannelId}" >
+                                    <div class="image-bx mr-sm-4 mr-2">
+                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
+                                        <span class="active"></span>
+                                    </div>
+                                    <div class="media-body">
+                                        <div class="d-flex mb-sm-2 mb-0">
+                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId}" onclick="retur false;">
+                                                <h6 class="text-black font-w600 fs-16 mb-0">${(item.AccountName) == null ? "" : item.AccountName}</h6>
+                                            </a>
+                                            <span class="ml-auto fs-14">${(item.LastUpdated) == null ? "" : item.LastUpdated}</span>
+                                        </div>
+                                        <p class="text-black">${(item.LastMessages) == null ? "" : item.LastMessages}</p>
+                                    </div>
+                                </div>`;
 
-                            _html += `<tr>
-                                        <td>#${ii}</td>
-                                        <td>${(item.AccountName) == null ? "" : item.AccountName}</td>
-                                        <td>${(item.LastMessages) == null ? "" : item.LastMessages}</td>
-                                        <td>${(item.LastUpdated) == null ? "" : item.LastUpdated}</td>
-                                        <td class="btn-group">
-                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId}" class='btn btn-primary btn-detail'>View profile</a>
-                                            <button data-id="${item.ChannelId}" class='btn btn-success btn-reply'>Reply</button>
-                                        </td>
-                                    </tr>`
                             ii++;
                         }
-                        $('#tbl_channel').html(_html);
+                        $('#AllMessage').html(_html);
 
-                        var pages = '';
-                        for (var i = 1; i <= res.totalPages; i++) {
-                            if (i == res.currentPage) {
-                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
-                            } else {
-                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
-                            }
-                        }
-                        $(".pagination").html(pages);
+                        var channel = $(".btn-reply").first().data("channel");
+                        chatHub.server.join(channel ?? 0);
                     }
                 });
             },
         };
 
         $(function () {
-            managerChannel.load();
+            $("#message").keypress(function (e) {
+                if (e.which === 13 && !e.shiftKey) {
+                    e.preventDefault();
+
+                    $("#chat").submit();
+                }
+            });
 
             $("#key").keyup(function () {
                 let key = $("#key").val();
@@ -381,10 +167,6 @@
                 let key = $("#key").val();
                 managerChannel.load(page, key);
             });
-
-            var connection = $.connection;
-            var chatHub = connection.chatHub;
-            var accountId = connection.hub.qs.userId;
 
             chatHub.client.updateUser = function (userView) {
                 console.log(userView);
@@ -422,18 +204,20 @@
                 managerChannel.load();
             };
 
-            // Create a function that the hub can call back to display messages.
-            chatHub.client.onlineList = function (data) {
-                let _html = "";
-                for (let item of res.data) {
-                    _html += `<a href="#" class="nav-link">
-                            <i class="fas fa-inbox"></i> item
-                        </a>`;
-                }
-                $('#list-online').html(_html);
-            };
+            //// Create a function that the hub can call back to display messages.
+            //chatHub.client.onlineList = function (data) {
+            //    let _html = "";
+            //    for (let item of res.data) {
+            //        _html += `<a href="#" class="nav-link">
+            //                <i class="fas fa-inbox"></i> item
+            //            </a>`;
+            //    }
+            //    $('#list-online').html(_html);
+            //};
 
             connection.hub.start().done(function () {
+                managerChannel.load();
+
                 $('#chat').submit(function () {
                     if ($('#message').val() !== "") {
                         chatHub.server.sendToChannel($('#channel').val(), $('#message').val());
@@ -451,20 +235,17 @@
             });
 
             $(document).on("click", ".btn-reply", function () {
-                let channelId = $(this).data("id");
-                $("#channel").val(channelId);
+                let channelId = $(this).data("channel");
+                if ($("#channel").val() !== channelId) {
+                    $("#channel").val(channelId);
+                    chatHub.server.join(channelId);
+                }
 
-                chatHub.server.join(channelId);
-
-                $(".chat-popup").show();
                 $('#message').focus();
-                $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
-            });
-
-            $(".direct-chat .btn-remove").click(function () {
-                $(".chat-icon").show();
-                $(".direct-chat").hide();
-                $('#discussion').html("");
+                $('#discussion')
+                    .ready(function () {
+                        $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                    });
             });
 
             $(document).on("click", "#discussion .btn-loadmore", function () {
@@ -489,21 +270,23 @@
             });
 
             function connvertMessage(accountId, messageView) {
-                return `
-                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''}" data-message="${messageView.MessageId}">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
-                                    ${htmlEncode(messageView.AccountName)}
-                                </span>
-                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
-                                    ${messageView.Timestamp}
-                                </span>
-                            </div>
-                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+                var image = `<div class="image-bx ${accountId == messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
+                                <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">
+                                <span class="active"></span>
+                            </div>`;
 
-                            <div class="direct-chat-text">
-                                ${htmlEncode(messageView.Content)}
+                return `
+                        <div class="direct-chat-msg media mb-4 justify-content-${accountId == messageView.AccountId ? 'end' : 'start'}
+                                align-items-${accountId == messageView.AccountId ? 'end' : 'start'}" data-message="${messageView.MessageId}">
+                            ${accountId == messageView.AccountId ? '' : image}
+                            <div class="${accountId == messageView.AccountId ? 'message-sent' : 'message-received'}">
+                                <p class="mb-1">
+                                    ${htmlEncode(messageView.Content)}
+                                </p>
+                                <span class="fs-12">${htmlEncode(messageView.AccountName)}</span>
+                                <span class="fs-12">${messageView.Timestamp}</span>
                             </div>
+                            ${accountId == messageView.AccountId ? image : '' }
                         </div>`;
             };
 
