@@ -67,7 +67,8 @@
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ViewModel\ChannelViewModels.cs" />
+    <Compile Include="ViewModel\ChannelViewModel.cs" />
+    <Compile Include="ViewModel\MessageViewModel.cs" />
     <Compile Include="ViewModel\ProfileViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
     <Compile Include="ViewModel\BalanceViewModels.cs" />
@@ -77,6 +78,7 @@
     <Compile Include="ViewModel\RoleViewModels.cs" />
     <Compile Include="ViewModel\TransactionsViewModels.cs" />
     <Compile Include="ViewModel\UpdateAccountViewModels.cs" />
+    <Compile Include="ViewModel\UserViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
