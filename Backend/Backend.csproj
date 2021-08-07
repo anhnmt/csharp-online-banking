@@ -536,6 +536,7 @@
     <Content Include="Content\vendor\summernote\font\summernote.woff" />
     <Content Include="Content\vendor\summernote\font\summernote.woff2" />
     <Content Include="Content\vendor\summernote\font\summernoted41d.eot" />
+    <Content Include="Areas\Admin\Views\Shared\_Layout - Copy.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -574,7 +575,6 @@
     <Content Include="Views\Transactions\Index.cshtml" />
     <Content Include="Views\BankAccounts\Index.cshtml" />
     <Content Include="Views\Transactions\ProfileAccountNumber.cshtml" />
-    <Content Include="Views\Home\Login - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
