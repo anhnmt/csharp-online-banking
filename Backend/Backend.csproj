@@ -574,6 +574,7 @@
     <Content Include="Views\Transactions\Index.cshtml" />
     <Content Include="Views\BankAccounts\Index.cshtml" />
     <Content Include="Views\Transactions\ProfileAccountNumber.cshtml" />
+    <Content Include="Views\Home\Login - Copy.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
