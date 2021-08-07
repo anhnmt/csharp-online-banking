@@ -18,17 +18,11 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-
         #region Properties
         /// <summary>
         /// List of online users
         /// </summary>
         public readonly static List<UserViewModel> _Connections = new List<UserViewModel>();
-
-        /// <summary>
-        /// List of all users
-        /// </summary>
-        public readonly static List<UserViewModel> _Accounts = new List<UserViewModel>();
 
         /// <summary>
         /// Mapping SignalR connections to application users.
@@ -112,41 +106,6 @@ namespace Backend.Hubs
             return 0;
         }
 
-        public void Join(int channelId)
-        {
-            try
-            {
-                var account = _Connections.Where(u => u.AccountId == GetIntegerAccountId()).FirstOrDefault();
-
-                if (!Utils.IsNullOrEmpty(account))
-                {
-                    if (account.CurrentChannelId != channelId)
-                    {
-                        // Remove user from others list
-                        if (!string.IsNullOrEmpty(account.CurrentChannelId.ToString()))
-                            Clients.Group(account.CurrentChannelId.ToString()).removeUser(account);
-
-                        // Join to new chat room
-                        Leave(account.CurrentChannelId);
-                        Groups.Add(Context.ConnectionId, channelId.ToString());
-                        account.CurrentChannelId = channelId;
-
-                        // Tell others to update their list of users
-                        Clients.Group(channelId.ToString()).addUser(account);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Clients.Caller.onError("You failed to join the chat room!" + ex.Message);
-            }
-        }
-
-        private void Leave(int channelId)
-        {
-            Groups.Remove(Context.ConnectionId, channelId.ToString());
-        }
-
         //public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
         //{
         //    if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
@@ -171,7 +130,7 @@ namespace Backend.Hubs
 
         public IEnumerable<UserViewModel> GetOnlineAccounts()
         {
-            return _Accounts;
+            return _Connections;
         }
 
         #region OnConnected/OnReconnected/OnDisconnected
@@ -192,16 +151,15 @@ namespace Backend.Hubs
                     {
                         var channel = FindChannelByAccountId(accountId);
                         userViewModel.CurrentChannelId = channel.ChannelId;
-                        Join(channel.ChannelId);
+                        Groups.Add(connection, channel.ChannelId.ToString());
                     }
 
-                    var tempAccount = _Accounts.Where(u => u.AccountId == accountId).FirstOrDefault();
-                    _Accounts.Remove(tempAccount);
-
-                    _Accounts.Add(userViewModel);
-                    Clients.All.UpdateUser(userViewModel);
+                    var tempAccount = _Connections.Where(u => u.AccountId == accountId).FirstOrDefault();
+                    _Connections.Remove(tempAccount);
 
                     _Connections.Add(userViewModel);
+                    Clients.All.UpdateUser(userViewModel);
+
                     _ConnectionsMap.TryAdd(accountId.ToString(), connection);
                 }
             }
@@ -222,24 +180,18 @@ namespace Backend.Hubs
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            var connection = Context.ConnectionId;
             var accountId = GetIntegerAccountId();
 
             try
             {
-                var tempAccount = _Accounts.Where(u => u.AccountId == accountId).FirstOrDefault();
-                _Accounts.Remove(tempAccount);
+                var tempAccount = _Connections.Where(u => u.AccountId == accountId).FirstOrDefault();
+                _Connections.Remove(tempAccount);
 
+                _Connections.Add(tempAccount);
                 Clients.All.UpdateUser(tempAccount);
 
-                var account = _Connections.Where(u => u.AccountId == accountId).FirstOrDefault();
-                _Connections.Remove(account);
-
-                // Tell other users to remove you from their list
-                Clients.OthersInGroup(account.CurrentChannelId.ToString()).removeUser(account);
-
                 // Remove mapping
-                _ConnectionsMap.TryRemove(account.AccountId.ToString(), out string value);
+                _ConnectionsMap.TryRemove(tempAccount.AccountId.ToString(), out string value);
 
             }
             catch (Exception ex)
@@ -250,6 +202,43 @@ namespace Backend.Hubs
             return base.OnDisconnected(stopCalled);
         }
         #endregion
+        public Task Join(int channelId)
+        {
+            try
+            {
+                var account = _Connections.Where(u => u.AccountId == GetIntegerAccountId()).FirstOrDefault();
+
+                //if (!Utils.IsNullOrEmpty(account))
+                //{
+                if (account.CurrentChannelId != channelId)
+                {
+                    // Join to new chat room
+                    Leave(account.CurrentChannelId);
+                    Groups.Add(Context.ConnectionId, channelId.ToString());
+                    _Connections.Remove(account);
+
+                    account.CurrentChannelId = channelId;
+
+                    _Connections.Add(account);
+                    Clients.All.UpdateUser(account);
+
+                    return Groups.Add(Context.ConnectionId, channelId.ToString());
+                }
+                //}
+            }
+            catch (Exception ex)
+            {
+                Clients.Caller.onError("You failed to join the chat room!" + ex.Message);
+            }
+
+            return null;
+        }
+
+        private Task Leave(int channelId)
+        {
+            return Groups.Remove(Context.ConnectionId, channelId.ToString());
+        }
+
         private Channels FindChannelByChannelId(int channelId)
         {
             return channelRepo.Get(x => x.ChannelId == channelId).FirstOrDefault();

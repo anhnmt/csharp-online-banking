@@ -277,7 +277,7 @@
             connection.hub.start().done(function () {
                 $('#chat').submit(function () {
                     if ($('#message').val() !== "") {
-                        chatHub.server.send($('#channel').val(), $('#message').val());
+                        chatHub.server.sendToChannel($('#channel').val(), $('#message').val());
                         // Clear text box and reset focus for next comment.
                         $('#message').val('').focus();
                     }
