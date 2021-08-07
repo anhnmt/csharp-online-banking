@@ -31,9 +31,9 @@ namespace Backend.Hubs
         private readonly static ConnectionMapping<string> _ConnectionsMap = new ConnectionMapping<string>();
         #endregion
 
-        private IRepository<Accounts> accountRepo;
-        private IRepository<Channels> channelRepo;
-        private IRepository<Messages> messageRepo;
+        private readonly IRepository<Accounts> accountRepo;
+        private readonly IRepository<Channels> channelRepo;
+        private readonly IRepository<Messages> messageRepo;
 
         public ChatHub()
         {
