@@ -1,0 +1,366 @@
+﻿@model IEnumerable<OnlineBanking.DAL.Channels>
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+@section customCss {
+    <style>
+        .chat-popup {
+            position: fixed !important;
+            bottom: 0;
+            right: 0;
+            margin-right: 10px;
+            width: 450px;
+            z-index: 3;
+        }
+
+        .direct-chat-messages {
+            height: 550px;
+        }
+
+        .card-title {
+            margin: 0 10px 0 0;
+        }
+
+        .card-header::after {
+            display: block;
+            clear: both;
+            content: unset;
+        }
+    </style>
+}
+
+<div class="page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Wizard</a></li>
+    </ol>
+</div>
+<!-- row -->
+<div class="row">
+</div>
+
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Chats Management</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item active">Inbox</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-md-3">
+                <a href="compose.html" class="btn btn-primary btn-block mb-3">Compose</a>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Folders</h3>
+
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="nav nav-pills flex-column">
+                            <li class="nav-item active" id="list-online">
+                                <a href="#" class="nav-link">
+                                    <i class="fas fa-inbox"></i> Inbox
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+            </div>
+            <!-- /.col -->
+            <div class="col-md-9">
+                <div class="card card-primary card-outline">
+                    <div class="card-header">
+                        <h3 class="card-title">Inbox</h3>
+
+                        <div class="card-tools">
+                            <div class="input-group input-group-sm">
+                                <input type="text" class="form-control form-control-sm" placeholder="Search message" name="key" id="key" aria-controls="">
+                                <div class="input-group-append">
+                                    <div class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- /.card-tools -->
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body p-0">
+                        <table class="table table-hover" id="datatables">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>User Name</th>
+                                    <th>Last Message</th>
+                                    <th>Last Updated</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl_channel"></tbody>
+
+                        </table>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+                        <ul class="pagination" id="pagination">
+                            <li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+
+
+            <div class="card direct-chat chat-popup direct-chat-primary" style="display: none;">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h3 class="card-title">
+                        Direct Chat
+                        <span data-toggle="tooltip" title="3 New Messages" class="badge badge-warning">3</span>
+                    </h3>
+
+                    <div class="card-tools">
+                        <button type="button" class="btn btn-tool" data-card-widget="remove">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <!-- /.card-header -->
+                <div class="card-body" style="display: block;">
+                    <!-- Conversations are loaded here -->
+                    <div class="direct-chat-messages" id="discussion">
+                    </div>
+                    <!--/.direct-chat-messages-->
+                </div>
+                <!-- /.card-body -->
+                <div class="card-footer" style="display: block;">
+                    <form action="#" method="post" id="chat" onsubmit="return false;">
+                        <div class="input-group">
+                            <input type="hidden" id="channel" name="channel" value="0">
+                            <input type="text" id="message" name="message" placeholder="Type Message ..." class="form-control">
+                            <span class="input-group-append">
+                                <button type="submit" class="btn btn-primary">Send</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card-footer-->
+            </div>
+        </div>
+        <!-- /.row -->
+    </section>
+    <!-- /.content -->
+</div>
+
+@section Scripts {
+    <!--Reference the SignalR library. -->
+    <script src="~/Scripts/jquery.signalR-2.2.2.min.js"></script>
+    <!--Reference the autogenerated SignalR hub script. -->
+    <script src="~/signalr/hubs"></script>
+    <!--SignalR script to update the chat page and send messages.-->
+
+    <script>
+        $.connection.hub.qs = { "userId": '@Session["userId"]', "name": '@Session["name"]' };
+
+        var managerChannel = {
+            load: function (page = 1, key = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Channels/GetData",
+                    data: { page: page, key: key },
+                    success: function (res) {
+                        console.log(res)
+                        let _html = "";
+                        var ii = 1;
+                        for (let item of res.data) {
+
+                            _html += `<tr>
+                                        <td>#${ii}</td>
+                                        <td>${(item.AccountName) == null ? "" : item.AccountName}</td>
+                                        <td>${(item.LastMessages) == null ? "" : item.LastMessages}</td>
+                                        <td>${(item.LastUpdated) == null ? "" : item.LastUpdated}</td>
+                                        <td class="btn-group">
+                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId}" class='btn btn-primary btn-detail'>View profile</a>
+                                            <button data-id="${item.ChannelId}" class='btn btn-success btn-reply'>Reply</button>
+                                        </td>
+                                    </tr>`
+                            ii++;
+                        }
+                        $('#tbl_channel').html(_html);
+
+                        var pages = '';
+                        for (var i = 1; i <= res.totalPages; i++) {
+                            if (i == res.currentPage) {
+                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            } else {
+                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            }
+                        }
+                        $(".pagination").html(pages);
+                    }
+                });
+            },
+        };
+
+        $(function () {
+            managerChannel.load();
+
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                managerChannel.load(1, key);
+            });
+
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                managerChannel.load(page, key);
+            });
+
+            var connection = $.connection;
+            var chatHub = connection.chatHub;
+            var accountId = connection.hub.qs.userId;
+
+            chatHub.client.updateUser = function (userView) {
+                console.log(userView);
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.newMessage = function (messageView) {
+                var msg = connvertMessage(accountId, messageView);
+
+                $('#discussion')
+                    .append(msg)
+                    .ready(function () {
+                        $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                    });
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.historyMessages = function (historyMessages) {
+                console.log(historyMessages.length);
+                if (historyMessages.length >= 10) {
+                    $('#discussion')
+                        .html('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
+                }
+                var msg = "";
+
+                for (let messageView of historyMessages) {
+                    msg += connvertMessage(accountId, messageView);
+                }
+
+                $('#discussion').append(msg);
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.reloadChatData = function () {
+                managerChannel.load();
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.onlineList = function (data) {
+                let _html = "";
+                for (let item of res.data) {
+                    _html += `<a href="#" class="nav-link">
+                            <i class="fas fa-inbox"></i> item
+                        </a>`;
+                }
+                $('#list-online').html(_html);
+            };
+
+            connection.hub.start().done(function () {
+                $('#chat').submit(function () {
+                    if ($('#message').val() !== "") {
+                        chatHub.server.sendToChannel($('#channel').val(), $('#message').val());
+                        // Clear text box and reset focus for next comment.
+                        $('#message').val('').focus();
+                    }
+                    event.preventDefault();
+                });
+            });
+
+            connection.hub.disconnected(function () {
+                setTimeout(function () {
+                    connection.hub.start();
+                }, 3000); // Restart connection
+            });
+
+            $(document).on("click", ".btn-reply", function () {
+                let channelId = $(this).data("id");
+                $("#channel").val(channelId);
+
+                chatHub.server.join(channelId);
+
+                $(".chat-popup").show();
+                $('#message').focus();
+                $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+            });
+
+            $(".direct-chat .btn-remove").click(function () {
+                $(".chat-icon").show();
+                $(".direct-chat").hide();
+                $('#discussion').html("");
+            });
+
+            $(document).on("click", "#discussion .btn-loadmore", function () {
+                $(this).hide().remove();
+                var msg = $(".direct-chat-msg").first().data("message");
+
+                chatHub.server.getMessageHistory($("#channel").val(), msg ?? 0).done(function (historyMessages) {
+                    console.log(historyMessages.length);
+                    var msg = "";
+
+                    for (let messageView of historyMessages) {
+                        msg += connvertMessage(accountId, messageView);
+                    }
+
+                    $('#discussion').prepend(msg);
+
+                    if (historyMessages.length >= 10) {
+                        $('#discussion')
+                            .prepend('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
+                    }
+                });
+            });
+
+            function connvertMessage(accountId, messageView) {
+                return `
+                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''}" data-message="${messageView.MessageId}">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
+                                    ${htmlEncode(messageView.AccountName)}
+                                </span>
+                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
+                                    ${messageView.Timestamp}
+                                </span>
+                            </div>
+                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+
+                            <div class="direct-chat-text">
+                                ${htmlEncode(messageView.Content)}
+                            </div>
+                        </div>`;
+            };
+
+        });
+    </script>
+}
