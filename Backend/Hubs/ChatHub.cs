@@ -106,12 +106,26 @@ namespace Backend.Hubs
             return 0;
         }
 
-        public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
+        public IEnumerable<MessageViewModel> GetMessageHistory(int channelId, int messageId = 0)
         {
             if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
             {
-                var messageHistory = messageRepo.Get().Where(m => m.Channel.ChannelId == channelId)
-                .OrderByDescending(m => m.Timestamp)
+                IEnumerable<Messages> messageHistory;
+
+                if (!Utils.IsNullOrEmpty(messageId) && messageId != 0)
+                {
+                    messageHistory = messageRepo.Get()
+                        .Where(m => m.Channel.ChannelId == channelId && m.MessageId < messageId)
+                        .OrderByDescending(m => m.MessageId);
+                }
+                else
+                {
+                    messageHistory = messageRepo.Get()
+                        .Where(m => m.Channel.ChannelId == channelId)
+                        .OrderByDescending(m => m.Timestamp);
+                }
+
+                var result = messageHistory
                 .Take(10)
                 .AsEnumerable()
                 .Reverse()
@@ -122,7 +136,7 @@ namespace Backend.Hubs
                     return new MessageViewModel(x, account?.Name);
                 });
 
-                return messageHistory;
+                return result;
             }
 
             return null;

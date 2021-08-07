@@ -230,28 +230,13 @@
             var chatHub = connection.chatHub;
             var accountId = connection.hub.qs.userId;
 
+            chatHub.client.updateUser = function (userView) {
+                console.log(userView);
+            };
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.newMessage = function (messageView) {
-                var msg = `
-                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''} ">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
-                                    ${htmlEncode(messageView.AccountName)}
-                                </span>
-                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
-                                    ${messageView.Timestamp}
-                                </span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
-
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                ${htmlEncode(messageView.Content)}
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>`;
+                var msg = connvertMessage(accountId, messageView);
 
                 $('#discussion')
                     .append(msg)
@@ -262,36 +247,18 @@
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.historyMessages = function (historyMessages) {
-                $('#discussion').html("")
+                console.log(historyMessages.length);
+                if (historyMessages.length >= 10) {
+                    $('#discussion')
+                        .html('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
+                }
                 var msg = "";
 
                 for (let messageView of historyMessages) {
-                    msg += `
-                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''} ">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
-                                    ${htmlEncode(messageView.AccountName)}
-                                </span>
-                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
-                                    ${messageView.Timestamp}
-                                </span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
-
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                ${htmlEncode(messageView.Content)}
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>`;
+                    msg += connvertMessage(accountId, messageView);
                 }
 
-                $('#discussion')
-                    .html(msg)
-                    .ready(function () {
-                    $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
-                });
+                $('#discussion').append(msg);
             };
 
             // Create a function that the hub can call back to display messages.
@@ -331,11 +298,10 @@
                 let channelId = $(this).data("id");
                 $("#channel").val(channelId);
 
-                chatHub.server.join(channelId).done(function () {
-                    $(".chat-popup").show();
-                    $('#message').focus();
-                });
+                chatHub.server.join(channelId);
 
+                $(".chat-popup").show();
+                $('#message').focus();
                 $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
             });
 
@@ -344,6 +310,46 @@
                 $(".direct-chat").hide();
                 $('#discussion').html("");
             });
+
+            $(document).on("click", "#discussion .btn-loadmore", function () {
+                $(this).hide().remove();
+                var msg = $(".direct-chat-msg").first().data("message");
+
+                chatHub.server.getMessageHistory($("#channel").val(), msg ?? 0).done(function (historyMessages) {
+                    console.log(historyMessages.length);
+                    var msg = "";
+
+                    for (let messageView of historyMessages) {
+                        msg += connvertMessage(accountId, messageView);
+                    }
+
+                    $('#discussion').prepend(msg);
+
+                    if (historyMessages.length >= 10) {
+                        $('#discussion')
+                            .prepend('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
+                    }
+                });
+            });
+
+            function connvertMessage(accountId, messageView) {
+                return `
+                        <div class="direct-chat-msg ${accountId == messageView.AccountId ? 'right' : ''}" data-message="${messageView.MessageId}">
+                            <div class="direct-chat-infos clearfix">
+                                <span class="direct-chat-name ${accountId == messageView.AccountId ? 'float-right' : 'float-left'}">
+                                    ${htmlEncode(messageView.AccountName)}
+                                </span>
+                                <span class="direct-chat-timestamp ${accountId == messageView.AccountId ? 'float-left' : 'float-right'}">
+                                    ${messageView.Timestamp}
+                                </span>
+                            </div>
+                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+
+                            <div class="direct-chat-text">
+                                ${htmlEncode(messageView.Content)}
+                            </div>
+                        </div>`;
+            };
 
         });
     </script>
