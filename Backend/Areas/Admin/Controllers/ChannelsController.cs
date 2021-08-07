@@ -52,8 +52,8 @@ namespace Backend.Areas.Admin.Controllers
                     return new ChannelViewModels
                     {
                         ChannelId = x.ChannelId,
-                        AccountId = x.AccountId,
-                        AccountName = x.Account.Name,
+                        AccountId = x.UserId,
+                        AccountName = x.User.Name,
                         LastMessages = lastMessage?.Content,
                         LastUpdated = lastMessage?.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss"),
                         CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),

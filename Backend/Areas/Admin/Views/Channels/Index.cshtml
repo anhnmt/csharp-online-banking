@@ -146,7 +146,7 @@
                 <div class="card-footer" style="display: block;">
                     <form action="#" method="post" id="chat" onsubmit="return false;">
                         <div class="input-group">
-                            <input type="hidden" id="channel" name="channel">
+                            <input type="hidden" id="channel" name="channel" value="0">
                             <input type="text" id="message" name="message" placeholder="Type Message ..." class="form-control">
                             <span class="input-group-append">
                                 <button type="submit" class="btn btn-primary">Send</button>
@@ -232,26 +232,27 @@
 
 
             // Create a function that the hub can call back to display messages.
-            chatHub.client.addNewMessageToPage = function (name, message) {
-                var msg = `
-                        <div class="direct-chat-msg ${user == name ? 'right' : ''} ">
-                            <div class="direct-chat-infos clearfix">
-                                <span class="direct-chat-name ${user == name ? 'float-right' : 'float-left'}">${htmlEncode(name)}</span>
-                                <span class="direct-chat-timestamp ${user == name ? 'float-left' : 'float-right'}">23 Jan 2:05 pm</span>
-                            </div>
-                            <!-- /.direct-chat-infos -->
-                            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
+            chatHub.client.newMessage = function (res) {
+                console.log(res);
+                //var msg = `
+                //        <div class="direct-chat-msg ${user == name ? 'right' : ''} ">
+                //            <div class="direct-chat-infos clearfix">
+                //                <span class="direct-chat-name ${user == name ? 'float-right' : 'float-left'}">${htmlEncode(name)}</span>
+                //                <span class="direct-chat-timestamp ${user == name ? 'float-left' : 'float-right'}">23 Jan 2:05 pm</span>
+                //            </div>
+                //            <!-- /.direct-chat-infos -->
+                //            <img class="direct-chat-img" src="/Content/dist/img/user3-128x128.jpg" alt="message user image">
 
-                            <!-- /.direct-chat-img -->
-                            <div class="direct-chat-text">
-                                ${htmlEncode(message)}
-                            </div>
-                            <!-- /.direct-chat-text -->
-                        </div>`;
-                // Add the message to the page.
-                $('#discussion')
-                    .append(msg)
-                    .animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                //            <!-- /.direct-chat-img -->
+                //            <div class="direct-chat-text">
+                //                ${htmlEncode(message)}
+                //            </div>
+                //            <!-- /.direct-chat-text -->
+                //        </div>`;
+                //// Add the message to the page.
+                //$('#discussion')
+                //    .append(msg)
+                //    .animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
             };
 
             // Create a function that the hub can call back to display messages.
@@ -273,7 +274,7 @@
             connection.hub.start().done(function () {
                 $('#chat').submit(function () {
                     if ($('#message').val() !== "") {
-                        chatHub.server.reply($('#channel').val(), $('#message').val());
+                        chatHub.server.send($('#channel').val(), $('#message').val());
                         // Clear text box and reset focus for next comment.
                         $('#message').val('').focus();
                     }
@@ -293,7 +294,7 @@
 
                 let channelId = $(this).data("id");
                 $("#channel").val(channelId);
-                chatHub.server.connectChannel(channelId);
+                $('#discussion').html("");
             });
 
             $(".direct-chat .btn-remove").click(function () {

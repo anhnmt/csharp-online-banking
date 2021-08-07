@@ -17,16 +17,21 @@ namespace OnlineBanking.DAL
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Transactions>()
-                        .HasRequired(t => t.FromAccount)
-                        .WithMany(a => a.FromTransactions)
-                        .HasForeignKey(m => m.FromId)
-                        .WillCascadeOnDelete(false);
+                .HasRequired(t => t.FromAccount)
+                .WithMany(a => a.FromTransactions)
+                .HasForeignKey(m => m.FromId)
+                .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Transactions>()
-                        .HasRequired(m => m.ToAccount)
-                        .WithMany(a => a.ToTransactions)
-                        .HasForeignKey(m => m.ToId)
-                        .WillCascadeOnDelete(false);
+                .HasRequired(m => m.ToAccount)
+                .WithMany(a => a.ToTransactions)
+                .HasForeignKey(m => m.ToId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Messages>()
+                .HasRequired(m => m.Account)
+                .WithMany()
+                .WillCascadeOnDelete(false);
         }
 
         public override int SaveChanges()

@@ -10,10 +10,6 @@ namespace OnlineBanking.DAL
 {
     public class Messages
     {
-        public Messages()
-        {
-        }
-
         [Key]
         public int MessageId { get; set; }
 
@@ -28,10 +24,10 @@ namespace OnlineBanking.DAL
 
         public DateTime? Timestamp { get; set; }
 
-        //[ForeignKey("AccountId")]
-        //public virtual Accounts Account { get; set; }
+        [ForeignKey("AccountId")]
+        public virtual Accounts Account { get; set; }
 
-        //[ForeignKey("ChannelId")]
-        //public virtual Channels Channel { get; set; }
+        [ForeignKey("ChannelId")]
+        public virtual Channels Channel { get; set; }
     }
 }

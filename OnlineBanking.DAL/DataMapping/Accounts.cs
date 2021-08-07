@@ -33,6 +33,5 @@ namespace OnlineBanking.DAL
         public virtual Roles Role { get; set; }
 
         public ICollection<BankAccounts> BankAccounts { get; set; }
-
     }
 }
