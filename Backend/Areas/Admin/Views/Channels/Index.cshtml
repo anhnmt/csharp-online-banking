@@ -179,6 +179,7 @@
                     url: "/Admin/Channels/GetData",
                     data: { page: page, key: key },
                     success: function (res) {
+                        console.log(res)
                         let _html = "";
                         var ii = 1;
                         for (let item of res.data) {
