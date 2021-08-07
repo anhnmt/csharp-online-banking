@@ -122,21 +122,19 @@
 
                         for (let item of res.data) {
                             if ($("#channel").val() == item.ChannelId) {
-                                $("#user-name").html(item.AccountName ?? '');
+                                $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">${item.AccountName ?? ''}</a>`);
                                 $("#user-timestamp").html(moment(item.LastUpdated ?? "").fromNow());
                             }
 
                             _html += `
-                                <div class="media mb-4 btn-reply" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
+                                <div class="media mb-4 btn-reply" data-account="${item.AccountId ?? '0'}" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
                                     <div class="image-bx mr-sm-4 mr-2">
                                         <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
                                         <span class="active"></span>
                                     </div>
                                     <div class="media-body w-25">
                                         <div class="d-flex mb-sm-2 mb-0">
-                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">
-                                                <h6 class="text-black font-w600 fs-16 mb-0">${item.AccountName ?? ""}</h6>
-                                            </a>
+                                            <h6 class="text-black font-w600 fs-16 mb-0">${item.AccountName ?? ""}</h6>
                                             <span class="ml-auto fs-14">${moment(item.LastUpdated ?? "").fromNow()}</span>
                                         </div>
                                         <p class="text-black text-truncate">${item.LastMessages ?? ""}</p>
@@ -239,10 +237,11 @@
                 let channelId = $(this).data("channel");
 
                 if ($("#channel").val() !== channelId) {
+                    let account = $(this).data("account");
                     let name = $(this).data("name");
                     let timestamp = $(this).data("timestamp");
 
-                    $("#user-name").html(name ?? "");
+                    $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${account ?? '0'}" onclick="return false;">${name ?? ''}</a>`);
                     $("#user-timestamp").html(moment(timestamp ?? "").fromNow());
 
                     $("#channel").val(channelId);
