@@ -48,19 +48,7 @@ namespace Backend.Hubs
             this.messageRepo = new Repository<Messages>();
         }
 
-        public int Send(int channelId, string message)
-        {
-            if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
-            {
-                return SendToChannel(channelId, message);
-            }
-            else
-            {
-                return SendPrivate(message);
-            }
-        }
-
-        private int SendPrivate(string message)
+        public int SendPrivate(string message)
         {
             try
             {
@@ -78,7 +66,7 @@ namespace Backend.Hubs
                 messageRepo.Add(msg);
 
                 // Broadcast the message
-                var messageViewModel = new MessageViewModel(msg);
+                var messageViewModel = new MessageViewModel(msg, account.Name);
                 Clients.Group(channel.ChannelId.ToString()).newMessage(messageViewModel);
                 Clients.All.reloadChatData();
 
@@ -92,7 +80,7 @@ namespace Backend.Hubs
             return 0;
         }
 
-        private int SendToChannel(int channelId, string message)
+        public int SendToChannel(int channelId, string message)
         {
             try
             {
@@ -110,7 +98,7 @@ namespace Backend.Hubs
                 messageRepo.Add(msg);
 
                 // Broadcast the message
-                var messageViewModel = new MessageViewModel(msg);
+                var messageViewModel = new MessageViewModel(msg, account.Name);
                 Clients.Group(channelId.ToString()).newMessage(messageViewModel);
                 Clients.All.reloadChatData();
 
@@ -128,20 +116,24 @@ namespace Backend.Hubs
         {
             try
             {
-                var user = _Connections.Where(u => u.AccountId == GetIntegerAccountId()).FirstOrDefault();
-                if (user.CurrentChannelId != channelId)
+                var account = _Connections.Where(u => u.AccountId == GetIntegerAccountId()).FirstOrDefault();
+
+                if (!Utils.IsNullOrEmpty(account))
                 {
-                    // Remove user from others list
-                    if (!string.IsNullOrEmpty(user.CurrentChannelId.ToString()))
-                        Clients.OthersInGroup(user.CurrentChannelId.ToString()).removeUser(user);
+                    if (account.CurrentChannelId != channelId)
+                    {
+                        // Remove user from others list
+                        if (!string.IsNullOrEmpty(account.CurrentChannelId.ToString()))
+                            Clients.Group(account.CurrentChannelId.ToString()).removeUser(account);
 
-                    // Join to new chat room
-                    Leave(user.CurrentChannelId);
-                    Groups.Add(Context.ConnectionId, channelId.ToString());
-                    user.CurrentChannelId = channelId;
+                        // Join to new chat room
+                        Leave(account.CurrentChannelId);
+                        Groups.Add(Context.ConnectionId, channelId.ToString());
+                        account.CurrentChannelId = channelId;
 
-                    // Tell others to update their list of users
-                    Clients.OthersInGroup(channelId.ToString()).addUser(user);
+                        // Tell others to update their list of users
+                        Clients.Group(channelId.ToString()).addUser(account);
+                    }
                 }
             }
             catch (Exception ex)
@@ -155,51 +147,32 @@ namespace Backend.Hubs
             Groups.Remove(Context.ConnectionId, channelId.ToString());
         }
 
-        public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
+        //public IEnumerable<MessageViewModel> GetMessageHistory(int channelId)
+        //{
+        //    if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
+        //    {
+        //        var messageHistory = messageRepo.Get().Where(m => m.Channel.ChannelId == channelId)
+        //        .OrderByDescending(m => m.Timestamp)
+        //        .Take(20)
+        //        .AsEnumerable()
+        //        .Reverse()
+        //        .Select(x => new MessageViewModel(x));
+
+        //        return messageHistory;
+        //    }
+
+        //    return null;
+        //}
+
+        //private void sendListOnline()
+        //{
+        //    Clients.All.onlineList();
+        //}
+
+        public IEnumerable<UserViewModel> GetOnlineAccounts()
         {
-            if (!Utils.IsNullOrEmpty(channelId) && channelId != 0)
-            {
-                var messageHistory = messageRepo.Get().Where(m => m.Channel.ChannelId == channelId)
-                .OrderByDescending(m => m.Timestamp)
-                .Take(20)
-                .AsEnumerable()
-                .Reverse()
-                .Select(x => new MessageViewModel(x));
-
-                return messageHistory;
-            }
-
-            return null;
+            return _Accounts;
         }
-
-        private void sendListOnline()
-        {
-            Clients.All.onlineList();
-        }
-
-        private Channels FindChannelByChannelId(int channelId)
-        {
-            return channelRepo.Get(x => x.ChannelId == channelId).FirstOrDefault();
-        }
-
-        private Channels FindChannelByAccountId(int accountId)
-        {
-            var channel = channelRepo.Get(x => x.UserId == accountId).FirstOrDefault();
-
-            if (Utils.IsNullOrEmpty(channel))
-            {
-                channel = new Channels(accountId);
-                channelRepo.Add(channel);
-            }
-
-            return channel;
-        }
-
-        private Accounts FindAccountByAccountId(int accountId)
-        {
-            return accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
-        }
-
 
         #region OnConnected/OnReconnected/OnDisconnected
         public override Task OnConnected()
@@ -210,22 +183,27 @@ namespace Backend.Hubs
             try
             {
                 var account = accountRepo.Get().Where(u => u.AccountId == accountId).FirstOrDefault();
-                var userViewModel = new UserViewModel(account, 0);
 
-                if (account.RoleId != 1 || account.RoleId != 2)
+                if (!Utils.IsNullOrEmpty(account))
                 {
-                    var channel = FindChannelByAccountId(accountId);
-                    userViewModel.CurrentChannelId = channel.ChannelId;
+                    var userViewModel = new UserViewModel(account, 0);
+
+                    if (account.RoleId != 1 && account.RoleId != 2)
+                    {
+                        var channel = FindChannelByAccountId(accountId);
+                        userViewModel.CurrentChannelId = channel.ChannelId;
+                        Join(channel.ChannelId);
+                    }
+
+                    var tempAccount = _Accounts.Where(u => u.AccountId == accountId).FirstOrDefault();
+                    _Accounts.Remove(tempAccount);
+
+                    _Accounts.Add(userViewModel);
+                    Clients.All.UpdateUser(userViewModel);
+
+                    _Connections.Add(userViewModel);
+                    _ConnectionsMap.TryAdd(accountId.ToString(), connection);
                 }
-
-                var tempAccount = _Accounts.Where(u => u.AccountId == accountId).FirstOrDefault();
-                _Accounts.Remove(tempAccount);
-
-                _Accounts.Add(userViewModel);
-                Clients.All.UpdateUser(userViewModel);
-
-                _Connections.Add(userViewModel);
-                _ConnectionsMap.TryAdd(accountId.ToString(), Context.ConnectionId);
             }
             catch (Exception ex)
             {
@@ -272,10 +250,27 @@ namespace Backend.Hubs
             return base.OnDisconnected(stopCalled);
         }
         #endregion
-
-        public IEnumerable<UserViewModel> GetOnlineAccounts()
+        private Channels FindChannelByChannelId(int channelId)
         {
-            return _Accounts;
+            return channelRepo.Get(x => x.ChannelId == channelId).FirstOrDefault();
+        }
+
+        private Channels FindChannelByAccountId(int accountId)
+        {
+            var channel = channelRepo.Get(x => x.UserId == accountId).FirstOrDefault();
+
+            if (Utils.IsNullOrEmpty(channel))
+            {
+                channel = new Channels(accountId);
+                channelRepo.Add(channel);
+            }
+
+            return channel;
+        }
+
+        private Accounts FindAccountByAccountId(int accountId)
+        {
+            return accountRepo.Get(x => x.AccountId == accountId).FirstOrDefault();
         }
 
         private int GetIntegerAccountId()

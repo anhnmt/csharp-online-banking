@@ -16,7 +16,16 @@ namespace OnlineBanking.DAL
         {
             MessageId = message.MessageId;
             AccountId = message.AccountId;
-            AccountName = message?.Account?.Name;
+            AccountName = message.Account?.Name;
+            Content = message.Content;
+            Timestamp = message.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss");
+        }
+
+        public MessageViewModel(Messages message, string accountName)
+        {
+            MessageId = message.MessageId;
+            AccountId = message.AccountId;
+            AccountName = accountName;
             Content = message.Content;
             Timestamp = message.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss");
         }

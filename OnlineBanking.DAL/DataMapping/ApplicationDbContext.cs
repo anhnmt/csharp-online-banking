@@ -31,6 +31,7 @@ namespace OnlineBanking.DAL
             modelBuilder.Entity<Messages>()
                 .HasRequired(m => m.Account)
                 .WithMany()
+                .HasForeignKey(m => m.AccountId)
                 .WillCascadeOnDelete(false);
         }
 
