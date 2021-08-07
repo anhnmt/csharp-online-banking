@@ -536,7 +536,6 @@
     <Content Include="Content\vendor\summernote\font\summernote.woff" />
     <Content Include="Content\vendor\summernote\font\summernote.woff2" />
     <Content Include="Content\vendor\summernote\font\summernoted41d.eot" />
-    <Content Include="Areas\Admin\Views\Channels\Index - Copy.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
