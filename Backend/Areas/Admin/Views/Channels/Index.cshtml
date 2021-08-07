@@ -118,28 +118,30 @@
                     url: "/Admin/Channels/GetData",
                     data: { page: page, key: key },
                     success: function (res) {
-
                         let _html = "";
-                        var ii = 1;
+
                         for (let item of res.data) {
+                            if ($("#channel").val() == item.ChannelId) {
+                                $("#user-name").html(item.AccountName ?? '');
+                                $("#user-timestamp").html(moment(item.LastUpdated ?? "").fromNow());
+                            }
+
                             _html += `
                                 <div class="media mb-4 btn-reply" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
                                     <div class="image-bx mr-sm-4 mr-2">
                                         <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
                                         <span class="active"></span>
                                     </div>
-                                    <div class="media-body">
+                                    <div class="media-body w-25">
                                         <div class="d-flex mb-sm-2 mb-0">
                                             <a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">
                                                 <h6 class="text-black font-w600 fs-16 mb-0">${item.AccountName ?? ""}</h6>
                                             </a>
                                             <span class="ml-auto fs-14">${moment(item.LastUpdated ?? "").fromNow()}</span>
                                         </div>
-                                        <p class="text-black">${item.LastMessages ?? ""}</p>
+                                        <p class="text-black text-truncate">${item.LastMessages ?? ""}</p>
                                     </div>
                                 </div>`;
-
-                            ii++;
                         }
                         $('#AllMessage').html(_html);
                     }
@@ -245,6 +247,12 @@
 
                     $("#channel").val(channelId);
                     chatHub.server.join(channelId);
+
+                    $('#message').focus();
+                    $('#discussion')
+                        .ready(function () {
+                            $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                        });
                 }
 
                 if ($("#user-list").hasClass("col-xl-12")) {
@@ -254,12 +262,6 @@
 
                     $("#chat-list").show();
                 }
-
-                $('#message').focus();
-                $('#discussion')
-                    .ready(function () {
-                        $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
-                    });
             });
 
 
