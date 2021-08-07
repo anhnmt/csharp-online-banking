@@ -1,79 +1,52 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 @section css{
-    <link href="~/Content/plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="~/Content/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/Content/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
-    <link rel="stylesheet" href="~/Content/plugins/datatables-buttons/css/buttons.bootstrap4.min.css">
+    <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>User Management </h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">User Management</li>
-                    </ol>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
 
-    <!-- Main content -->
-    <section class="content">
-        <div class="col-md-12">
-            <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
+
+<div class="page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">User Management</a></li>
+    </ol>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
+        <div class="card">
+
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">User Management</h3>
                 </div>
                 <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>RoleName </th>
+                                    <th>Status </th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbl_user"></tbody>
 
-
-                    @*<div class="form-inline">
-                        <label>Search : </label>
-                        <input type="search" class="form-control form-control-sm" placeholder="Input Email" name="key" id="key" aria-controls="">
-                    </div>*@
-                    <table class="table table-bordered table-striped dataTable dtr-inline" id="datatables">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>RoleName </th>
-                                <th>Status </th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tbl_user"></tbody>
-
-                    </table>
-
-                </div>
-                <div class="card-footer d-flex justify-content-center">
-                    @*<ul class="pagination" id="pagination">
-                        <li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>
-                    </ul>*@
+                        </table>
+                    </div>
                 </div>
 
-                <!-- /.card-body -->
             </div>
         </div>
-        <!-- Default box -->
-        <!-- /.card -->
 
-    </section>
-
-    <!-- /.content -->
+    </div>
 </div>
+
 <div class="modal fade" id="myModal" role="dialog">
     <div class="modal-dialog">
 
@@ -154,27 +127,15 @@
                 <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
                 <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
             </div>
-
         </div>
-
     </div>
 </div>
 @section AdminlteJs{
     <script src="~/Content/plugins/moment/moment.min.js"></script>
     <script src="~/Content/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
     <!-- DataTables  & Plugins -->
-    <script src="~/Content/plugins/datatables/jquery.dataTables.min.js"></script>
-    <script src="~/Content/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
-    <script src="~/Content/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
-    <script src="~/Content/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
-    <script src="~/Content/plugins/datatables-buttons/js/dataTables.buttons.min.js"></script>
-    <script src="~/Content/plugins/datatables-buttons/js/buttons.bootstrap4.min.js"></script>
-    <script src="~/Content/plugins/jszip/jszip.min.js"></script>
-    <script src="~/Content/plugins/pdfmake/pdfmake.min.js"></script>
-    <script src="~/Content/plugins/pdfmake/vfs_fonts.js"></script>
-    <script src="~/Content/plugins/datatables-buttons/js/buttons.html5.min.js"></script>
-    <script src="~/Content/plugins/datatables-buttons/js/buttons.print.min.js"></script>
-    <script src="~/Content/plugins/datatables-buttons/js/buttons.colVis.min.js"></script>
+
+    <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
 @section scripts{
 
@@ -220,13 +181,13 @@
                         for (let item of res.data) {
 
                             _html += `<tr>
-                                                <td>${ii}</td>
-                                                <td>${(item.Name) == null ? "" : item.Name}</td>
-                                                <td>${(item.Email) == null ? "" : item.Email}</td>
-                                                <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
-                                                <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
-                                                <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
-                                            </tr>`
+                                                    <td>${ii}</td>
+                                                    <td>${(item.Name) == null ? "" : item.Name}</td>
+                                                    <td>${(item.Email) == null ? "" : item.Email}</td>
+                                                    <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
+                                                    <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                                    <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                                </tr>`
                             ii++;
                         }
                         $('#tbl_user').html(_html);
@@ -338,9 +299,8 @@
                     {
                         data: 'AccountId',
                         "render": function (data, type, row) {
-                            return "<button data-id=" + row.AccountId
-                                + " class='btn btn-primary btn-detail'>Detail</button><button data-id=" + row.AccountId + " class='btn btn-warning btn-edit'>Edit</button><button data-id=" + row.AccountId + " class='btn btn-danger'>Detele</button>";
-                        }
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.AccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id=" '+ row.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" '+ row.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                             }
                     },
                 ]
             })

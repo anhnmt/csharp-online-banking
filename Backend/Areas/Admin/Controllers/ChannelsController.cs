@@ -27,7 +27,7 @@ namespace Backend.Areas.Admin.Controllers
         {
             if (Session["email"] != null)
             {
-                ViewBag.Channel = "active";
+                ViewBag.Channel = "mm-active";
                 return View();
             }
 
@@ -36,7 +36,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetData(int page = 1, string key = null, int pageSize = 5)
         {
-            ViewBag.Channel = "active";
+            ViewBag.Channel = "mm-active";
 
             var data = channels.Get();
 
