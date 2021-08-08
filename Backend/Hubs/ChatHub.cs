@@ -55,7 +55,6 @@ namespace Backend.Hubs
                     AccountId = account.AccountId,
                     ChannelId = channel.ChannelId,
                     Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", String.Empty),
-                    Timestamp = DateTime.Now,
                 };
                 messageRepo.Add(msg);
 
@@ -87,7 +86,6 @@ namespace Backend.Hubs
                     AccountId = account.AccountId,
                     ChannelId = channel.ChannelId,
                     Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", String.Empty),
-                    Timestamp = DateTime.Now,
                 };
                 messageRepo.Add(msg);
 
@@ -122,7 +120,7 @@ namespace Backend.Hubs
                 {
                     messageHistory = messageRepo.Get()
                         .Where(m => m.Channel.ChannelId == channelId)
-                        .OrderByDescending(m => m.Timestamp);
+                        .OrderByDescending(m => m.CreatedAt);
                 }
 
                 var result = messageHistory

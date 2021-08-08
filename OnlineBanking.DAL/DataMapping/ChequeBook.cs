@@ -8,24 +8,17 @@ using System.Threading.Tasks;
 
 namespace OnlineBanking.DAL
 {
-    public class Messages : BaseModel
+    public class ChequeBooks : BaseModel
     {
         [Key]
-        public int MessageId { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        public int ChannelId { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
+        public int ChequeBookId { get; set; }
+        public string Code { get; set; }
         public int AccountId { get; set; }
-
-        [Required(AllowEmptyStrings = false)]
-        public string Content { get; set; }
+        public int Status { get; set; }
 
         [ForeignKey("AccountId")]
         public virtual Accounts Account { get; set; }
 
-        [ForeignKey("ChannelId")]
-        public virtual Channels Channel { get; set; }
+        public virtual ICollection<Cheques> Cheques { get; set; }
     }
 }
