@@ -1,8 +1,9 @@
-﻿@model OnlineBanking.DAL.BankAccounts
+﻿@model OnlineBanking.DAL.ProfileBankAccountViewModels
 @{
-    ViewBag.Title = "ProfileAccountNumber";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "ProfileBankAccount";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+
 @section css{
     <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
@@ -37,6 +38,21 @@
                             <div class="form-group">
                                 <strong>Bank Account Number: </strong> @Model.Name
                             </div>
+                            <div class="form-group">
+                                <strong>Account Name: </strong> @Model.AccountName
+                            </div>
+                            <div class="form-group">
+                                <strong>Balance: </strong> @string.Format("{0:0,0}", Model.Balance)
+                            </div>
+                            <div class="form-group">
+                                <strong>Currency: </strong> @Model.CurrencyName
+                            </div>
+                            <div class="form-group">
+                                <strong>Status: </strong> @Model.StatusName
+                            </div>
+                            <div class="form-group">
+                                <strong>CreatedAt: </strong> @Model.CreatedAt
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -44,7 +60,7 @@
             <div class="col-md-9">
                 <div class="card card-info">
                     <div class="card-header">
-                        <h3 class="card-title">Total Account Number</h3>
+                        <h3 class="card-title">Total Transaction History</h3>
                     </div>
                     <div class="card-body">
                         <input type="hidden" name="Id" id="fromId" value="@Model.BankAccountId" />
@@ -72,30 +88,7 @@
 @section scripts{
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script>
-
-        var managerTran = {
-            post: function (tran) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Transactions/Transfers",
-                    data: tran,
-                    success: function (res) {
-                        if (res.statusCode == 200) {
-                            $("#myModal").modal("hide");
-                            let fromId = $("#fromId").val();
-                            console.log(res)
-                            managerTran.load(fromId);
-                            toastr.success('Created Successfully')
-                        } else {
-                            console.log(res)
-                            toastr.error('Created Fail')
-                        }
-                    }
-                })
-            }
-        }
         $(function () {
-            //let fromId = $("#fromId").val();
             $('#datatables').DataTable({
                 "paging": true,
                 "ordering": true,
@@ -106,11 +99,11 @@
                 "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
                 "ajax": {
                     url: "/Transactions/GetData",
-                    data: 
+                    data:
                         function (d) {
                             d.fromId = $("#fromId").val();
                         }
-                    
+
                 },
                 "order": [
                     [1, 'desc']
@@ -129,15 +122,15 @@
                         className: 'align-middle',
                     },
                     {
-                        data: { Amount: 'Amount', FromId: 'FromId'},
-                        render: function(data) {
+                        data: { Amount: 'Amount', FromId: 'FromId' },
+                        render: function (data) {
                             let fromId = $("#fromId").val();
                             return (data.Amount) == null ? "" : ((data.FromId == fromId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
                         },
                         className: 'align-middle',
                     },
                     {
-                        data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo:"BalancedTo"},
+                        data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo: "BalancedTo" },
                         render: function (data) {
                             let fromId = $("#fromId").val();
                             return ((data.FromId == fromId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
@@ -156,7 +149,7 @@
                 ]
             })
 
-            
+
             //if (fromId != null) {
             //    managerTran.load(fromId);
             //}
@@ -222,6 +215,3 @@
         })
     </script>
 }
-
-
-<!-- /.content -->

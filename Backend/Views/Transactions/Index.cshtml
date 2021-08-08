@@ -2,7 +2,14 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
+@section customCss{
+    <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/OverlayScrollbars.min.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/prism.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/simple-notify.min.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/reset.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/demo.css" rel="stylesheet" />
+}
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
@@ -33,21 +40,26 @@
                     <div class="form-group">
                         <label for="exampleInputName">Source Account</label>
                         <select class="form-control" id="FromId" placeholder="Account Number...">
-                            <option value="" selected >Choose here</option>
+                            <option value="" selected>Choose here</option>
                         </select>
                         <span class="text-dark font-weight-bold" id="text1" style="display: none">Balance: </span>
-                        <span class="text-danger font-weight-bold" id="infoSource"  style="display: none"></span>
+                        <span class="text-danger font-weight-bold" id="infoSource" style="display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputName">Receiver Infomation </label>
                         <input type="text" class="form-control" id="ToId" placeholder="Receiver Account..." disabled>
                         <input type="hidden" class="form-control" id="BankId">
-                        <span class="text-dark font-weight-bold" id="text2"  style="display: none">Name: </span>
-                        <span class="text-danger font-weight-bold" id="infoReceiver"  style="display: none"></span>
+                        <span class="text-dark font-weight-bold" id="text2" style="display: none">Name: </span>
+                        <span class="text-danger font-weight-bold" id="infoReceiver" style="display: none"></span>
                     </div>
                     <div class="form-group">
                         <label for="exampleInputName">Amount </label>
-                        <input type="text" class="form-control" id="Amount" placeholder="Amount..." disabled>
+                        <input type="text" class="form-control Amount" id="Amount" placeholder="Amount..." disabled>
+                        <span class="text-danger font-weight-bold"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="exampleInputName">Messages </label>
+                        <input type="text" class="form-control" id="Messages" placeholder="Messages..." disabled>
                         <span class="text-danger font-weight-bold"></span>
                     </div>
 
@@ -65,6 +77,11 @@
 
 </section>
 @section scripts{
+    <script src="~/Content/custom/notify/js/simple-notify.min.js"></script>
+    <script src="~/Content/custom/notify/js/OverlayScrollbars.min.js"></script>
+    <script src="~/Content/custom/notify/js/prism.js"></script>
+    <script src="~/Content/custom/custom-notify.js"></script>
+
     <script>
         function loadAccountNumber(accountId) {
             let data;
@@ -108,15 +125,13 @@
                     if (res.statusCode == 200) {
                         $("#myModal").modal("hide");
                         let fromId = $("#fromId").val();
-                        console.log(res)
-                        toastr.success('Created Successfully')
+                        notifySuccess("Transfers Success", "Transfers Success");
                         sleep(3000).then(() => {
                             let bankId = $("#FromId").val();
                             window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
                         });
                     } else {
-                        console.log(res)
-                        toastr.error(res.data)
+                        notifyError("Transfers Error", res.data);
                     }
                 }
             })
@@ -144,6 +159,8 @@
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
         }
+
+
         $(function () {
             loadAccountNumber("@Session["userId"]");
             $("#Form").trigger("reset");
@@ -154,6 +171,7 @@
                     $('#infoSource').css('display', 'none');
                     $('#ToId').prop('disabled', true);
                     $('#Amount').prop('disabled', true);
+                    $('#Messages').prop('disabled', true);
                 } else {
                     let dataBalance = loadBalance(this.value)
                     $('#text1').css('display', 'inline-block');
@@ -161,8 +179,16 @@
                     $('#infoSource').html(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: dataBalance[0].Currency }).format(dataBalance[0].Balance));
                     $('#ToId').prop('disabled', false);
                     $('#Amount').prop('disabled', false);
+                    $('#Messages').prop('disabled', false);
+                    $('#Amount').val("");
+                    let dinput = new CurrencyInput('.Amount', {
+                        currency: dataBalance[0].Currency,
+                        //locale: 'vi',
+                    });
+                    //$('#Amount').val("");
                 }
             });
+
             $(document).on('blur', '#ToId', function () {
                 let dataInfoBankAccount;
                 if (this.value.length == 0) {
@@ -193,17 +219,17 @@
                 var tran = {
                     FromId: $("#FromId").val(),
                     ToId: $("#BankId").val(),
+                    Messages: $("#Messages").val(),
                     Amount: $("#Amount").val()
                 }
                 if (tran.Amount[0] == "0") {
-                    toastr.error("Nhập sai")
+                    notifyError("Error","Nhập sai")
                 } else {
                     transfer(tran)
                 }
 
             })
-           
+
         })
     </script>
-    }
-<!-- /.content -->
+}

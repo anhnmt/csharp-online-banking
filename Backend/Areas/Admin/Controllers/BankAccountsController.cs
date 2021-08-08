@@ -21,6 +21,23 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
+        public ActionResult ProfileBankAccount(int id)
+        {
+            if (Session["email"] != null)
+            {
+                var data = bankaccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
+                if (data == null)
+                {
+                    return View();
+                }
+
+                return View(data);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Home", new { area = "" });
+            }
+        }
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {

@@ -228,6 +228,17 @@
     <Content Include="Areas\Admin\Content\ckeditor5\translations\zh.js" />
     <Content Include="Areas\Admin\Content\ckeditor5\vendor.js" />
     <Content Include="Content\css\style.css" />
+    <Content Include="Content\custom\custom-notify.js" />
+    <Content Include="Content\custom\notify\css\demo.css" />
+    <Content Include="Content\custom\notify\css\line.min.css" />
+    <Content Include="Content\custom\notify\css\OverlayScrollbars.min.css" />
+    <Content Include="Content\custom\notify\css\prism.css" />
+    <Content Include="Content\custom\notify\css\reset.css" />
+    <Content Include="Content\custom\notify\css\simple-notify.min.css" />
+    <Content Include="Content\custom\notify\js\main.js" />
+    <Content Include="Content\custom\notify\js\OverlayScrollbars.min.js" />
+    <Content Include="Content\custom\notify\js\prism.js" />
+    <Content Include="Content\custom\notify\js\simple-notify.min.js" />
     <Content Include="Content\icons\avasta\css\style.css" />
     <Content Include="Content\icons\avasta\fonts\avasta.svg" />
     <Content Include="Content\icons\flaticon\flaticon.css" />
@@ -585,6 +596,7 @@
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff2" />
     <Content Include="Areas\Admin\Views\Cheque\Index.cshtml" />
     <Content Include="Areas\Admin\Views\ChequeBooks\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\BankAccounts\ProfileBankAccount.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />

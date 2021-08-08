@@ -29,8 +29,8 @@
                             <tr>
                                 <th>No</th>
                                 <th>Name</th>
-                                <th>Email</th>
-                                <th>RoleName </th>
+                                <th>Currency</th>
+                                <th>Banlanced </th>
                                 <th>Status </th>
                                 <th>Action</th>
                             </tr>
@@ -244,7 +244,10 @@
                         className: 'align-middle',
                     },
                     {
-                        data: 'Balance',
+                        data: { Balance: 'Balance', CurrencyName:"CurrencyName"},
+                        render: function (data) {
+                            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.CurrencyName }).format(data.Balance)
+                        },
                         className: 'align-middle',
                     },
                     {
@@ -256,7 +259,9 @@
                     {
                         data: 'BankAccountId',
                         "render": function (data, type, row) {
-                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.BankAccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id=" ' + row.BankAccountId + ' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.BankAccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
+                                '<a data-id="' + row.BankAccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a>' +
+                                '<a data-id="' + row.BankAccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                         }
                     },
                 ]
@@ -275,7 +280,7 @@
             })
             $(document).on("click", ".btn-detail", function () {
                 let userId = $(this).data("id");
-                window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
+                window.location.assign("/Admin/BankAccounts/ProfileBankAccount/" + userId)
             })
 
             $(document).on("click", "#btnSave", function () {
