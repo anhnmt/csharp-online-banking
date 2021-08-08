@@ -73,6 +73,7 @@
     <Compile Include="ViewModel\ChequeBookViewModel.cs" />
     <Compile Include="ViewModel\CurencyViewModel.cs" />
     <Compile Include="ViewModel\MessageViewModel.cs" />
+    <Compile Include="ViewModel\ProfileBankAccountViewModels.cs" />
     <Compile Include="ViewModel\ProfileViewModel.cs" />
     <Compile Include="ViewModel\AccountViewModel.cs" />
     <Compile Include="ViewModel\BalanceViewModels.cs" />

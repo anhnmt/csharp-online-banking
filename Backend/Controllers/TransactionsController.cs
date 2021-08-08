@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 
@@ -43,6 +44,17 @@ namespace Backend.Controllers
                 Transactions BankDequeue = BankQueue.Dequeue();
                 var sourceAccount = bankaccounts.Get(BankDequeue.FromId);
                 var receiverAccount = bankaccounts.Get(BankDequeue.ToId);
+                var sourceCurrency = sourceAccount.Currency.Name;
+                var receiverCurrency = receiverAccount.Currency.Name;
+                if (sourceCurrency != receiverCurrency)
+                {
+                    return Json(new
+                    {
+                        data = "Đơn vị tiền tệ người nhận không đúng",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
                 if (receiverAccount == null)
                 {
                     return Json(new
@@ -82,7 +94,7 @@ namespace Backend.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                BankDequeue.Status = 1;
+                BankDequeue.Status = 0;
                 BankDequeue.CreatedAt = DateTime.Now;
                 BankDequeue.UpdatedAt = DateTime.Now;
                 BankDequeue.BalancedFrom = sourceAccount.Balance;
@@ -91,13 +103,24 @@ namespace Backend.Controllers
                 {
                     BankDequeue.Messages = "Tranfers from " + BankDequeue.FromId + " to " + BankDequeue.ToId;
                 }
-                transactions.Add(BankDequeue);
+                if (transactions.Add(BankDequeue))
+                {
+                    return Json(new
+                    {
+                        data = "Chuyển khoản thành công",
+                        message = "Success",
+                        statusCode = 200
+                    });
+                }
                 return Json(new
                 {
-                    data = "Chuyển khoản thành công",
-                    message = "Success",
-                    statusCode = 200
+                    data = "Chuyển khoản thất bại",
+                    message = "Error",
+                    statusCode = 404
                 });
+               
+
+                
             } while (BankQueue.Count != 0);
            
         }
@@ -107,7 +130,7 @@ namespace Backend.Controllers
             return TransfersQueue(tran);
 
         }
-        public ActionResult GetData(int fromId,int page = 1, string key = null)
+        public ActionResult GetData(int fromId)
         {
             var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId).OrderByDescending(x=> x.CreatedAt).Select(x=> new TransactionsViewModels {
                 TransactionId = x.TransactionId,
@@ -122,17 +145,10 @@ namespace Backend.Controllers
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
             });
-            int pageSize = 5;
-            if (!string.IsNullOrEmpty(key))
-            {
-                data = data.Where(x => x.ToId.Equals(key));
-            }
-            decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
+
             return Json(new
             {
-                totalPages = totalPages,
-                currentPage = page,
-                data = data.Skip((page - 1) * pageSize).Take(pageSize),
+                data = data.ToList(),
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);

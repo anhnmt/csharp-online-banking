@@ -21,6 +21,23 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
+        public ActionResult ProfileBankAccount(int id)
+        {
+            if (Session["email"] != null)
+            {
+                var data = bankaccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
+                if (data == null)
+                {
+                    return View();
+                }
+
+                return View(data);
+            }
+            else
+            {
+                return RedirectToAction("Login", "Home", new { area = "" });
+            }
+        }
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {
@@ -86,6 +103,28 @@ namespace Backend.Areas.Admin.Controllers
         {
             ViewBag.Accounts = "active";
             var data = bankaccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
+            {
+                AccountId = x.AccountId,
+                BankAccountId = x.BankAccountId,
+                CurrencyId = x.CurrencyId,
+                CurrencyName = x.Currency.Name,
+                Name = x.Name,
+                Balance = x.Balance,
+                Status = x.Status,
+                StatusName = ((BankAccountStatus)x.Status).ToString()
+            });
+            return Json(new
+            {
+                data = data,
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult GetAllData()
+        {
+            ViewBag.Accounts = "active";
+            var data = bankaccounts.Get().Select(x => new BankAccountsViewModels
             {
                 AccountId = x.AccountId,
                 BankAccountId = x.BankAccountId,

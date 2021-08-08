@@ -60,22 +60,13 @@ namespace Backend.Controllers
                 bank.Balance = 0;
                 Random random = new Random();
                 string number = string.Empty;
-            check_number:
+            do
+            {
                 for (int i = 0; i < 11; i++)
                 {
                     number += random.Next(10).ToString();
                 }
-                while (true)
-                {
-                    if (bankaccounts.Get().Where(x => x.Name == number).FirstOrDefault() != null)
-                    {
-                        goto check_number;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+            } while (!bankaccounts.CheckDuplicate(x => x.Name == number));
                 bank.Name = number;
                 bank.Status = 2;
                 bank.CreatedAt = DateTime.Now;
