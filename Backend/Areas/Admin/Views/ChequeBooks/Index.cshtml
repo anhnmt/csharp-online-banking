@@ -4,6 +4,7 @@
 }
 @section css{
     <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/Content/vendor/select2/css/select2.min.css">
 }
 
 
@@ -60,7 +61,8 @@
                             <span class="text-danger">*</span>
                         </label>
                         <div class="col-lg-8">
-                            
+                            <select class="form-control select2" id="AccountId" name="AccountId">
+                            </select>
                         </div>
                     </div>
                     <div class="form-group row">
@@ -86,9 +88,10 @@
 @section AdminlteJs{
     <!-- DataTables  & Plugins -->
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
+
 }
 @section scripts{
-
+    <script src="~/Content/vendor/select2/js/select22.full.min.js"></script>
     <script>
         function loadStatus(status = null) {
             $.ajax({
@@ -105,6 +108,21 @@
             })
         }
 
+        function loadAccount(account = null) {
+            $.ajax({
+                type: "GET",
+                url: "/Admin/Accounts/GetData",
+                success: function (res) {
+                    console.log(res.data)
+                    var html;
+                    for (var i = 0; i < res.data.length; i++) {
+                        html += "<option value = '" + res.data[i].AccountId + "' " + ((parseInt(status)) == res.data[i].AccountId ? 'selected' : '') + "> #" + res.data[i].AccountId + " - " + res.data[i].Name + " </option>";
+                    }
+                    $("#AccountId").html(html);
+                }
+            })
+        }
+
         var managerAcc = {
             get: function (id) {
                 $.ajax({
@@ -113,7 +131,7 @@
                     data: { id: id },
                     success: function (res) {
                         console.log(res);
-                        
+
                     }
                 })
             },
@@ -148,7 +166,8 @@
                 })
             }
         }
-        $(function () {
+        $(function () {      
+            $(".select2").select2();
             $('#datatables').DataTable({
                 "paging": true,
                 "ordering": true,
@@ -174,7 +193,7 @@
                         data: 'AccountName',
                         className: 'align-middle',
                     },
-                    
+
                     {
                         data: 'StatusName',
                         className: 'align-middle text-center',
@@ -188,7 +207,7 @@
                         data: 'ChequeBookId',
                         "render": function (data, type, row) {
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id="' + row.ChequeBookId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
-                             }
+                        }
                     },
                 ]
             })
@@ -203,6 +222,7 @@
             $(document).on("click", ".btn-add", function () {
                 $(".modal-title").html("Create Account");
                 loadStatus();
+                loadAccount();
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
             })
@@ -210,17 +230,6 @@
             $(document).on("click", ".btn-detail", function () {
                 let chequeBookId = $(this).data("id");
                 window.location.assign("/Admin/ChequeBooks/ProfileAccount/" + chequeBookId)
-            })
-
-            $(document).on("blur", "#AccountId", function () {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Accounts/FindId",
-                    data: { id: $("#AccountId").val() },
-                    success: function (res) {
-                        $(
-                    }
-                })
             })
 
             $(document).on("click", "#btnSave", function () {

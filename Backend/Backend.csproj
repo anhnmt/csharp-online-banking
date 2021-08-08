@@ -479,6 +479,7 @@
     <Content Include="Content\vendor\raphael\raphael.min.js" />
     <Content Include="Content\vendor\select2\css\select2.min.css" />
     <Content Include="Content\vendor\select2\js\select2.full.min.js" />
+    <Content Include="Content\vendor\select2\js\select22.full.min.js" />
     <Content Include="Content\vendor\star-rating\jquery.star-rating-svg.js" />
     <Content Include="Content\vendor\star-rating\star-rating-svg.css" />
     <Content Include="Content\vendor\summernote\js\summernote.min.js" />
