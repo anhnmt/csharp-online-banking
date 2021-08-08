@@ -157,9 +157,10 @@ var Vora = function () {
         jQuery('.dlab-scroll').each(function () {
 
             var scroolWidgetId = jQuery(this).attr('id');
+            var wheelProp = jQuery(this).hasClass("ps-trap") ? false : true;
             const ps = new PerfectScrollbar('#' + scroolWidgetId, {
                 wheelSpeed: 2,
-                wheelPropagation: true,
+                wheelPropagation: wheelProp,
                 minScrollbarLength: 20
             });
         })
