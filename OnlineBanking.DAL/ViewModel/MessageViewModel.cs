@@ -18,7 +18,6 @@ namespace OnlineBanking.DAL
             AccountId = message.AccountId;
             AccountName = message.Account?.Name;
             Content = message.Content;
-            Timestamp = message.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss");
         }
 
         public MessageViewModel(Messages message, string accountName)
@@ -27,7 +26,7 @@ namespace OnlineBanking.DAL
             AccountId = message.AccountId;
             AccountName = accountName;
             Content = message.Content;
-            Timestamp = message.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss");
+            Timestamp = message.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
         }
 
         public int MessageId { get; set; }
