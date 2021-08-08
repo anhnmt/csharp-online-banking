@@ -4,6 +4,17 @@
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+@section customCss{
+    <style>
+        .text-custom-wrap {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2; /* number of lines to show */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+}
 <div class="page-titles">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
@@ -97,17 +108,21 @@
                             }
 
                             _html += `
-                                <div class="media mb-4 btn-reply" data-account="${item.AccountId ?? '0'}" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
+                                <div class="media mb-4">
                                     <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
+                                    <img src="/Content/images/users/1.png" alt="" class="rounded-circle img-1">
+                                    <span class="active"></span>
                                     </div>
-                                    <div class="media-body w-25">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">${item.AccountName ?? ""}</h6>
-                                            <span class="ml-auto fs-14">${momentFromNow(item.LastUpdated ?? "")}</span>
-                                        </div>
-                                        <p class="text-black text-truncate">${item.LastMessages ?? ""}</p>
+                                    <div class="media-body d-sm-flex justify-content-between d-block align-items-center">
+                                    <div class="mr-sm-3 mr-0">
+                                        <h6 class="fs-16 font-w600 mb-sm-2 mb-0">
+                                            <a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" class="text-black">${item.AccountName ?? ""}</a>
+                                        </h6>
+                                        <p class="text-black mb-sm-3 mb-1 text-custom-wrap">${item.LastMessages ?? ""}</p>
+                                        <span class="fs-14">${momentFromNow(item.LastUpdated ?? "")}</span>
+                                    </div>
+                                    <button class="btn btn-primary light rounded mt-sm-0 mt-2 btn-reply" data-account="${item.AccountId ?? '0'}" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
+                                        Reply</button>
                                     </div>
                                 </div>`;
                         }
@@ -207,6 +222,7 @@
                 let channelId = $(this).data("channel");
 
                 if ($("#channel").val() !== channelId) {
+                    $('#discussion').html('');
                     let account = $(this).data("account");
                     let name = $(this).data("name");
                     let timestamp = $(this).data("timestamp");

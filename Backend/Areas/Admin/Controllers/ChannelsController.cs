@@ -47,7 +47,7 @@ namespace Backend.Areas.Admin.Controllers
             var result = data
                 .Select(x =>
                 {
-                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId).OrderByDescending(y => y.Timestamp).FirstOrDefault();
+                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId).OrderByDescending(y => y.CreatedAt).FirstOrDefault();
 
                     return new ChannelViewModels
                     {
@@ -55,7 +55,7 @@ namespace Backend.Areas.Admin.Controllers
                         AccountId = x.UserId,
                         AccountName = x.User.Name,
                         LastMessages = lastMessage?.Content,
-                        LastUpdated = lastMessage?.Timestamp?.ToString("dd-MM-yyyy HH:mm:ss"),
+                        LastUpdated = lastMessage?.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                         CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                         UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                     };

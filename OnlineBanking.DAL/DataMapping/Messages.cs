@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace OnlineBanking.DAL
 {
-    public class Messages
+    public class Messages : BaseModel
     {
         [Key]
         public int MessageId { get; set; }
@@ -21,8 +21,6 @@ namespace OnlineBanking.DAL
 
         [Required(AllowEmptyStrings = false)]
         public string Content { get; set; }
-
-        public DateTime? Timestamp { get; set; }
 
         [ForeignKey("AccountId")]
         public virtual Accounts Account { get; set; }

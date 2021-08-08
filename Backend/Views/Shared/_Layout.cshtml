@@ -16,7 +16,6 @@
     @RenderSection("customCss", required: false)
     <link href="~/Content/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/vendor/jquery-smartwizard/dist/css/smart_wizard.min.css" rel="stylesheet" type="text/css" />
-    <link href="~/Content/vendor/fontawesome/css/all.min.css" rel="stylesheet" type="text/css" />
     <link href="~/Content/css/style.css" rel="stylesheet" type="text/css" />
 
     <style>
@@ -417,15 +416,9 @@
             <div class="row">
                 <div class="col-xl-12">
                     <div class="card message-bx chat-box">
-                        <div class="card-header border-0 shadow-sm">
-                            <div class="d-flex mr-auto align-items-center">
-                                <div class="image-bx mr-sm-4 mr-2">
-                                    <img src="https://vora.dexignlab.com/laravel/demo/images/users/5.png" alt="" class="rounded-circle img-1">
-                                </div>
-                                <div>
-                                    <h5 class="text-black font-w600 mb-sm-1 mb-0 title-nm">Chat Support</h5>
-                                    <span>Chat Service Customer Support</span>
-                                </div>
+                        <div class="card-header d-sm-flex d-block shadow-sm">
+                            <div>
+                                <h4 class="fs-20 mb-0 font-w600 text-black mb-sm-0 mb-2">Chat Support</h4>
                             </div>
 
                             <button type="button" class="close btn-close" data-dismiss="modal">
