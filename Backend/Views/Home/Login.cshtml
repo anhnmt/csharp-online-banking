@@ -59,7 +59,7 @@
                                         </div>
                                     </form>
                                     <div class="new-account mt-3">
-                                        <p class="text-white">Don't have an account? <a class="text-white" href="page-register.html">Sign up</a></p>
+                                        <p class="text-white">Don't have an account? <a class="text-white" href="@Url.Action("Register", "Home")">Sign up</a></p>
                                     </div>
                                 </div>
                             </div>
@@ -74,10 +74,6 @@
     <script src="~/Content/js/custom.js" type="text/javascript"></script>
     <script src="~/Content/js/dlabnav-init.js" type="text/javascript"></script>
     <script src="~/Content/vendor/jquery-validation/jquery.validate.min.js"></script>
-    <!--		<script src="https://vora.dexignlab.com/laravel/demo/js/custom.min.js" type="text/javascript"></script>
-        <script src="https://vora.dexignlab.com/laravel/demo/js/deznav-init.js" type="text/javascript"></script> -->
-    <!--
-    -->
     <script>
         var validator = $("#formData").validate({
             rules: {
@@ -96,24 +92,16 @@
                     url: "/Home/CheckLogin",
                     data: { Email: $("#Email").val(), Password: $("#Password").val() },
                     success: function (res) {
-                        setTimeout(() => {
-                            if (res.statusCode == 400) {
-                                validator.showErrors(res.data);
-                                $(".preloader").css('height', 0);
-                                $(".preloader").children().hide();
-                            } else if (res.statusCode == 200) {
-                                window.location.replace(`/${res.url}`);
-                            }
-                        }, 1000);
-                    },
-                    beforeSend: function () {
-                        $(".preloader").css('height', "100%");
-                        $(".preloader").children().show();
+                        if (res.statusCode == 400) {
+                            validator.showErrors(res.data);
+                        } else if (res.statusCode == 200) {
+                            window.location.replace(`/${res.url}`);
+                        }
                     },
                 })
             }
         });
     </script>
 </body>
- </html>
+</html>
 

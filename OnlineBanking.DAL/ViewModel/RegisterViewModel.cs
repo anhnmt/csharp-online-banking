@@ -20,7 +20,5 @@ namespace OnlineBanking.DAL
         [Required]
         [MinLength(6)]
         public string RePassword { get; set; }
-        [Required]
-        public bool Term { get; set; }
     }
 }

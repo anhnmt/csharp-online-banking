@@ -566,7 +566,7 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
-    <Content Include="Views\Home\Register.cshtml" />
+    <Content Include="Views\Home\Register3.cshtml" />
     <Content Include="Views\Home\InfoAccount.cshtml" />
     <Content Include="Views\Home\PageNotFound.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
@@ -575,6 +575,7 @@
     <Content Include="Views\BankAccounts\Index.cshtml" />
     <Content Include="Views\Transactions\ProfileAccountNumber.cshtml" />
     <Content Include="Views\Shared\_Layout - Copy.cshtml" />
+    <Content Include="Views\Home\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
