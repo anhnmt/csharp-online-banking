@@ -33861,7 +33861,7 @@ svg text {
     border-radius: 0;
     background: #fff;
     border: 1px solid #f0f1f5;
-    color: #B1B1B1;
+    color: #000;
     height: 56px;
 }
 
@@ -33874,7 +33874,7 @@ svg text {
 .form-control:hover, .form-control:focus, .form-control.active {
     box-shadow: none;
     background: #fff;
-    color: #B1B1B1;
+    color: #000;
 }
 
 .input-rounded {

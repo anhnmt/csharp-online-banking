@@ -36,23 +36,15 @@ namespace Backend.Areas.Admin.Controllers
             }
         }
 
-        public ActionResult GetData(int page = 1, string key = null, int pageSize = 5)
+        public ActionResult GetData()
         {
             ViewBag.Accounts = "active";
 
-            var data = currencies.Get();
-
-            if (!string.IsNullOrEmpty(key))
-            {
-                data = data.Where(x => x.Name.Contains(key));
-            }
-            decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
+            var data = currencies.Get().Select(x => new CurencyViewModel(x));
 
             return Json(new
             {
-                totalPages = totalpage,
-                currentPage = page,
-                data = data.Skip((page - 1) * pageSize).Take(pageSize)
+                data = data.ToList()
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -68,15 +60,13 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid)
             {
-                var check = currencies.Get(x => x.Name == c.Name);
+                var check = currencies.Get(x => x.Name == c.Name).FirstOrDefault();
 
-                if (Utils.IsNullOrEmpty(check))
+                if (!Utils.IsNullOrEmpty(check))
                 {
-                    var first = check.FirstOrDefault();
-
-                    if (first.Status == (int)DefaultStatus.Deleted)
+                    if (check.Status == (int)DefaultStatus.Deleted)
                     {
-                        c.CurrencyId = first.CurrencyId;
+                        c.CurrencyId = check.CurrencyId;
                         c.Status = (int)DefaultStatus.Actived;
                         currencies.Update(c);
 
@@ -136,7 +126,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 var check = currencies.Get(x => x.CurrencyId != c.CurrencyId && x.Name == c.Name);
 
-                if (Utils.IsNullOrEmpty(check))
+                if (!Utils.IsNullOrEmpty(check))
                 {
                     errors.Add("Name", "Name is dublicated!");
 
