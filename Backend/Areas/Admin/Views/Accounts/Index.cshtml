@@ -16,8 +16,6 @@
 <div class="row">
     <div class="col-md-12">
         <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
-        <div class="card">
-
             <div class="card card-success">
                 <div class="card-header">
                     <h3 class="card-title">User Management</h3>
@@ -40,15 +38,12 @@
                         </table>
                     </div>
                 </div>
-
             </div>
-        </div>
-
     </div>
 </div>
 
-<div class="modal fade" id="myModal" role="dialog">
-    <div class="modal-dialog">
+<div class="modal fade " id="myModal" role="dialog">
+    <div class="modal-dialog modal-lg">
 
         <!-- Modal content-->
         <div class="modal-content">
@@ -90,10 +85,7 @@
                             <div class="col-md-6">
                                 <label for="exampleInputAge">Birthday</label>
                                 <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                    <input type="text" class="form-control datetimepicker-input" data-target="#reservationdate" name="Birthday" id="Birthday" placeholder="Birthday...">
-                                    <div class="input-group-append" data-target="#reservationdate" data-toggle="datetimepicker">
-                                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
-                                    </div>
+                                    <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
                                 </div>
                             </div>
                             <span class="error text-danger"></span>
