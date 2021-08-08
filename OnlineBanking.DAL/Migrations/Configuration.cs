@@ -112,7 +112,6 @@ namespace OnlineBanking.DAL.Migrations
                 }
             );
 
-
         }
     }
 }
