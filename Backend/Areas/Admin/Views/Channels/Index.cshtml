@@ -18,42 +18,13 @@
                 <div class="card">
                     <div class="card-header d-sm-flex d-block shadow-sm border-0 align-items-center">
                         <div class="card-action card-tabs">
-                            <ul class="nav nav-tabs" role="tablist">
-                                <li class="nav-item">
-                                    <a class="nav-link active" data-toggle="tab" href="#AllMessage" role="tab" aria-selected="false">
-                                        All Message
-                                    </a>
-                                </li>
-                                <li class="nav-item">
-                                    <a class="nav-link" data-toggle="tab" href="#Unread" role="tab" aria-selected="false">
-                                        Unread
-                                    </a>
-                                </li>
-                            </ul>
+                            All Message
                         </div>
                     </div>
                     <div class="card-body message-bx dlab-scroll height640 ps ps--active-y" id="message-bx">
-                        <div class="tab-content">
-                            <div class="tab-pane fade show active" id="AllMessage" role="tabpanel">
+                        <div id="AllMessage">
 
-                            </div>
-                            <div class="tab-pane fade" id="Unread" role="tabpanel">
-                                <div class="media mb-4">
-                                    <div class="image-bx mr-sm-4 mr-2">
-                                        <img src="https://vora.dexignlab.com/laravel/demo/images/users/3.png" alt="" class="rounded-circle img-1">
-                                        <span class="active"></span>
-                                    </div>
-                                    <div class="media-body">
-                                        <div class="d-flex mb-sm-2 mb-0">
-                                            <h6 class="text-black font-w600 fs-16 mb-0">Roberto Charloz</h6>
-                                            <span class="ml-auto fs-14">2m ago</span>
-                                        </div>
-                                        <p class="text-black">Hey, check my design update last night. Tell me what you think and if that is OK. I hear client said they want to change the layout concept</p>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
-                        <div class="ps__rail-x" style="left: 0px; bottom: 0px;"><div class="ps__thumb-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps__rail-y" style="top: 0px; height: 496px; right: 0px;"><div class="ps__thumb-y" tabindex="0" style="top: 0px; height: 241px;"></div></div>
                     </div>
                 </div>
             </div>
@@ -79,7 +50,7 @@
                             <span>×</span>
                         </button>
                     </div>
-                    <div class="card-body dlab-scroll height520 ps ps--active-y ps-trap" id="discussion">
+                    <div class="card-body dlab-scroll height480 ps ps--active-y ps-trap" id="discussion">
                     </div>
                     <div class="card-footer border-0 type-massage">
                         <form id="chat" onsubmit="return false;">
@@ -300,6 +271,8 @@
                                 <span class="active"></span>
                             </div>`;
 
+                var username = `${accountId != messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
+
                 return `
                         <div class="direct-chat-msg media mb-4 justify-content-${accountId == messageView.AccountId ? 'end' : 'start'}
                                 align-items-${accountId == messageView.AccountId ? 'end' : 'start'}" data-message="${messageView.MessageId}">
@@ -308,7 +281,7 @@
                                 <p class="mb-1">
                                     ${htmlEncode(messageView.Content)}
                                 </p>
-                                <span class="fs-12">${momentFromNow(messageView.Timestamp ?? "")}</span>
+                                <span class="fs-12">${username ?? ""}</span>
                             </div>
                             ${accountId == messageView.AccountId ? image : '' }
                         </div>`;
