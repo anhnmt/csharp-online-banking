@@ -374,6 +374,12 @@
                             <span class="nav-text">Users</span>
                         </a>
                     </li>
+                    <li class="@ViewBag.UserManagement">
+                        <a href="@Url.Action("Index", "BankAccounts")" class="ai-icon @ViewBag.BankAccounts" aria-expanded="false">
+                            <i class="far fa-users"></i>
+                            <span class="nav-text">Bank Accounts</span>
+                        </a>
+                    </li>
                     <li class="@ViewBag.Currency">
                         <a href="@Url.Action("Index", "Roles")" class="ai-icon @ViewBag.Currency" aria-expanded="false">
                             <i class="far fa-user-tag"></i>

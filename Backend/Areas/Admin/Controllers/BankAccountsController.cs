@@ -104,6 +104,28 @@ namespace Backend.Areas.Admin.Controllers
             }, JsonRequestBehavior.AllowGet);
 
         }
+        public ActionResult GetAllData()
+        {
+            ViewBag.Accounts = "active";
+            var data = bankaccounts.Get().Select(x => new BankAccountsViewModels
+            {
+                AccountId = x.AccountId,
+                BankAccountId = x.BankAccountId,
+                CurrencyId = x.CurrencyId,
+                CurrencyName = x.Currency.Name,
+                Name = x.Name,
+                Balance = x.Balance,
+                Status = x.Status,
+                StatusName = ((BankAccountStatus)x.Status).ToString()
+            });
+            return Json(new
+            {
+                data = data,
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+
+        }
         // GET: Admin/BankAccounts/Details/5
         public ActionResult GetStatus()
         {
