@@ -23,5 +23,7 @@ namespace OnlineBanking.DAL
         public virtual Currencies Currency { get; set; }
         public ICollection<Transactions> FromTransactions { get; set; }
         public ICollection<Transactions> ToTransactions { get; set; }
+        public ICollection<Cheques> FromCheques { get; set; }
+        public ICollection<Cheques> ToCheques { get; set; }
     }
 }

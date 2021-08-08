@@ -33,5 +33,6 @@ namespace OnlineBanking.DAL
         public virtual Roles Role { get; set; }
 
         public ICollection<BankAccounts> BankAccounts { get; set; }
+        public ICollection<ChequeBooks> ChequeBooks { get; set; }
     }
 }

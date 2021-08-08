@@ -28,6 +28,18 @@ namespace OnlineBanking.DAL
                 .HasForeignKey(m => m.ToId)
                 .WillCascadeOnDelete(false);
 
+            modelBuilder.Entity<Cheques>()
+                .HasRequired(t => t.FromBankAccount)
+                .WithMany(a => a.FromCheques)
+                .HasForeignKey(m => m.FromBankAccountId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<Cheques>()
+                .HasRequired(t => t.ToBankAccount)
+                .WithMany(a => a.ToCheques)
+                .HasForeignKey(m => m.ToBankAccountId)
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<Messages>()
                 .HasRequired(m => m.Account)
                 .WithMany()
@@ -63,5 +75,7 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
+
+        public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
     }
 }
