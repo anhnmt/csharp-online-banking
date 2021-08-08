@@ -50,7 +50,7 @@
     </div>
     <div id="main-wrapper">
         <div class="nav-header">
-            <a href="index-2.html" class="brand-logo">
+            <a href="@Url.Action("Index", "Home")" class="brand-logo">
                 <img class="logo-abbr" src="~/Content/images/logo.png" alt="">
                 <img class="logo-compact" src="~/Content/images/logo-text.png" alt="">
                 <img class="brand-title" src="~/Content/images/logo-text.png" alt="">
@@ -352,7 +352,6 @@
                                     <img src="~/Content/images/profile/17.jpg" width="20" alt="" />
                                     <div class="header-info">
                                         <span class="text-black">@Session["name"].ToString()</span>
-                                        @*<p class="fs-12 mb-0 ">@Session["rold"].ToString()</p>*@
                                     </div>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-right">
