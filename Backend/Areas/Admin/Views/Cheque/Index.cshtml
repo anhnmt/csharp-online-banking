@@ -10,35 +10,35 @@
 <div class="page-titles">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-        <li class="breadcrumb-item active"><a href="javascript:void(0)">User Management</a></li>
+        <li class="breadcrumb-item active"><a href="javascript:void(0)">Cheque Management</a></li>
     </ol>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">User Management</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>RoleName </th>
-                                    <th>Status </th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbl_user"></tbody>
+        <a href="#" class="btn btn-primary mb-3 btn-add">Create New Cheque</a>
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Cheque Book Management</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Code</th>
+                                <th>User's Name</th>
+                                <th>Status</th>
+                                <th>Cheques</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_chequebook"></tbody>
 
-                        </table>
-                    </div>
+                    </table>
                 </div>
             </div>
+        </div>
     </div>
 </div>
 
@@ -162,6 +162,39 @@
         }
 
         var managerAcc = {
+            load: function (page = 1, key = null) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Accounts/GetData",
+                    data: { page: page, key: key },
+                    success: function (res) {
+                        let _html = "";
+                        var ii = 1;
+                        for (let item of res.data) {
+
+                            _html += `<tr>
+                                                    <td>${ii}</td>
+                                                    <td>${(item.Name) == null ? "" : item.Name}</td>
+                                                    <td>${(item.Email) == null ? "" : item.Email}</td>
+                                                    <td>${(item.RoleName) == null ? "" : item.RoleName}</td>
+                                                    <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
+                                                    <td class="btn-group"><button data-id="${item.AccountId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.AccountId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.AccountId}" class='btn btn-danger'>Detele</button></td>
+                                                </tr>`
+                            ii++;
+                        }
+                        $('#tbl_user').html(_html);
+                        var pages = '';
+                        for (var i = 1; i <= res.totalPages; i++) {
+                            if (i == res.currentPage) {
+                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            } else {
+                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
+                            }
+                        }
+                        $(".pagination").html(pages);
+                    }
+                });
+            },
             get: function (id) {
                 $.ajax({
                     type: "GET",
@@ -304,6 +337,16 @@
                     user.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
                     managerAcc.post(user);
                 }
+            })
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                managerAcc.load(1, key);
+            })
+
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                managerAcc.load(page, key);
             })
 
             $('#reservationdate').datetimepicker({

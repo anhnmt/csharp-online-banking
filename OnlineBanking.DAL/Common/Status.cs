@@ -35,5 +35,17 @@ namespace OnlineBanking.DAL
         Error = 3
     }
 
+    public enum ChequeStatus
+    {
+        Actived = 0,
+        Received = 1,
+        Stopped = 2,
+        Deleted = 3,
+    }
 
+    public enum ChequeBookStatus
+    {
+        Openned = 0,
+        Closed = 1,
+    }
 }
