@@ -43,8 +43,11 @@ var Vora = function () {
     }
 
     var handleTheme = function () {
-        $('#preloader').fadeOut(500);
-        $('#main-wrapper').addClass('show');
+        setTimeout(function () {
+            $('#preloader').fadeOut(500, function () {
+                $('#main-wrapper').addClass('show');
+            });
+        }, 500);
     }
 
     var handleMetisMenu = function () {
@@ -109,9 +112,8 @@ var Vora = function () {
 
     var handleMinHeight = function () {
         var win_h = window.outerHeight;
-        var win_h = window.outerHeight;
         if (win_h > 0 ? win_h : screen.height) {
-            $(".content-body").css("min-height", (win_h + 60) + "px");
+            $(".content-body").css("min-height", (win_h * 0.7) + "px");
         };
     }
 
@@ -327,7 +329,7 @@ var Vora = function () {
             handleCurrentActive();
             handleCustomFileInput();
             handleMiniSidebar();
-            //handleMinHeight();
+            handleMinHeight();
             handleDataAction();
             handleHeaderHight();
             handleDlabScroll();
@@ -362,53 +364,6 @@ jQuery(document).ready(function () {
     'use strict';
     Vora.init();
 
-    if ($('#example5').length > 0) {
-        var table = $('#example5').DataTable({
-            searching: false,
-            paging: true,
-            select: false,
-            lengthChange: false
-        });
-    }
-    if ($('#example-5').length > 0) {
-        var table = $('#example-5').DataTable({
-            searching: false,
-            paging: true,
-            select: false,
-            lengthChange: false
-        });
-    }
-    if ($('#example6').length > 0) {
-        var table = $('#example6').DataTable({
-            searching: false,
-            paging: true,
-            select: false,
-            lengthChange: false
-        });
-    }
-    if ($('#example7').length > 0) {
-        var table = $('#example7').DataTable({
-            searching: false,
-            paging: true,
-            select: false,
-            lengthChange: false
-        });
-    }
-
-    if ($('#example8').length > 0) {
-        var table = $('#example8').DataTable({
-            searching: false,
-            paging: true,
-            select: false,
-            lengthChange: false
-        });
-    }
-    if ($('#example').length > 0) {
-        $('#example tbody').on('click', 'tr', function () {
-            var data = table.row(this).data();
-
-        });
-    }
     if ($('#smartwizard').length > 0) {
         $('#smartwizard').smartWizard();
     }
