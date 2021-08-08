@@ -60,7 +60,7 @@ namespace Backend.Controllers
                 bank.Balance = 0;
                 Random random = new Random();
                 string number = string.Empty;
-                check_number:
+            check_number:
                 for (int i = 0; i < 11; i++)
                 {
                     number += random.Next(10).ToString();
@@ -145,7 +145,7 @@ namespace Backend.Controllers
         {
             Dictionary<string, string> errors = new Dictionary<string, string>();
             bool check = true;
-            int userId = (int) Session["userId"];
+            int userId = (int)Session["userId"];
 
             if (!String.IsNullOrEmpty(acc.Birthday))
             {
@@ -253,13 +253,13 @@ namespace Backend.Controllers
                     Session["userId"] = obj.AccountId;
                     Session["email"] = email;
                     Session["name"] = obj.Name;
+                    Session["rold"] = obj.Role.Name;
 
                     obj.AttemptLogin = 0;
                     users.Update(obj);
 
                     if (obj.RoleId == 1)
                     {
-                        Session["rold"] = "Admin";
                         return Json(new
                         {
                             statusCode = 200,
@@ -269,7 +269,6 @@ namespace Backend.Controllers
                     }
                     if (obj.RoleId == 2)
                     {
-                        Session["rold"] = "TeleSopport";
                         return Json(new
                         {
                             statusCode = 200,

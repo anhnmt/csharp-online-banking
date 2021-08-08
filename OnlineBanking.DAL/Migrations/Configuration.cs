@@ -21,19 +21,19 @@ namespace OnlineBanking.DAL.Migrations
                 new Roles()
                 {
                     RoleId = 1,
-                    Name = "admin",
+                    Name = "Admin",
                     Status = ((int)DefaultStatus.Actived)
                 },
                 new Roles()
                 {
                     RoleId = 2,
-                    Name = "telesupport",
+                    Name = "Support",
                     Status = ((int)DefaultStatus.Actived)
                 },
                 new Roles()
                 {
                     RoleId = 3,
-                    Name = "user",
+                    Name = "User",
                     Status = ((int)DefaultStatus.Actived)
                 }
                 );
@@ -52,8 +52,8 @@ namespace OnlineBanking.DAL.Migrations
                 new Accounts()
                 {
                     AccountId = 2,
-                    Name = "Telesupport 1",
-                    Email = "tele@gmail.com",
+                    Name = "Support 1",
+                    Email = "support@gmail.com",
                     Password = "123456",
                     RoleId = 2,
                     Status = ((int)AccountStatus.Actived),
@@ -62,8 +62,8 @@ namespace OnlineBanking.DAL.Migrations
                 new Accounts()
                 {
                     AccountId = 3,
-                    Name = "Telesupport 2",
-                    Email = "tele2@gmail.com",
+                    Name = "Support 2",
+                    Email = "support2@gmail.com",
                     Password = "123456",
                     RoleId = 2,
                     Status = ((int)AccountStatus.Actived),
