@@ -126,9 +126,11 @@
 
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
+
 @section scripts{
 
     <script>
+    
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",

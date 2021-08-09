@@ -10,28 +10,31 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class TransactionsController : Controller
     {
-        private IRepository<Transactions> transactions;
-        private IRepository<BankAccounts> bankaccounts;
+        private readonly IRepository<Transactions> transactions;
+        private readonly IRepository<BankAccounts> bankaccounts;
+
         public TransactionsController()
         {
             transactions = new Repository<Transactions>();
             bankaccounts = new Repository<BankAccounts>();
         }
+
         // GET: Admin/Transactions
         public ActionResult Index()
         {
             return View();
         }
+
         private JsonResult TransfersQueue(Transactions tran)
         {
             tran.Status = 0;
-            Queue<Transactions> BankQueue = new Queue<Transactions>();
-            BankQueue.Enqueue(tran);
+            var bankQueue = new Queue<Transactions>();
+            bankQueue.Enqueue(tran);
             do
             {
-                Transactions BankDequeue = BankQueue.Dequeue();
-                var sourceAccount = bankaccounts.Get(BankDequeue.FromId);
-                var receiverAccount = bankaccounts.Get(BankDequeue.ToId);
+                var bankDequeue = bankQueue.Dequeue();
+                var sourceAccount = bankaccounts.Get(bankDequeue.FromId);
+                var receiverAccount = bankaccounts.Get(bankDequeue.ToId);
                 if (receiverAccount == null)
                 {
                     return Json(new
@@ -41,8 +44,9 @@ namespace Backend.Areas.Admin.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                var balaceSource = sourceAccount.Balance;
-                if (balaceSource < BankDequeue.Amount)
+
+                var balanceSource = sourceAccount.Balance;
+                if (balanceSource < bankDequeue.Amount)
                 {
                     return Json(new
                     {
@@ -51,7 +55,8 @@ namespace Backend.Areas.Admin.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                sourceAccount.Balance = balaceSource - BankDequeue.Amount;
+
+                sourceAccount.Balance = balanceSource - bankDequeue.Amount;
                 if (bankaccounts.Edit(sourceAccount) != true)
                 {
                     return Json(new
@@ -61,7 +66,8 @@ namespace Backend.Areas.Admin.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                receiverAccount.Balance = receiverAccount.Balance + BankDequeue.Amount;
+
+                receiverAccount.Balance = receiverAccount.Balance + bankDequeue.Amount;
                 if (bankaccounts.Edit(receiverAccount) != true)
                 {
                     return Json(new
@@ -71,52 +77,44 @@ namespace Backend.Areas.Admin.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                BankDequeue.Status = 1;
-                BankDequeue.CreatedAt = DateTime.Now;
-                BankDequeue.UpdatedAt = DateTime.Now;
-                BankDequeue.BalancedFrom = sourceAccount.Balance;
-                BankDequeue.BalancedTo = receiverAccount.Balance;
-                if (string.IsNullOrEmpty(BankDequeue.Messages))
+
+                bankDequeue.Status = 1;
+                bankDequeue.CreatedAt = DateTime.Now;
+                bankDequeue.UpdatedAt = DateTime.Now;
+                bankDequeue.BalancedFrom = sourceAccount.Balance;
+                bankDequeue.BalancedTo = receiverAccount.Balance;
+                if (string.IsNullOrEmpty(bankDequeue.Messages))
                 {
-                    BankDequeue.Messages = "Tranfers from " + BankDequeue.FromId + " to " + BankDequeue.ToId;
+                    bankDequeue.Messages = "Transfers from " + bankDequeue.FromId + " to " + bankDequeue.ToId;
                 }
-                transactions.Add(BankDequeue);
+
+                transactions.Add(bankDequeue);
                 return Json(new
                 {
                     data = "Chuyển khoản thành công",
                     message = "Success",
                     statusCode = 200
                 });
-            } while (BankQueue.Count != 0);
-           
+            } while (bankQueue.Count != 0);
         }
+
         [HttpPost]
         public ActionResult Transfers(Transactions tran)
         {
             return TransfersQueue(tran);
-
         }
-        public ActionResult GetData(int fromId,int page = 1, string key = null)
+
+        public ActionResult GetData(int fromId, int page = 1, string key = null)
         {
-            var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId).OrderByDescending(x=> x.CreatedAt).Select(x=> new TransactionsViewModels {
-                TransactionId = x.TransactionId,
-                FromId = x.FromId,
-                ToId = x.ToId,
-                Amount = x.Amount,
-                Messages = x.Messages,
-                BalancedFrom = x.BalancedFrom,
-                BalancedTo = x.BalancedTo,
-                Status = x.Status,
-                StatusName = ((BankingActivity)x.Status).ToString(),
-                CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
-                UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
-            });
-            int pageSize = 5;
+            var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId)
+                .OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            var pageSize = 5;
             if (!string.IsNullOrEmpty(key))
             {
-                data = data.Where(x => x.ToId.Equals(key));
+                data = data.Where(x => false);
             }
-            decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
+
+            var totalPages = Math.Ceiling((decimal) data.Count() / pageSize);
             return Json(new
             {
                 totalPages = totalPages,
@@ -126,21 +124,17 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult ProfileAccountNumber(int id)
         {
             if (Session["email"] != null)
             {
                 var data = bankaccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
-                if (data == null)
-                {
-                    return View();
-                }
-                
-                return View(data);
+                return data == null ? View() : View(data);
             }
             else
             {
-                return RedirectToAction("Login", "Home", new { area = "" });
+                return RedirectToAction("Login", "Home", new {area = ""});
             }
         }
     }
