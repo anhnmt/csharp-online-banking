@@ -25,15 +25,11 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Currencies
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                ViewBag.Currency = "active";
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new { area = "" });
-            }
+            if (Session["email"] == null) 
+                return RedirectToAction("Login", "Home", new {area = ""});
+            ViewBag.Currency = "active";
+            return View();
+
         }
 
         public ActionResult GetData()
