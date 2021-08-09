@@ -24,6 +24,11 @@ namespace OnlineBanking.DAL
             return data == null;
         }
 
+        public static bool NotNullOrEmpty<T>(T data)
+        {
+            return !IsNullOrEmpty(data);
+        }
+
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

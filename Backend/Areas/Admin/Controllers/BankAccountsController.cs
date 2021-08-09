@@ -20,7 +20,7 @@ namespace Backend.Areas.Admin.Controllers
         }
         public ActionResult ProfileBankAccount(int id)
         {
-            if (Session["email"] != null)
+            if (((Accounts)Session["user"]) != null)
             {
                 var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
                 return data == null ? View() : View(data);
