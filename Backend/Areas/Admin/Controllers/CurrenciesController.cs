@@ -11,6 +11,7 @@ namespace Backend.Areas.Admin.Controllers
     {
         private readonly ApplicationDbContext db = new ApplicationDbContext();
         private readonly IRepository<Currencies> currencies;
+
         public CurrenciesController()
         {
             currencies = new Repository<Currencies>();
@@ -19,11 +20,10 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Currencies
         public ActionResult Index()
         {
-            if (Session["email"] == null) 
+            if (Session["email"] == null)
                 return RedirectToAction("Login", "Home", new {area = ""});
             ViewBag.Currency = "active";
             return View();
-
         }
 
         public ActionResult GetData()
@@ -46,7 +46,7 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult PostData(Currencies c)
         {
-            Dictionary<string, string> errors = new Dictionary<string, string>();
+            var errors = new Dictionary<string, string>();
 
             if (ModelState.IsValid)
             {
@@ -54,10 +54,10 @@ namespace Backend.Areas.Admin.Controllers
 
                 if (!Utils.IsNullOrEmpty(check))
                 {
-                    if (check != null && check.Status == (int)DefaultStatus.Deleted)
+                    if (check != null && check.Status == (int) DefaultStatus.Deleted)
                     {
                         c.CurrencyId = check.CurrencyId;
-                        c.Status = (int)DefaultStatus.Actived;
+                        c.Status = (int) DefaultStatus.Actived;
                         currencies.Update(c);
 
                         return Json(new
@@ -67,20 +67,18 @@ namespace Backend.Areas.Admin.Controllers
                             data = c
                         }, JsonRequestBehavior.AllowGet);
                     }
-                    else
-                    {
-                        errors.Add("Name", "Name is duplicated!");
 
-                        return Json(new
-                        {
-                            statusCode = 400,
-                            message = "Error",
-                            data = errors
-                        }, JsonRequestBehavior.AllowGet);
-                    }
+                    errors.Add("Name", "Name is duplicated!");
+
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error",
+                        data = errors
+                    }, JsonRequestBehavior.AllowGet);
                 }
 
-                c.Status = (int)DefaultStatus.Actived;
+                c.Status = (int) DefaultStatus.Actived;
                 currencies.Add(c);
 
                 return Json(new
@@ -92,12 +90,12 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             foreach (var k in ModelState.Keys)
-                foreach (var err in ModelState[k].Errors)
-                {
-                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                    if (!errors.ContainsKey(key))
-                        errors.Add(key, err.ErrorMessage);
-                }
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
 
             return Json(new
             {
@@ -110,7 +108,7 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult PutData(Currencies c)
         {
-            Dictionary<string, string> errors = new Dictionary<string, string>();
+            var errors = new Dictionary<string, string>();
 
             if (ModelState.IsValid)
             {
@@ -128,7 +126,7 @@ namespace Backend.Areas.Admin.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                c.Status = (int)DefaultStatus.Actived;
+                c.Status = (int) DefaultStatus.Actived;
                 currencies.Edit(c);
 
                 return Json(new
@@ -140,12 +138,12 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             foreach (var k in ModelState.Keys)
-                foreach (var err in ModelState[k].Errors)
-                {
-                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                    if (!errors.ContainsKey(key))
-                        errors.Add(key, err.ErrorMessage);
-                }
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
 
             return Json(new
             {
@@ -154,7 +152,6 @@ namespace Backend.Areas.Admin.Controllers
                 data = errors
             }, JsonRequestBehavior.AllowGet);
         }
-
 
 
         // GET: Admin/Currencies/Delete/5
@@ -182,6 +179,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
 
