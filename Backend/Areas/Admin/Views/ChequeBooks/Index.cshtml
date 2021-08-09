@@ -65,17 +65,6 @@
                             </select>
                         </div>
                     </div>
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label" for="val-username">
-                            Status
-                            <span class="text-danger">*</span>
-                        </label>
-                        <div class="col-lg-8">
-                            <select class="form-control" id="Status" name="Status">
-                            </select>
-                        </div>
-                    </div>
-
                 </form>
             </div>
             <div class="modal-footer">
@@ -88,7 +77,6 @@
 @section AdminlteJs{
     <!-- DataTables  & Plugins -->
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
-
 }
 @section scripts{
     <script src="~/Content/vendor/select2/js/select22.full.min.js"></script>
@@ -113,7 +101,6 @@
                 type: "GET",
                 url: "/Admin/Accounts/GetData",
                 success: function (res) {
-                    console.log(res.data)
                     var html;
                     for (var i = 0; i < res.data.length; i++) {
                         html += "<option value = '" + res.data[i].AccountId + "' " + ((parseInt(status)) == res.data[i].AccountId ? 'selected' : '') + "> #" + res.data[i].AccountId + " - " + res.data[i].Name + " </option>";
@@ -123,7 +110,7 @@
             })
         }
 
-        var managerAcc = {
+        var managerChequeBook = {
             get: function (id) {
                 $.ajax({
                     type: "GET",
@@ -131,7 +118,6 @@
                     data: { id: id },
                     success: function (res) {
                         console.log(res);
-
                     }
                 })
             },
@@ -142,8 +128,8 @@
                     data: chequeBook,
                     success: function (res) {
                         if (res.statusCode == 200) {
+                            $('#datatables').DataTable().ajax.reload();
                             $("#myModal").modal("hide");
-                            managerAcc.load();
                             toastr.success('Updated Successfully')
                         }
                     }
@@ -157,8 +143,8 @@
                     data: chequeBook,
                     success: function (res) {
                         if (res.statusCode == 200) {
+                            $('#datatables').DataTable().ajax.reload();
                             $("#myModal").modal("hide");
-                            managerAcc.load();
                             toastr.success('Created Successfully')
                         }
                     }
@@ -166,7 +152,7 @@
                 })
             }
         }
-        $(function () {      
+        $(function () {
             $(".select2").select2();
             $('#datatables').DataTable({
                 "paging": true,
@@ -197,31 +183,24 @@
                     {
                         data: 'StatusName',
                         className: 'align-middle text-center',
-                        "orderable": false
+                        "orderable": false,
                     },
                     {
                         data: 'ChequesUsed',
-                        className: 'align-middle',
+                        className: 'align-middle text-center',
+                        "orderable": false
                     },
                     {
                         data: 'ChequeBookId',
                         "render": function (data, type, row) {
-                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id="' + row.ChequeBookId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a></div></div>'
                         }
                     },
                 ]
             })
 
-            $(document).on("click", ".btn-edit", function () {
-                $("#type").val("EDIT");
-                let chequeBookId = $(this).data("id");
-                loadStatus(chequeBookId);
-                let a = managerAcc.get(chequeBookId);
-            })
-
             $(document).on("click", ".btn-add", function () {
-                $(".modal-title").html("Create Account");
-                loadStatus();
+                $(".modal-title").html("Create Cheque Book");
                 loadAccount();
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
@@ -229,30 +208,22 @@
 
             $(document).on("click", ".btn-detail", function () {
                 let chequeBookId = $(this).data("id");
-                window.location.assign("/Admin/ChequeBooks/ProfileAccount/" + chequeBookId)
+                window.location.assign("/Admin/ChequeBooks/Cheques/" + chequeBookId)
             })
 
             $(document).on("click", "#btnSave", function () {
-                var today = new Date();
                 var chequeBook = {
-                    Name: $("#Name").val(),
-                    Email: $("#Email").val(),
-                    Password: $("#Password").val(),
-                    Birthday: $("#Birthday").val(),
-                    Address: $("#Address").val(),
-                    Phone: $("#Phone").val(),
-                    NumberID: $("#NumberID").val(),
-                    RoleId: $("#RoleId").val(),
-                    Address: $("#Address").val(),
-                    Status: parseInt(($("#Status").val()))
+                    AccountId: $("#AccountId").val(),
                 }
                 if ($("#type").val() == "EDIT") {
                     chequeBook.AccountId = $("#Id").val();
-                    managerAcc.put(chequeBook);
+                    managerChequeBook.put(chequeBook);
                 } else {
-                    managerAcc.post(chequeBook);
+                    managerChequeBook.post(chequeBook);
                 }
             })
+
+            $('.toggle').bootstrapToggle()
         })
 
     </script>

@@ -45,7 +45,7 @@ namespace OnlineBanking.DAL
 
     public enum ChequeBookStatus
     {
-        Openned = 0,
+        Opened = 0,
         Closed = 1,
     }
 }
