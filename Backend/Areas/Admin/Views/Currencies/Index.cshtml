@@ -17,7 +17,7 @@
         <div class="card">
             <div class="card-header align-middle">
                 <h4 class="card-title">Currencies Management</h4>
-                <button class="btn btn-primary btn-add">Create Currency</button>
+                <button class="btn btn-primary btn-sm btn-add">Create Currency</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -99,13 +99,11 @@
                 };
 
                 if ($("#type").val() === "EDIT") {
-                    currency.CurrencyId = $("#Id").val(),
+                    currency.CurrencyId = $("#Id").val();
                         currencyManager.put(currency);
                 } else {
                     currencyManager.post(currency);
                 }
-
-                
             }
         });
         
@@ -212,15 +210,6 @@
                 $("#modifyModal").modal("show");
                 $("#type").val("CREATE");
                 $("#Id").val("");
-            });
-
-            $(document).on("click", ".item-page", function () {
-                let page = $(this).text();
-                let key = $("#key").val();
-            });
-
-            $("#key").keyup(function () {
-                let key = $("#key").val();
             });
 
             $(document).on("click", ".btn-edit", function () {

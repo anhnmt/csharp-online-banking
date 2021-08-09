@@ -11,9 +11,9 @@ namespace OnlineBanking.BLL.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class, new()
     {
-        private ApplicationDbContext cnn;
+        private readonly ApplicationDbContext cnn;
 
-        private DbSet<T> tbl;
+        private readonly DbSet<T> tbl;
         public Repository()
         {
             cnn = new ApplicationDbContext();

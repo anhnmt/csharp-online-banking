@@ -58,10 +58,6 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetRole()
         {
-            //var data = roles.Get().Select(x => new RoleViewModels { 
-            //    RoleId = x.RoleId,
-            //    Name = x.Name
-            //});
             return Json(roles.Get(), JsonRequestBehavior.AllowGet);
         }
 
