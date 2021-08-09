@@ -1,16 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OnlineBanking.DAL
+﻿namespace OnlineBanking.DAL
 {
     public class AccountViewModel
     {
         public AccountViewModel()
         {
-                
         }
 
         public AccountViewModel(Accounts account)
@@ -30,6 +23,7 @@ namespace OnlineBanking.DAL
             CreatedAt = account.CreatedAt?.ToString("dd-MM-yyyy");
             UpdatedAt = account.UpdatedAt?.ToString("dd-MM-yyyy");
         }
+
         public int AccountId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }

@@ -10,14 +10,12 @@ namespace OnlineBanking.DAL
 {
     public class ChequeBooks : BaseModel
     {
-        [Key]
-        public int ChequeBookId { get; set; }
+        [Key] public int ChequeBookId { get; set; }
         public string Code { get; set; }
         public int AccountId { get; set; }
         public int Status { get; set; }
 
-        [ForeignKey("AccountId")]
-        public virtual Accounts Account { get; set; }
+        [ForeignKey("AccountId")] public virtual Accounts Account { get; set; }
 
         public virtual ICollection<Cheques> Cheques { get; set; }
     }

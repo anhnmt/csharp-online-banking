@@ -20,15 +20,12 @@ namespace OnlineBanking.DAL
             UserId = accountId;
         }
 
-        [Key]
-        public int ChannelId { get; set; }
+        [Key] public int ChannelId { get; set; }
 
         // UserId: user need support
-        [Required(AllowEmptyStrings = false)]
-        public int UserId { get; set; }
+        [Required(AllowEmptyStrings = false)] public int UserId { get; set; }
 
-        [ForeignKey("UserId")]
-        public virtual Accounts User { get; set; }
+        [ForeignKey("UserId")] public virtual Accounts User { get; set; }
 
         public ICollection<Messages> Messages { get; set; }
     }

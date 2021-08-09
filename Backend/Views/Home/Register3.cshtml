@@ -20,87 +20,89 @@
     <link rel="stylesheet" href="~/Content/dist/css/adminlte.min.css">
 </head>
 <body class="hold-transition register-page">
-    <div class="register-box">
-        <div class="card card-outline card-primary">
-            <div class="card-header text-center">
-                <a href="~/Content/index2.html" class="h1"><b>Banking Online</b></a>
-            </div>
-            <div class="card-body">
-                <p class="login-box-msg">Register a new membership</p>
-                <form method="post" id="formData">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="text" class="form-control" id="Name" placeholder="Full name" name="Name">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-user"></span>
-                                </div>
+<div class="register-box">
+    <div class="card card-outline card-primary">
+        <div class="card-header text-center">
+            <a href="~/Content/index2.html" class="h1">
+                <b>Banking Online</b>
+            </a>
+        </div>
+        <div class="card-body">
+            <p class="login-box-msg">Register a new membership</p>
+            <form method="post" id="formData">
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="Name" placeholder="Full name" name="Name">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-user"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="email" class="form-control" id="Email" placeholder="Email" name="Email">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-envelope"></span>
-                                </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="email" class="form-control" id="Email" placeholder="Email" name="Email">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-envelope"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="Password" placeholder="Password" name="Password">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="Password" placeholder="Password" name="Password">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="RePassword" placeholder="Confirm Password" name="RePassword">
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
+                </div>
+                <div class="form-group">
+                    <div class="input-group">
+                        <input type="password" class="form-control" id="RePassword" placeholder="Confirm Password" name="RePassword">
+                        <div class="input-group-append">
+                            <div class="input-group-text">
+                                <span class="fas fa-lock"></span>
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-8">
-                            <div class="icheck-primary">
-                                <input type="checkbox" id="agreeTerms" name="Term" value="agree" required>
-                                <label for="agreeTerms">
-                                    I agree to the <a href="#">terms</a>
-                                </label>
-                            </div>
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <div class="icheck-primary">
+                            <input type="checkbox" id="agreeTerms" name="Term" value="agree" required>
+                            <label for="agreeTerms">
+                                I agree to the <a href="#">terms</a>
+                            </label>
                         </div>
-                        <!-- /.col -->
-                        <div class="col-4">
-                            <button type="submit" class="btn btn-primary btn-block">Register</button>
-                        </div>
-                        <!-- /.col -->
                     </div>
-                </form>
+                    <!-- /.col -->
+                    <div class="col-4">
+                        <button type="submit" class="btn btn-primary btn-block">Register</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
 
 
-                <a href="@Url.Action("Login","Home")" class="text-center">I already have a membership</a>
-            </div>
-            <!-- /.form-box -->
-        </div><!-- /.card -->
-    </div>
-    <!-- /.register-box -->
-    <!-- jQuery -->
-    <script src="~/Content/plugins/jquery/jquery.min.js"></script>
-    <script src="~/Content/plugins/jquery-validation/jquery.validate.min.js"></script>
-    <!-- Bootstrap 4 -->
-    <script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <!-- AdminLTE App -->
-    <script src="~/Content/dist/js/adminlte.min.js"></script>
-    <script src="~/Content/js/custom-validate.js"></script>
-    <script>
+            <a href="@Url.Action("Login", "Home")" class="text-center">I already have a membership</a>
+        </div>
+        <!-- /.form-box -->
+    </div><!-- /.card -->
+</div>
+<!-- /.register-box -->
+<!-- jQuery -->
+<script src="~/Content/plugins/jquery/jquery.min.js"></script>
+<script src="~/Content/plugins/jquery-validation/jquery.validate.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="~/Content/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="~/Content/dist/js/adminlte.min.js"></script>
+<script src="~/Content/js/custom-validate.js"></script>
+<script>
         var validator = $("#formData").validate({
             rules: {
                 Name: {
@@ -147,4 +149,3 @@
     </script>
 </body>
 </html>
-
