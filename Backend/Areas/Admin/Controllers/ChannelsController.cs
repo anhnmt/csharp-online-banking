@@ -26,7 +26,7 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Channels
         public ActionResult Index()
         {
-            if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             ViewBag.Channel = "mm-active";
             return View();
         }

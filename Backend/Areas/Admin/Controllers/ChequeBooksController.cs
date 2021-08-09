@@ -22,14 +22,9 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/ChequeBooks
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new {area = ""});
-            }
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            return View();
+
         }
 
         public ActionResult GetData()

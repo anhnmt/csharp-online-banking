@@ -13,31 +13,25 @@ namespace Backend.Controllers
     public class HomeController : Controller
     {
         private readonly IRepository<Accounts> accounts;
-        private readonly IRepository<BankAccounts> bankaccounts;
+        private readonly IRepository<BankAccounts> bankAccounts;
 
         public HomeController()
         {
             accounts = new Repository<Accounts>();
-            bankaccounts = new Repository<BankAccounts>();
+            bankAccounts = new Repository<BankAccounts>();
         }
 
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                ViewBag.Index = "active";
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login");
-            }
+            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
+            ViewBag.Index = "active";
+            return View();
         }
 
         public ActionResult GetDataBankAccount(int account)
         {
             ViewBag.Accounts = "active";
-            var data = bankaccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
+            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
             {
                 AccountId = x.AccountId,
                 BankAccountId = x.BankAccountId,
@@ -78,12 +72,12 @@ namespace Backend.Controllers
                 {
                     number += random.Next(10).ToString();
                 }
-            } while (!bankaccounts.CheckDuplicate(x => number != null && x.Name == number));
+            } while (!bankAccounts.CheckDuplicate(x => number != null && x.Name == number));
 
             bank.Name = number;
             bank.Status = 2;
             bank.CreatedAt = DateTime.Now;
-            bankaccounts.Add(bank);
+            bankAccounts.Add(bank);
 
             return Json(new
             {
@@ -99,42 +93,35 @@ namespace Backend.Controllers
 
         public ActionResult InfoAccountData()
         {
-            if (Session["email"] != null)
+            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
+            var userId = ((Accounts) Session["user"]).AccountId;
+            var acc = accounts.Get(userId);
+            var account = new ProfileViewModel
             {
-                var userId = int.Parse(Session["userId"].ToString());
-                var acc = accounts.Get(userId);
-                var account = new ProfileViewModel
+                Name = acc.Name,
+                Email = acc.Email,
+                Phone = acc.Phone,
+                Birthday = acc.Birthday?.ToString("yyyy-MM-dd"),
+                RoleName = acc.RoleId != 2 ? acc.Role.Name : null,
+                NumberID = acc.NumberID,
+                StatusName = ((AccountStatus) acc.Status).ToString(),
+                Address = acc.Address,
+            };
+
+            return Json(
+                new
                 {
-                    Name = acc.Name,
-                    Email = acc.Email,
-                    Phone = acc.Phone,
-                    Birthday = acc.Birthday?.ToString("yyyy-MM-dd"),
-                    RoleName = acc.RoleId != 2 ? acc.Role.Name : null,
-                    NumberID = acc.NumberID,
-                    StatusName = ((AccountStatus) acc.Status).ToString(),
-                    Address = acc.Address,
-                };
-
-                return Json(
-                    new
-                    {
-                        data = account,
-                        message = "Success",
-                        statusCode = 200
-                    }, JsonRequestBehavior.AllowGet);
-            }
-
-            return RedirectToAction("Login");
+                    data = account,
+                    message = "Success",
+                    statusCode = 200
+                }, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult InfoAccount()
         {
-            if (Session["email"] != null)
-            {
-                return View();
-            }
+            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
 
-            return RedirectToAction("Login");
+            return View();
         }
 
         [HttpPost]
@@ -142,7 +129,7 @@ namespace Backend.Controllers
         {
             var errors = new Dictionary<string, string>();
             var check = true;
-            var userId = (int) Session["userId"];
+            var userId = ((Accounts) Session["user"]).AccountId;
 
             if (!IsNullOrEmpty(acc.Birthday))
             {
@@ -185,7 +172,7 @@ namespace Backend.Controllers
 
             if (ModelState.IsValid && check)
             {
-                var acc1 = accounts.Get(Session["userId"]);
+                var acc1 = accounts.Get(((Accounts) Session["user"]).AccountId);
                 acc1.Name = acc.Name;
                 acc1.Email = acc.Email;
                 acc1.Phone = acc.Phone;
@@ -237,7 +224,7 @@ namespace Backend.Controllers
 
         public ActionResult Login()
         {
-            if (Session["email"] != null)
+            if ((Accounts) Session["user"] != null)
             {
                 return RedirectToAction("Index", "Home");
             }
@@ -254,10 +241,7 @@ namespace Backend.Controllers
                 var obj = users.Get(x => x.Email == email).FirstOrDefault();
                 if (password == obj.Password && obj.Status != ((int) AccountStatus.Locked) && obj.AttemptLogin < 3)
                 {
-                    Session["userId"] = obj.AccountId;
-                    Session["email"] = email;
-                    Session["name"] = obj.Name;
-                    Session["rold"] = obj.Role.Name;
+                    Session["user"] = obj;
 
                     obj.AttemptLogin = 0;
                     users.Update(obj);
@@ -345,7 +329,7 @@ namespace Backend.Controllers
         public ActionResult CheckRegister(RegisterViewModel register)
         {
             var errors = new Dictionary<string, string>();
-            var addtionCheck = true;
+            var additionCheck = true;
             IRepository<Accounts> users = new Repository<Accounts>();
 
             foreach (var k in ModelState.Keys)
@@ -359,16 +343,16 @@ namespace Backend.Controllers
             if (register.RePassword != register.Password)
             {
                 errors.Add("RePassword", "Confirm Password is not the same as Password");
-                addtionCheck = false;
+                additionCheck = false;
             }
 
             if (users.CheckDuplicate(x => x.Email == register.Email))
             {
                 errors.Add("Email", "Email has been used!");
-                addtionCheck = false;
+                additionCheck = false;
             }
 
-            if (!ModelState.IsValid || addtionCheck != true)
+            if (!ModelState.IsValid || additionCheck != true)
                 return Json(new
                 {
                     statusCode = 400,
@@ -376,7 +360,7 @@ namespace Backend.Controllers
                     data = errors
                 }, JsonRequestBehavior.AllowGet);
 
-            var accounts = new Accounts
+            var account = new Accounts
             {
                 Name = register.Name,
                 Email = register.Email,
@@ -387,11 +371,11 @@ namespace Backend.Controllers
                 Status = ((int) AccountStatus.Actived)
             };
 
-            users.Add(accounts);
+            users.Add(account);
             return Json(new
             {
                 statusCode = 200,
-                message = "Error",
+                message = "Successfully",
                 url = "Home/Login",
             }, JsonRequestBehavior.AllowGet);
         }

@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<OnlineBanking.DAL.Channels>
+@using OnlineBanking.DAL
+@{ var user = (Accounts)Session["user"]; }
 
 @{
     ViewBag.Title = "Index";
@@ -86,7 +88,7 @@
     <!--SignalR script to update the chat page and send messages.-->
 
     <script>
-        $.connection.hub.qs = { "userId": '@Session["userId"]' };
+        $.connection.hub.qs = { "userId": '@user.AccountId' };
 
         const connection = $.connection;
         const chatHub = connection.chatHub;

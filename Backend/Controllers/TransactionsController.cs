@@ -186,7 +186,7 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (Session["email"] == null) 
+            if (((Accounts)Session["user"]) == null) 
                 RedirectToAction("Login", "Home", new {area = ""});
             
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();

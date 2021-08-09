@@ -20,14 +20,9 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new {area = ""});
-            }
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            return View();
+
         }
 
         public ActionResult GetData()
@@ -129,7 +124,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileAccount(int id)
         {
-            if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             var x = users.Get(id);
             if (x == null)
             {
