@@ -1,0 +1,238 @@
+﻿@model OnlineBanking.DAL.ChequesInformationViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header align-middle">
+                <h4 class="card-title">Currencies Management</h4>
+                <button class="btn btn-primary btn-add text-right">Generate Cheque</button>
+                <button class="btn btn-primary btn-test text-right">Test</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="datatables" class="display min-w850">
+                        <thead>
+                        <tr>
+                            <th>ChequeId</th>
+                            <th>Code</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.content -->
+<div class="modal fade" id="modifyModal" role="dialog">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="form-validation">
+                <form id="formData" action="#" method="POST" novalidate="novalidate">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create new Currency</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="Id" id="Id" value=""/>
+                        <input type="hidden" name="type" id="type" value="CREATE"/>
+
+                        <div class="form-group">
+                            <label class="col-form-label" for="Name">
+                                Name <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <input type="text" class="form-control" id="Name" name="Name" placeholder="Name...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+        var currencyManager = {
+            post: function (currency) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Currencies/PostData",
+                    data: currency,
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            $("#modifyModal").modal("hide");
+                            $('#datatables').DataTable().ajax.reload();
+                            toastr.success('Created Successfully');
+                        } else {
+                            validator.showErrors(res.data);
+                        }
+                    }
+
+                })
+            },
+            put: function (currency) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Currencies/PutData",
+                    data: currency,
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            $("#modifyModal").modal("hide");
+                            $('#datatables').DataTable().ajax.reload();
+                            toastr.success('Updated Successfully');
+                        } else {
+                            validator.showErrors(res.data);
+                        }
+                    }
+                })
+            },
+            get: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/Currencies/FindId",
+                    data: { id: id },
+                    success: function (res) {
+                        $("#Name").val(res.Name);
+                        $("#modifyModal").modal("show");
+                    }
+                })
+            },
+        }
+
+        var validator = $("#formData").validate({
+            rules: {
+                "Name": {
+                    required: true
+                },
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).parents(".form-group > div").append(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+
+            submitHandler: function (form) {
+                var currency = {
+                    Name: $("#Name").val(),
+                }
+
+                if ($("#type").val() === "EDIT") {
+                    currency.CurrencyId = $("#Id").val(),
+                        currencyManager.put(currency);
+                } else {
+                    currencyManager.post(currency);
+                }
+                
+            }
+        });
+
+        $(function () {
+            $('#datatables').DataTable({
+                "paging": true,
+                "ordering": true,
+                "autoWidth": false,
+                "responsive": true,
+                "processing": true,
+                "filter": true,
+                "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+                "ajax":{
+                    "url": "@Url.Action("GetData", "Cheques")",
+                    "data": {ChequeBookId: @Model.ChequeBookId},
+                }, 
+                "order": [
+                    [0, 'asc']
+                ],
+                "columns": [
+                    {
+                        data: 'CurrencyId',
+                        className: 'align-middle',
+                        "render": function (data, type, row) {
+                            return `#${row.CurrencyId}`;
+                        }
+                    },
+                    {
+                        data: 'Name',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: 'StatusName',
+                        className: 'align-middle',
+                    },
+                    {
+                        bSortable: false,
+                        data: '',
+                        className: 'align-middle text-right',
+                        "render": function (data, type, row) {
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id=" ' + row.CurrencyId + ' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.CurrencyId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        }
+                    },
+                ]
+            });
+
+            $(".btn-add").click(function () {
+                $("#formData").trigger("reset");
+                $(".modal-title").html("Create new Currency");
+                $("#modifyModal").modal("show");
+                $("#type").val("CREATE");
+                $("#Id").val("");
+            });
+
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                currencyManager.load(page, key);
+            });
+
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                currencyManager.load(1, key);
+            });
+
+            $(document).on("click", ".btn-edit", function () {
+                $("#formData").trigger("reset");
+                $(".modal-title").html("Update Currency");
+                $("#type").val("EDIT");
+                let currencyId = $(this).data("id");
+                $("#Id").val(currencyId);
+                currencyManager.get(currencyId);
+            });
+
+            $(document).on("click", ".btn-delete", function () {
+                let currencyId = $(this).data("id");
+                currencyManager.delete(currencyId);
+            });
+
+            $('#modifyModal').on('shown.bs.modal', function () {
+                validator.resetForm();
+            });
+        })
+
+    </script>
+}

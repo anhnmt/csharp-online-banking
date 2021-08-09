@@ -139,7 +139,7 @@
     <Compile Include="Areas\Admin\Controllers\BankAccountsController.cs" />
     <Compile Include="Areas\Admin\Controllers\ChannelsController.cs" />
     <Compile Include="Areas\Admin\Controllers\ChequeBooksController.cs" />
-    <Compile Include="Areas\Admin\Controllers\ChequeController.cs" />
+    <Compile Include="Areas\Admin\Controllers\ChequesController.cs" />
     <Compile Include="Areas\Admin\Controllers\CurrenciesController.cs" />
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\RolesController.cs" />
@@ -596,6 +596,7 @@
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff2" />
     <Content Include="Areas\Admin\Views\Cheque\Index.cshtml" />
     <Content Include="Areas\Admin\Views\ChequeBooks\Index.cshtml" />
+    <Content Include="Areas\Admin\Views\Cheques\Index.cshtml" />
     <Content Include="Areas\Admin\Views\BankAccounts\ProfileBankAccount.cshtml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />

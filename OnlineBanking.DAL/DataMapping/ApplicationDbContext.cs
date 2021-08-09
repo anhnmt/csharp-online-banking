@@ -77,5 +77,7 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Messages> Messages { get; set; }
 
         public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
+
+        public System.Data.Entity.DbSet<OnlineBanking.DAL.Cheques> Cheques { get; set; }
     }
 }
