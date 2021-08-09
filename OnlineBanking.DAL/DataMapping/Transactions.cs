@@ -9,8 +9,7 @@ namespace OnlineBanking.DAL
 {
     public class Transactions : BaseModel
     {
-        [Key]
-        public int TransactionId { get; set; }
+        [Key] public int TransactionId { get; set; }
         public int FromId { get; set; }
         public int ToId { get; set; }
         public int Status { get; set; }
@@ -19,9 +18,7 @@ namespace OnlineBanking.DAL
         public double BalancedFrom { get; set; }
         public string Messages { get; set; }
 
-        [ForeignKey("FromId")]
-        public virtual BankAccounts FromAccount { get; set; }
-        [ForeignKey("ToId")]
-        public virtual BankAccounts ToAccount { get; set; }
+        [ForeignKey("FromId")] public virtual BankAccounts FromAccount { get; set; }
+        [ForeignKey("ToId")] public virtual BankAccounts ToAccount { get; set; }
     }
 }

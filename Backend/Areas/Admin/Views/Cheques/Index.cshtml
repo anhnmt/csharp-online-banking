@@ -1,34 +1,32 @@
-﻿@{
+﻿@model OnlineBanking.DAL.ChequesInformationViewModel
+
+@{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
+
 @section css{
 }
-
-<div class="page-titles">
-    <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-        <li class="breadcrumb-item active"><a href="@Url.Action("Index", "Currencies")">Currencies</a></li>
-    </ol>
-</div>
 
 <div class="row">
     <div class="col-12">
         <div class="card">
             <div class="card-header align-middle">
                 <h4 class="card-title">Currencies Management</h4>
-                <button class="btn btn-primary btn-sm btn-add">Create Currency</button>
+                <button class="btn btn-primary btn-add text-right">Generate Cheque</button>
+                <button class="btn btn-primary btn-test text-right">Test</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
                     <table id="datatables" class="display min-w850">
                         <thead>
-                            <tr>
-                                <th>CurrencyId</th>
-                                <th>Name</th>
-                                <th>Status</th>
-                                <th></th>
-                            </tr>
+                        <tr>
+                            <th>ChequeId</th>
+                            <th>Code</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th></th>
+                        </tr>
                         </thead>
                         <tbody></tbody>
                     </table>
@@ -50,8 +48,8 @@
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <input type="hidden" name="Id" id="Id" value="" />
-                        <input type="hidden" name="type" id="type" value="CREATE" />
+                        <input type="hidden" name="Id" id="Id" value=""/>
+                        <input type="hidden" name="type" id="type" value="CREATE"/>
 
                         <div class="form-group">
                             <label class="col-form-label" for="Name">
@@ -74,40 +72,7 @@
 
 @section scripts{
     <script>
-        const validator = $("#formData").validate({
-            rules: {
-                "Name": {
-                    required: true
-                },
-            },
-            ignore: [],
-            errorClass: "invalid-feedback animated fadeInUp",
-            errorElement: "div",
-            errorPlacement: function (e, a) {
-                jQuery(a).parents(".form-group > div").append(e)
-            },
-            highlight: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
-            },
-            success: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
-            },
-
-            submitHandler: function () {
-                const currency = {
-                    Name: $("#Name").val(),
-                };
-
-                if ($("#type").val() === "EDIT") {
-                    currency.CurrencyId = $("#Id").val();
-                        currencyManager.put(currency);
-                } else {
-                    currencyManager.post(currency);
-                }
-            }
-        });
-        
-        const currencyManager = {
+        var currencyManager = {
             post: function (currency) {
                 $.ajax({
                     type: "POST",
@@ -152,17 +117,41 @@
                     }
                 })
             },
-            delete: function (id) {
-                $.ajax({
-                    type: "GET",
-                    url: `/Admin/Currencies/Delete/${id}`,
-                    success: function () {
-                        $('#datatables').DataTable().ajax.reload();
-                        toastr.success('Deleted Successfully');
-                    }
-                })
+        }
+
+        var validator = $("#formData").validate({
+            rules: {
+                "Name": {
+                    required: true
+                },
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).parents(".form-group > div").append(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+
+            submitHandler: function (form) {
+                var currency = {
+                    Name: $("#Name").val(),
+                }
+
+                if ($("#type").val() === "EDIT") {
+                    currency.CurrencyId = $("#Id").val(),
+                        currencyManager.put(currency);
+                } else {
+                    currencyManager.post(currency);
+                }
+                
             }
-        };
+        });
 
         $(function () {
             $('#datatables').DataTable({
@@ -173,7 +162,10 @@
                 "processing": true,
                 "filter": true,
                 "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
-                "ajax": "@Url.Action("GetData", "Currencies")",
+                "ajax":{
+                    "url": "@Url.Action("GetData", "Cheques")",
+                    "data": {ChequeBookId: @Model.ChequeBookId},
+                }, 
                 "order": [
                     [0, 'asc']
                 ],
@@ -212,6 +204,17 @@
                 $("#Id").val("");
             });
 
+            $(document).on("click", ".item-page", function () {
+                let page = $(this).text();
+                let key = $("#key").val();
+                currencyManager.load(page, key);
+            });
+
+            $("#key").keyup(function () {
+                let key = $("#key").val();
+                currencyManager.load(1, key);
+            });
+
             $(document).on("click", ".btn-edit", function () {
                 $("#formData").trigger("reset");
                 $(".modal-title").html("Update Currency");
@@ -229,7 +232,7 @@
             $('#modifyModal').on('shown.bs.modal', function () {
                 validator.resetForm();
             });
-        });
+        })
 
     </script>
 }

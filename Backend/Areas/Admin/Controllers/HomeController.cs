@@ -13,16 +13,10 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Home
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                ViewBag.Index = "active";
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new { area = "" });
-            }
-        }
+            if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
+            ViewBag.Index = "active";
+            return View();
 
+        }
     }
 }

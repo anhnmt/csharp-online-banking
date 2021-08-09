@@ -22,21 +22,21 @@ namespace OnlineBanking.DAL.Migrations
                 {
                     RoleId = 1,
                     Name = "Admin",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 },
                 new Roles()
                 {
                     RoleId = 2,
                     Name = "Support",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 },
                 new Roles()
                 {
                     RoleId = 3,
                     Name = "User",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 }
-                );
+            );
 
             context.Accounts.AddOrUpdate(x => x.AccountId,
                 new Accounts()
@@ -46,7 +46,7 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "admin@gmail.com",
                     Password = "123456",
                     RoleId = 1,
-                    Status = ((int)AccountStatus.Actived),
+                    Status = ((int) AccountStatus.Actived),
                     AttemptLogin = 0,
                 },
                 new Accounts()
@@ -56,7 +56,7 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "support@gmail.com",
                     Password = "123456",
                     RoleId = 2,
-                    Status = ((int)AccountStatus.Actived),
+                    Status = ((int) AccountStatus.Actived),
                     AttemptLogin = 0,
                 },
                 new Accounts()
@@ -66,7 +66,7 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "support2@gmail.com",
                     Password = "123456",
                     RoleId = 2,
-                    Status = ((int)AccountStatus.Actived),
+                    Status = ((int) AccountStatus.Actived),
                     AttemptLogin = 0,
                 },
                 new Accounts()
@@ -76,7 +76,7 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "user@gmail.com",
                     Password = "123456",
                     RoleId = 3,
-                    Status = ((int)AccountStatus.Actived),
+                    Status = ((int) AccountStatus.Actived),
                     AttemptLogin = 0,
                 },
                 new Accounts()
@@ -86,7 +86,7 @@ namespace OnlineBanking.DAL.Migrations
                     Email = "user2@gmail.com",
                     Password = "123456",
                     RoleId = 3,
-                    Status = ((int)AccountStatus.Actived),
+                    Status = ((int) AccountStatus.Actived),
                     AttemptLogin = 0,
                 }
             );
@@ -96,22 +96,21 @@ namespace OnlineBanking.DAL.Migrations
                 {
                     CurrencyId = 1,
                     Name = "VND",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 },
                 new Currencies()
                 {
                     CurrencyId = 2,
                     Name = "USD",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 },
                 new Currencies()
                 {
                     CurrencyId = 3,
                     Name = "EUR",
-                    Status = ((int)DefaultStatus.Actived)
+                    Status = ((int) DefaultStatus.Actived)
                 }
             );
-
         }
     }
 }

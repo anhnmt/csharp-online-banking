@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Web;
 using System.Web.Mvc;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
@@ -13,9 +9,10 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class ChequeBooksController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private IRepository<ChequeBooks> chequebooks;
-        private IRepository<Accounts> accounts;
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly IRepository<ChequeBooks> chequebooks;
+        private readonly IRepository<Accounts> accounts;
+
         public ChequeBooksController()
         {
             chequebooks = new Repository<ChequeBooks>();
@@ -31,7 +28,7 @@ namespace Backend.Areas.Admin.Controllers
             }
             else
             {
-                return RedirectToAction("Login", "Home", new { area = "" });
+                return RedirectToAction("Login", "Home", new {area = ""});
             }
         }
 
@@ -44,7 +41,7 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus)x.Status).ToString()
+                StatusName = ((ChequeBookStatus) x.Status).ToString()
             });
 
             return Json(new
@@ -53,19 +50,18 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
-
         }
 
-        public ActionResult GetAccountData(int AccountId)
+        public ActionResult GetAccountData(int accountId)
         {
             ViewBag.ChequeBooks = "active";
-            var data = chequebooks.Get(x => x.AccountId == AccountId).Select(x => new ChequeBookViewModel
+            var data = chequebooks.Get(x => x.AccountId == accountId).Select(x => new ChequeBookViewModel
             {
                 ChequeBookId = x.ChequeBookId,
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus)x.Status).ToString()
+                StatusName = ((ChequeBookStatus) x.Status).ToString()
             });
 
             return Json(new
@@ -78,29 +74,35 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetStatus()
         {
-            var data = Enum.GetValues(typeof(ChequeBookStatus)).Cast<ChequeBookStatus>().Select(v => v.ToString()).ToArray();
+            var data = Enum.GetValues(typeof(ChequeBookStatus)).Cast<ChequeBookStatus>().Select(v => v.ToString())
+                .ToArray();
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
-        //[ValidateAntiForgeryToken]
         public ActionResult Create(ChequeBooks chequeBook)
         {
-            Dictionary<string, string> errors = new Dictionary<string, string>();
-            bool check = true;
+            var errors = new Dictionary<string, string>();
+            var check = true;
             if (!accounts.CheckDuplicate(x => x.AccountId == chequeBook.AccountId))
             {
                 check = false;
                 errors.Add("AccountId", "Account does not exist!");
             }
 
-            if (check)
+            if (!check)
+                return Json(new
+                {
+                    statusCode = 402,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
             {
                 string random;
                 do
                 {
                     random = Utils.RandomString(16);
-                } while (chequebooks.CheckDuplicate(x=> x.Code == random));
+                } while (chequebooks.CheckDuplicate(x => x.Code == random));
 
                 chequeBook.Code = random;
                 chequebooks.Add(chequeBook);
@@ -110,14 +112,8 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
-                
-            
-            return Json(new
-            {
-                statusCode = 402,
-                message = "Error",
-                data = errors
-            }, JsonRequestBehavior.AllowGet);
+
+
         }
 
         public ActionResult FindId(int id)
@@ -129,7 +125,7 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus)x.Status).ToString()
+                StatusName = ((ChequeBookStatus) x.Status).ToString()
             };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -140,6 +136,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 db.Dispose();
             }
+
             base.Dispose(disposing);
         }
     }

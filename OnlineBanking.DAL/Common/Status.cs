@@ -28,7 +28,6 @@ namespace OnlineBanking.DAL
 
     public enum BankingActivity
     {
-
         Processing = 0,
         Completed = 1,
         MoneyRefund = 2,

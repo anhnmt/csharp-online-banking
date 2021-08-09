@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace OnlineBanking.DAL
 {
-    public class GetInfoBankAccountViewModels
+    public class ChequesInformationViewModel
     {
-        public string Name { get; set; }
-        public int Id { get; set; }
+        public int ChequeBookId { get; set; }
+        public int AccountId { get; set; }
     }
 }

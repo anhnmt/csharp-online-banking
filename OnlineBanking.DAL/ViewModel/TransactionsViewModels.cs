@@ -8,6 +8,25 @@ namespace OnlineBanking.DAL
 {
     public class TransactionsViewModels
     {
+        public TransactionsViewModels()
+        {
+            
+        }
+
+        public TransactionsViewModels(Transactions transactions)
+        {
+            TransactionId = transactions.TransactionId;
+            FromId = transactions.FromId;
+            ToId = transactions.ToId;
+            Amount = transactions.Amount;
+            Messages = transactions.Messages;
+            BalancedFrom = transactions.BalancedFrom;
+            BalancedTo = transactions.BalancedTo;
+            Status = transactions.Status;
+            StatusName = ((BankingActivity) transactions.Status).ToString();
+            CreatedAt = transactions.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
+            UpdatedAt = transactions.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
+        }
         public int TransactionId { get; set; }
         public int FromId { get; set; }
         public int ToId { get; set; }

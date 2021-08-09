@@ -8,6 +8,7 @@ namespace OnlineBanking.DAL
     public static class Utils
     {
         private static Random random = new Random();
+
         public static bool IsNullOrEmpty<T>(this IEnumerable<T> data)
         {
             return data == null || !data.Any();
@@ -15,13 +16,14 @@ namespace OnlineBanking.DAL
 
         public static bool IsNullOrEmpty(string data)
         {
-            return data == null || data == string.Empty;
+            return string.IsNullOrEmpty(data);
         }
 
         public static bool IsNullOrEmpty<T>(T data)
         {
             return data == null;
         }
+
         public static string RandomString(int length)
         {
             const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";

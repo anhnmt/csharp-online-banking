@@ -2,76 +2,77 @@
     ViewBag.Title = "Home Page";
 }
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Home</h1>
-                </div>
-            </div>
-        </div><!-- /.container-fluid -->
-    </section>
-
-    <!-- Main content -->
-    <section class="content">
-        
-        <div class="col-md-12">
-            <a href="#" class="btn btn-primary mb-3 btn-add">Create New Account</a>
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">Account Number</h3>
-                </div>
-                <div class="card-body">
-                    <table class="table">
-                        <tr>
-                            <th>Account Number</th>
-                            <th>CurrencyId</th>
-                            <th>Balance</th>
-                            <th>Status </th>
-                            <th></th>
-                        </tr>
-
-                        <tbody id="tbl_user"></tbody>
-
-                    </table>
-                </div>
-                <!-- /.card-body -->
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Home</h1>
             </div>
         </div>
-        <!-- Default box -->
-        <!-- /.card -->
+    </div><!-- /.container-fluid -->
+</section>
 
-    </section>
-    <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-MoneyManament">Update Infomation Account</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" name="BankAccountId" id="BankAccountId" value="" />
-                    <input type="hidden" name="type" id="type" value="CREATE" />
-                    <form method="post" id="Form2">
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <label for="exampleInputClass">Currency</label>
-                                <select class="form-control" id="CurrencyId" name="CurrencyId">
-                                </select>
-                                <span class="error text-danger"></span>
-                            </div>
+<!-- Main content -->
+<section class="content">
+
+    <div class="col-md-12">
+        <a href="#" class="btn btn-primary mb-3 btn-add">Create New Account</a>
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Account Number</h3>
+            </div>
+            <div class="card-body">
+                <table class="table">
+                    <tr>
+                        <th>Account Number</th>
+                        <th>CurrencyId</th>
+                        <th>Balance</th>
+                        <th>Status </th>
+                        <th></th>
+                    </tr>
+
+                    <tbody id="tbl_user"></tbody>
+
+                </table>
+            </div>
+            <!-- /.card-body -->
+        </div>
+    </div>
+    <!-- Default box -->
+    <!-- /.card -->
+
+</section>
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-MoneyManament">Update Infomation Account</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" name="BankAccountId" id="BankAccountId" value=""/>
+                <input type="hidden" name="type" id="type" value="CREATE"/>
+                <form method="post" id="Form2">
+                    <div class="form-group">
+                        <div class="col-md-6">
+                            <label for="exampleInputClass">Currency</label>
+                            <select class="form-control" id="CurrencyId" name="CurrencyId">
+                            </select>
+                            <span class="error text-danger"></span>
                         </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-                </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>
-    <!-- /.content -->
+</div>
+<!-- /.content -->
+
 @section scripts{
     <script>
         function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
@@ -157,4 +158,4 @@
 
         })
     </script>
-    }
+}

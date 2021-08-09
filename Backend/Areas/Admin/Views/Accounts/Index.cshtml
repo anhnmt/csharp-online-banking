@@ -2,145 +2,221 @@
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-@section css{
-    <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet" />
-}
 
+@section css{
+    <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet"/>
+}
 
 <div class="page-titles">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
-        <li class="breadcrumb-item active"><a href="javascript:void(0)">User Management</a></li>
+        <li class="breadcrumb-item">
+            <a href="javascript:void(0)">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="javascript:void(0)">User Management</a>
+        </li>
     </ol>
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
-            <div class="card card-success">
-                <div class="card-header">
-                    <h3 class="card-title">User Management</h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Name</th>
-                                    <th>Email</th>
-                                    <th>RoleName </th>
-                                    <th>Status </th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody id="tbl_user"></tbody>
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">User Management</h3>
+                        <button class="btn btn-sm btn-primary btn-add">Create New User</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>RoleName </th>
+                            <th>Status </th>
+                            <th>Action</th>
+                        </tr>
+                        </thead>
+                        <tbody id="tbl_user"></tbody>
 
-                        </table>
-                    </div>
+                    </table>
                 </div>
             </div>
+        </div>
     </div>
 </div>
 
 <div class="modal fade " id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">
-
-        <!-- Modal content-->
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Update Infomation Account</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="Id" id="Id" value="" />
-                <input type="hidden" name="type" id="type" value="CREATE" />
-                <form method="post" id="Form">
+            <form id="formData" action="#" method="POST" novalidate="novalidate">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value=""/>
+                    <input type="hidden" name="type" id="type" value="CREATE"/>
+
                     <div class="form-group">
-                        <label for="exampleInputName">Name</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Name...">
-                        <span class="error text-danger"></span>
+                        <label>Name <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Name...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Email</label>
-                        <input type="text" class="form-control" id="Email" placeholder="Email...">
-                        <span class="error text-danger"></span>
+                        <label>Email <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="text" class="form-control" id="Email" name="Email" placeholder="Email...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Password</label>
-                        <input type="text" class="form-control" id="Password" placeholder="Password...">
-                        <span class="error text-danger"></span>
+                        <label>Password <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="text" class="form-control" id="Password" name="Password" placeholder="Password...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Phone</label>
-                        <input type="text" class="form-control" id="Phone" placeholder="Phone...">
-                        <span class="error text-danger"></span>
+                        <label>Phone <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="text" class="form-control" id="Phone" name="Phone" placeholder="Phone...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputClass">Address</label>
-                        <input type="text" class="form-control" id="Address" placeholder="Address...">
-                        <span class="error text-danger"></span>
+                        <label>Address <span class="text-danger">*</span></label>
+                        <div>
+                            <input type="text" class="form-control" id="Address" name="Address" placeholder="Address...">
+                        </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="exampleInputAge">Birthday</label>
+                                <label>Birthday <span class="text-danger">*</span></label>
                                 <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                    <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
+                                    <div>
+                                        <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
+                                    </div>
                                 </div>
                             </div>
                             <span class="error text-danger"></span>
                             <div class="col-md-6">
-                                <label for="exampleInputClass">NumberID</label>
-                                <input type="text" class="form-control" id="NumberID" placeholder="NumberID...">
-                                <span class="error text-danger"></span>
+                                <label>NumberID <span class="text-danger">*</span></label>
+                                <div>
+                                    <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="NumberID...">
+                                </div>
                             </div>
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Role</label>
-                                <select class="form-control" id="RoleId" name="RoleId">
-                                </select>
-                                <span class="error text-danger"></span>
+                                <label>Role <span class="text-danger">*</span></label>
+                                <div>
+                                    <select class="form-control" id="RoleId" name="RoleId">
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Status</label>
-                                <select class="form-control" id="Status" name="Status">
-                                </select>
-                                <span class="error text-danger"></span>
+                                <label>Status <span class="text-danger">*</span></label>
+                                <div>
+                                    <select class="form-control" id="Status" name="Status">
+                                    </select>
+                                </div>
                             </div>
                         </div>
                     </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success ">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-@section AdminlteJs{
-    <script src="~/Content/plugins/moment/moment.min.js"></script>
-    <script src="~/Content/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- DataTables  & Plugins -->
 
+@section AdminlteJs{
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
+
 @section scripts{
 
     <script>
+        const validator = $("#formData").validate({
+            rules: {
+                "Name": {
+                    required: true
+                },
+                "Email": {
+                    required: true
+                },
+                "Password": {
+                    required: true
+                },
+                "Birthday": {
+                    required: true
+                },
+                "Address": {
+                    required: true
+                },
+                "Phone": {
+                    required: true
+                },
+                "NumberId": {
+                    required: true
+                },
+                "RoleId": {
+                    required: true
+                },
+                "Status": {
+                    required: true
+                },
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).parents(".form-group > div").append(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+
+            submitHandler: function () {
+                const today = new Date();
+                const user = {
+                    Name: $("#Name").val(),
+                    Email: $("#Email").val(),
+                    Password: $("#Password").val(),
+                    Birthday: $("#Birthday").val(),
+                    Address: $("#Address").val(),
+                    Phone: $("#Phone").val(),
+                    NumberID: $("#NumberID").val(),
+                    RoleId: $("#RoleId").val(),
+                    Status: parseInt(($("#Status").val()))
+                };
+                if ($("#type").val() === "EDIT") {
+                    user.AccountId = $("#Id").val();
+                    managerAcc.put(user);
+                } else {
+                    managerAcc.post(user);
+                }
+            }
+        });
+    
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Accounts/GetStatus",
+                url: "@Url.Action("GetStatus", "Accounts")",
                 success: function (res) {
                     console.log(res)
                     var html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
+                        html += "<option value = '" + key + "' " + ((parseInt(status)) === key ? 'selected' : '') + ">" + value + " </option>";
                     });
                     $('#Status').html(html);
                 }
@@ -149,23 +225,22 @@
         function loadRole(roleId = null) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Accounts/GetRole",
+                url: "@Url.Action("GetRole", "Accounts")",
                 success: function (res) {
                     console.log(res)
                     var html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                        html += "<option value = '" + value.RoleId + "' " + (roleId === value.RoleId  ? 'selected' : '') + ">" + value.Name + " </option>";
                     });
                     $('#RoleId').html(html);
                 }
             })
         }
-
-        var managerAcc = {
+        const managerAcc = {
             get: function (id) {
                 $.ajax({
                     type: "GET",
-                    url: "/Admin/Accounts/FindId",
+                    url: "@Url.Action("FindId", "Accounts")",
                     data: { id: id },
                     success: function (res) {
                         console.log(res);
@@ -186,12 +261,12 @@
             put: function (user) {
                 $.ajax({
                     type: "POST",
-                    url: "/Admin/Accounts/Edit",
+                    url: "@Url.Action("Edit", "Accounts")",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAcc.load();
+                             $('#datatables').DataTable().ajax.reload();
                             toastr.success('Updated Successfully')
                         }
                     }
@@ -201,19 +276,19 @@
             post: function (user) {
                 $.ajax({
                     type: "POST",
-                    url: "/Admin/Accounts/Create",
+                    url: "@Url.Action("Create", "Accounts")",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAcc.load();
+                            $('#datatables').DataTable().ajax.reload();
                             toastr.success('Created Successfully')
                         }
                     }
 
                 })
             }
-        }
+        };
         $(function () {
             $('#datatables').DataTable({
                 "paging": true,
@@ -223,7 +298,7 @@
                 "processing": true,
                 "filter": true,
                 "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
-                "ajax": "/Admin/Accounts/GetData",
+                "ajax": "@Url.Action("GetData", "Accounts")",
                 "order": [
                     [0, 'asc']
                 ],
@@ -241,21 +316,23 @@
                         className: 'align-middle',
                     },
                     {
-                        data: 'RoleName',
-                        className: 'align-middle',
+                        "data": 'RoleName',
+                        "className": 'align-middle',
                         "searchable": false,
-                        "orderable": false
+                        "orderable": false,
                     },
                     {
                         data: 'StatusName',
                         className: 'align-middle text-center',
                         "searchable": false,
-                        "orderable": false
+                        "orderable": false,
                     },
                     {
-                        data: 'AccountId',
-                        "render": function (data, type, row) {
-                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.AccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id=" '+ row.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" '+ row.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        data: {AccountId:'AccountId'},
+                        "render": function (data) {
+                            let detail = "@Url.Action("ProfileAccount", "Accounts")/"+data.AccountId;
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
+                             '<a href="'+detail+'" class="dropdown-item btn-detail" >Details</a><a  data-id=" '+ data.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                              }
                     },
                 ]
@@ -266,43 +343,22 @@
                 let userId = $(this).data("id");
                 let a = managerAcc.get(userId);
             })
-
+            
             $(document).on("click", ".btn-add", function () {
-                loadRole(1);
-                loadStatus(1);
+                loadRole(0);
+                loadStatus(0);
                 $(".modal-title").html("Create Account");
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
             })
-            $(document).on("click", ".btn-detail", function () {
-                let userId = $(this).data("id");
-                window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
-            })
-
-            $(document).on("click", "#btnSave", function () {
-                var today = new Date();
-                var user = {
-                    Name: $("#Name").val(),
-                    Email: $("#Email").val(),
-                    Password: $("#Password").val(),
-                    Birthday: $("#Birthday").val(),
-                    Address: $("#Address").val(),
-                    Phone: $("#Phone").val(),
-                    NumberID: $("#NumberID").val(),
-                    RoleId: $("#RoleId").val(),
-                    Address: $("#Address").val(),
-                    Status: parseInt(($("#Status").val()))
-                }
-                if ($("#type").val() == "EDIT") {
-                    user.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    user.AccountId = $("#Id").val();
-                    managerAcc.put(user);
-                } else {
-                    user.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    managerAcc.post(user);
-                }
-            })
-
+            
+            // $(document).on("click", ".btn-detail", function () {
+            //     let userId = $(this).data("id");
+            //     window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
+            // })
+            $('#myModal').on('shown.bs.modal', function () {
+                validator.resetForm();
+            });
         })
 
     </script>

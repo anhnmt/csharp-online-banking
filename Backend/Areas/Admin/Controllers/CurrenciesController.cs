@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Entity;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Text.RegularExpressions;
-using System.Web;
 using System.Web.Mvc;
-using Backend.Areas.Admin;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
@@ -15,8 +9,8 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class CurrenciesController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private IRepository<Currencies> currencies;
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly IRepository<Currencies> currencies;
         public CurrenciesController()
         {
             currencies = new Repository<Currencies>();
@@ -25,15 +19,11 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Currencies
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                ViewBag.Currency = "active";
-                return View();
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new { area = "" });
-            }
+            if (Session["email"] == null) 
+                return RedirectToAction("Login", "Home", new {area = ""});
+            ViewBag.Currency = "active";
+            return View();
+
         }
 
         public ActionResult GetData()
@@ -64,7 +54,7 @@ namespace Backend.Areas.Admin.Controllers
 
                 if (!Utils.IsNullOrEmpty(check))
                 {
-                    if (check.Status == (int)DefaultStatus.Deleted)
+                    if (check != null && check.Status == (int)DefaultStatus.Deleted)
                     {
                         c.CurrencyId = check.CurrencyId;
                         c.Status = (int)DefaultStatus.Actived;
@@ -79,7 +69,7 @@ namespace Backend.Areas.Admin.Controllers
                     }
                     else
                     {
-                        errors.Add("Name", "Name is dublicated!");
+                        errors.Add("Name", "Name is duplicated!");
 
                         return Json(new
                         {
@@ -126,9 +116,9 @@ namespace Backend.Areas.Admin.Controllers
             {
                 var check = currencies.Get(x => x.CurrencyId != c.CurrencyId && x.Name == c.Name);
 
-                if (!Utils.IsNullOrEmpty(check))
+                if (!check.IsNullOrEmpty())
                 {
-                    errors.Add("Name", "Name is dublicated!");
+                    errors.Add("Name", "Name is duplicated!");
 
                     return Json(new
                     {
@@ -195,7 +185,7 @@ namespace Backend.Areas.Admin.Controllers
             base.Dispose(disposing);
         }
 
-        private bool existCurrencyId(int id)
+        private bool ExistCurrencyId(int id)
         {
             return Utils.IsNullOrEmpty(currencies.Get(id));
         }

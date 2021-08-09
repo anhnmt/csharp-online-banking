@@ -2,14 +2,16 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 @section customCss{
-    <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet" />
-    <link href="~/Content/custom/notify/css/OverlayScrollbars.min.css" rel="stylesheet" />
-    <link href="~/Content/custom/notify/css/prism.css" rel="stylesheet" />
-    <link href="~/Content/custom/notify/css/simple-notify.min.css" rel="stylesheet" />
-    <link href="~/Content/custom/notify/css/reset.css" rel="stylesheet" />
-    <link href="~/Content/custom/notify/css/demo.css" rel="stylesheet" />
+    <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet"/>
+    <link href="~/Content/custom/notify/css/OverlayScrollbars.min.css" rel="stylesheet"/>
+    <link href="~/Content/custom/notify/css/prism.css" rel="stylesheet"/>
+    <link href="~/Content/custom/notify/css/simple-notify.min.css" rel="stylesheet"/>
+    <link href="~/Content/custom/notify/css/reset.css" rel="stylesheet"/>
+    <link href="~/Content/custom/notify/css/demo.css" rel="stylesheet"/>
 }
+
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <div class="container-fluid">
@@ -19,7 +21,9 @@
             </div>
             <div class="col-sm-6">
                 <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item"><a href="@Url.Action("Index","Home")">Home</a></li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">Home</a>
+                    </li>
                     <li class="breadcrumb-item active">Funds Transfer</li>
                 </ol>
             </div>
@@ -35,7 +39,7 @@
                 <h3 class="card-title">Funds Transfer</h3>
             </div>
             <div class="card-body">
-                <input type="hidden" name="type" id="type" value="CREATE" />
+                <input type="hidden" name="type" id="type" value="CREATE"/>
                 <form method="post" id="Form">
                     <div class="form-group">
                         <label for="exampleInputName">Source Account</label>
@@ -76,6 +80,7 @@
     <!-- /.card -->
 
 </section>
+
 @section scripts{
     <script src="~/Content/custom/notify/js/simple-notify.min.js"></script>
     <script src="~/Content/custom/notify/js/OverlayScrollbars.min.js"></script>
@@ -92,7 +97,7 @@
                 async: false,
                 success: function (res) {
                     console.log(res)
-                    var html;
+                    let html;
                     $.each(res.data, function (key, value) {
                         html += "<option value = '" + value.BankAccountId + "'  >" + value.Name + " </option>";
                     });
@@ -106,7 +111,7 @@
             let data;
             $.ajax({
                 type: "POST",
-                url: "/BankAccounts/GetBanlace",
+                url: "/BankAccounts/GetBalance",
                 data: { bankId: bankId },
                 async: false,
                 success: function (res) {
@@ -122,9 +127,8 @@
                 url: "/Transactions/Transfers",
                 data: tran,
                 success: function (res) {
-                    if (res.statusCode == 200) {
+                    if (res.statusCode === 200) {
                         $("#myModal").modal("hide");
-                        let fromId = $("#fromId").val();
                         notifySuccess("Transfers Success", "Transfers Success");
                         sleep(3000).then(() => {
                             let bankId = $("#FromId").val();
@@ -144,7 +148,7 @@
                 data: { name: name },
                 async: false,
                 success: function (res) {
-                    if (res.statusCode == 200) {
+                    if (res.statusCode === 200) {
                         data = res;
                     } else {
                         data = res;
@@ -166,7 +170,7 @@
             $("#Form").trigger("reset");
 
             $(document).on('change', '#FromId', function () {
-                if ($("#FromId").val() == "") {
+                if ($("#FromId").val() === "") {
                     $('#text1').css('display', 'none');
                     $('#infoSource').css('display', 'none');
                     $('#ToId').prop('disabled', true);
@@ -191,14 +195,14 @@
 
             $(document).on('blur', '#ToId', function () {
                 let dataInfoBankAccount;
-                if (this.value.length == 0) {
+                if (this.value.length === 0) {
                     $('#text2').css('display', 'none');
                     $('#infoReceiver').css('display', 'none');
                 } else {
                     dataInfoBankAccount = loadInfoBankAccount(this.value);
                     $('#text2').css('display', 'inline-block');
                 }
-                if (dataInfoBankAccount.statusCode == 200) {
+                if (dataInfoBankAccount.statusCode === 200) {
                     $("#BankId").val(dataInfoBankAccount.data[0].Id);
                     $('#infoReceiver').css('display', 'inline-block');
                     $('#infoReceiver').html(dataInfoBankAccount.data[0].Name);
@@ -209,20 +213,21 @@
                 }
             });
             $(document).on("keyup", "#Amount", function () {
-                if ($("#Amount").val()[0] == "0") {
+                if ($("#Amount").val()[0] === "0") {
                     toastr.error("Nhập sai")
                     $("#Amount").val("")
                 }
             })
             $(document).on("click", "#btnSave", function () {
-                var today = new Date();
-                var tran = {
+                const today = new Date();
+                const tran = {
                     FromId: $("#FromId").val(),
                     ToId: $("#BankId").val(),
                     Messages: $("#Messages").val(),
                     Amount: $("#Amount").val()
-                }
-                if (tran.Amount[0] == "0") {
+                };
+                
+                if (tran.Amount[0] === "0") {
                     notifyError("Error","Nhập sai")
                 } else {
                     transfer(tran)

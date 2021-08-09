@@ -17,7 +17,7 @@ namespace OnlineBanking.DAL
             CurrencyId = currency.CurrencyId;
             Name = currency.Name;
             Status = currency.Status;
-            StatusName = ((DefaultStatus)currency.Status).ToString();
+            StatusName = ((DefaultStatus) currency.Status).ToString();
         }
 
         public int CurrencyId { get; set; }
