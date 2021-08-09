@@ -14,8 +14,9 @@ namespace Backend.Areas.Admin.Controllers
     public class ChannelsController : Controller
     {
         private ApplicationDbContext db = new ApplicationDbContext();
-        private IRepository<Channels> channels;
-        private IRepository<Messages> messages;
+        private readonly IRepository<Channels> channels;
+        private readonly IRepository<Messages> messages;
+
         public ChannelsController()
         {
             channels = new Repository<Channels>();
@@ -25,13 +26,9 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Channels
         public ActionResult Index()
         {
-            if (Session["email"] != null)
-            {
-                ViewBag.Channel = "mm-active";
-                return View();
-            }
-
-            return RedirectToAction("Login", "Home", new { area = "" });
+            if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
+            ViewBag.Channel = "mm-active";
+            return View();
         }
 
         public ActionResult GetData(int page = 1, string key = null, int pageSize = 5)
@@ -40,14 +37,12 @@ namespace Backend.Areas.Admin.Controllers
 
             var data = channels.Get();
 
-            decimal totalpage = Math.Ceiling((decimal)data.Count() / pageSize);
-
-            // 
-
+            var totalPage = Math.Ceiling((decimal) data.Count() / pageSize);
             var result = data
                 .Select(x =>
                 {
-                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId).OrderByDescending(y => y.CreatedAt).FirstOrDefault();
+                    var lastMessage = messages.Get().Where(y => y.ChannelId == x.ChannelId)
+                        .OrderByDescending(y => y.CreatedAt).FirstOrDefault();
 
                     return new ChannelViewModels
                     {
@@ -59,17 +54,17 @@ namespace Backend.Areas.Admin.Controllers
                         CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                         UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
                     };
-
                 }).Where(x => !Utils.IsNullOrEmpty(x.LastMessages));
 
             if (!string.IsNullOrEmpty(key))
             {
-                result = result.Where(x => x.AccountId.ToString().Contains(key) || x.ChannelId.ToString().Contains(key));
+                result = result.Where(x =>
+                    x.AccountId.ToString().Contains(key) || x.ChannelId.ToString().Contains(key));
             }
 
             return Json(new
             {
-                totalPages = totalpage,
+                totalPages = totalPage,
                 currentPage = page,
                 data = result.OrderByDescending(x => x.LastUpdated).Skip((page - 1) * pageSize).Take(pageSize)
             }, JsonRequestBehavior.AllowGet);
