@@ -88,11 +88,11 @@
     <script>
         $.connection.hub.qs = { "userId": '@Session["userId"]' };
 
-        var connection = $.connection;
-        var chatHub = connection.chatHub;
-        var accountId = connection.hub.qs.userId;
+        const connection = $.connection;
+        const chatHub = connection.chatHub;
+        const accountId = connection.hub.qs.userId;
 
-        var managerChannel = {
+        const managerChannel = {
             load: function (page = 1, key = null) {
                 $.ajax({
                     type: "GET",
@@ -102,7 +102,7 @@
                         let _html = "";
 
                         for (let item of res.data) {
-                            if ($("#channel").val() == item.ChannelId) {
+                            if ($("#channel").val() === item.ChannelId) {
                                 $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">${item.AccountName ?? ''}</a>`);
                                 $("#user-timestamp").html(momentFromNow(item.LastUpdated ?? ""));
                             }
@@ -160,7 +160,7 @@
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.newMessage = function (messageView) {
-                var msg = connvertMessage(accountId, messageView);
+                const msg = convertMessage(accountId, messageView);
 
                 $('#discussion')
                     .append(msg)
@@ -171,15 +171,14 @@
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.historyMessages = function (historyMessages) {
-                console.log(historyMessages.length);
                 if (historyMessages.length >= 10) {
                     $('#discussion')
                         .html('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
                 }
-                var msg = "";
+                let msg = "";
 
                 for (let messageView of historyMessages) {
-                    msg += connvertMessage(accountId, messageView);
+                    msg += convertMessage(accountId, messageView);
                 }
 
                 $('#discussion').append(msg);
@@ -202,7 +201,7 @@
             //};
 
             connection.hub.start().done(function () {
-                $('#chat').submit(function () {
+                $('#chat').submit(function (event) {
                     if ($('#message').val() !== "") {
                         chatHub.server.sendToChannel($('#channel').val(), $('#message').val());
                         // Clear text box and reset focus for next comment.
@@ -219,10 +218,10 @@
             });
 
             $(document).on("click", ".btn-reply", function () {
-                let channelId = $(this).data("channel");
+                let channelId = $(".btn-reply").data("channel") + "";
 
                 if ($("#channel").val() !== channelId) {
-                    $('#discussion').html('');
+                    // $('#discussion').html('');
                     let account = $(this).data("account");
                     let name = $(this).data("name");
                     let timestamp = $(this).data("timestamp");
@@ -249,7 +248,6 @@
                 }
             });
 
-
             $(document).on("click", ".btn-close", function () {
                 if ($("#user-list").hasClass("col-xl-5")) {
                     $("#user-list")
@@ -260,49 +258,47 @@
                 }
             });
 
-            $(document).on("click", "#discussion .btn-loadmore", function () {
+            $(document).on("click", "#discussion .btn-loader", function () {
                 $(this).hide().remove();
-                var msg = $(".direct-chat-msg").first().data("message");
+                const msg = $(".direct-chat-msg").first().data("message");
 
                 chatHub.server.getMessageHistory($("#channel").val(), msg ?? 0).done(function (historyMessages) {
-                    console.log(historyMessages.length);
-                    var msg = "";
+                    let msg = "";
 
                     for (let messageView of historyMessages) {
-                        msg += connvertMessage(accountId, messageView);
+                        msg += convertMessage(accountId, messageView);
                     }
 
                     $('#discussion').prepend(msg);
 
                     if (historyMessages.length >= 10) {
                         $('#discussion')
-                            .prepend('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loadmore">Load more message!</button>');
+                            .prepend('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loader">Load more message!</button>');
                     }
                 });
             });
 
-            function connvertMessage(accountId, messageView) {
-                var image = `<div class="image-bx ${accountId == messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
+            function convertMessage(accountId, messageView) {
+                const image = `<div class="image-bx ${accountId === messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
                                 <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">
                                 <span class="active"></span>
                             </div>`;
 
-                var username = `${accountId != messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
+                const username = `${accountId !== messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
 
                 return `
-                        <div class="direct-chat-msg media mb-4 justify-content-${accountId == messageView.AccountId ? 'end' : 'start'}
-                                align-items-${accountId == messageView.AccountId ? 'end' : 'start'}" data-message="${messageView.MessageId}">
-                            ${accountId == messageView.AccountId ? '' : image}
-                            <div class="${accountId == messageView.AccountId ? 'message-sent' : 'message-received'}">
+                        <div class="direct-chat-msg media mb-4 justify-content-${accountId === messageView.AccountId ? 'end' : 'start'}
+                                align-items-${accountId === messageView.AccountId ? 'end' : 'start'}" data-message="${messageView.MessageId}">
+                            ${accountId === messageView.AccountId ? '' : image}
+                            <div class="${accountId === messageView.AccountId ? 'message-sent' : 'message-received'}">
                                 <p class="mb-1">
                                     ${htmlEncode(messageView.Content)}
                                 </p>
                                 <span class="fs-12">${username ?? ""}</span>
                             </div>
-                            ${accountId == messageView.AccountId ? image : '' }
+                            ${accountId === messageView.AccountId ? image : '' }
                         </div>`;
             }
-
         });
     </script>
 }

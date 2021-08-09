@@ -16,7 +16,6 @@ namespace Backend.Areas.Admin.Controllers
             if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
             ViewBag.Index = "active";
             return View();
-
         }
     }
 }
