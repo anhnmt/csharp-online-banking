@@ -10,8 +10,8 @@ namespace OnlineBanking.DAL
     {
         public ProfileBankAccountViewModels()
         {
-
         }
+
         public ProfileBankAccountViewModels(BankAccounts bankaccounts)
         {
             BankAccountId = bankaccounts.BankAccountId;
@@ -23,9 +23,9 @@ namespace OnlineBanking.DAL
             CreatedAt = bankaccounts.CreatedAt?.ToString("dd-MM-yy HH:mm:ss");
             Balance = bankaccounts.Balance;
             Status = bankaccounts.Status;
-            StatusName = ((BankAccountStatus)bankaccounts.Status).ToString();
-
+            StatusName = ((BankAccountStatus) bankaccounts.Status).ToString();
         }
+
         public int BankAccountId { get; set; }
         public int AccountId { get; set; }
         public int CurrencyId { get; set; }

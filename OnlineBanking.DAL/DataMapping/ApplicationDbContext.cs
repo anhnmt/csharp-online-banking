@@ -52,16 +52,16 @@ namespace OnlineBanking.DAL
             var entries = ChangeTracker
                 .Entries()
                 .Where(e => e.Entity is BaseModel && (
-                        e.State == EntityState.Added
-                        || e.State == EntityState.Modified));
+                    e.State == EntityState.Added
+                    || e.State == EntityState.Modified));
 
             foreach (var entityEntry in entries)
             {
-                ((BaseModel)entityEntry.Entity).UpdatedAt = DateTime.Now;
+                ((BaseModel) entityEntry.Entity).UpdatedAt = DateTime.Now;
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.Now;
+                    ((BaseModel) entityEntry.Entity).CreatedAt = DateTime.Now;
                 }
             }
 
