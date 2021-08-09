@@ -1,21 +1,18 @@
-﻿using Backend.Areas.Admin;
-using OnlineBanking.BLL.Repositories;
+﻿using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Backend.Areas.Admin.Controllers
 {
     public class BankAccountsController : Controller
     {
-        private IRepository<BankAccounts> bankaccounts;
+        private readonly IRepository<BankAccounts> bankAccounts;
         // GET: Admin/BankAccounts
         public BankAccountsController()
         {
-            bankaccounts = new Repository<BankAccounts>();
+            bankAccounts = new Repository<BankAccounts>();
         }
         public ActionResult Index()
         {
@@ -25,13 +22,8 @@ namespace Backend.Areas.Admin.Controllers
         {
             if (Session["email"] != null)
             {
-                var data = bankaccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
-                if (data == null)
-                {
-                    return View();
-                }
-
-                return View(data);
+                var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
+                return data == null ? View() : View(data);
             }
             else
             {
@@ -41,13 +33,13 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {
-            BankAccounts data = bankaccounts.Get(id);
+            var data = bankAccounts.Get(id);
             if (data != null)
             {
                 if (data.Balance != 0)
                 {
-                    int balance1 = Convert.ToInt32(data.Balance);
-                    int balance = balance1 + money;
+                    var balance1 = Convert.ToInt32(data.Balance);
+                    var balance = balance1 + money;
                     data.Balance = balance;
                 }
                 else
@@ -56,7 +48,7 @@ namespace Backend.Areas.Admin.Controllers
                 }
             }
 
-            if (bankaccounts.Edit(data))
+            if (bankAccounts.Edit(data))
             {
                 return Json(new
                 {
@@ -71,38 +63,37 @@ namespace Backend.Areas.Admin.Controllers
             }, JsonRequestBehavior.AllowGet);
         }
         [HttpPost]
-        public ActionResult GetBanlace(int bankId)
+        public ActionResult GetBalance(int bankId)
         {
-
-            var data = bankaccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels { 
+            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels { 
                 Balance = x.Balance,
                 BankId = x.BankAccountId,
                 Currency = x.Currency.Name
             });
             return Json(new
             {
-                data = data,
+                data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
         public ActionResult GetInfoBankAccount(string name)
         {
-            var data = bankaccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels { 
+            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels { 
                 Name = x.Account.Name,
                 Id = x.BankAccountId
             });
             return Json(new
             {
-                data = data,
+                data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
-        public ActionResult GetData(int Account)
+        public ActionResult GetData(int account)
         {
             ViewBag.Accounts = "active";
-            var data = bankaccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
+            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
             {
                 AccountId = x.AccountId,
                 BankAccountId = x.BankAccountId,
@@ -115,7 +106,7 @@ namespace Backend.Areas.Admin.Controllers
             });
             return Json(new
             {
-                data = data,
+                data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
@@ -124,7 +115,7 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult GetAllData()
         {
             ViewBag.Accounts = "active";
-            var data = bankaccounts.Get().Select(x => new BankAccountsViewModels
+            var data = bankAccounts.Get().Select(x => new BankAccountsViewModels
             {
                 AccountId = x.AccountId,
                 BankAccountId = x.BankAccountId,
@@ -137,7 +128,7 @@ namespace Backend.Areas.Admin.Controllers
             });
             return Json(new
             {
-                data = data,
+                data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
@@ -154,48 +145,44 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Create(BankAccounts bank)
         {
-            if (ModelState.IsValid)
-            {
-                bankaccounts.Add(bank);
+            if (!ModelState.IsValid)
                 return Json(new
                 {
-                    statusCode = 200,
-                    message = "Success"
+                    statusCode = 402,
+                    message = "Error",
+                    data = bank
                 }, JsonRequestBehavior.AllowGet);
-            }
+            bankAccounts.Add(bank);
             return Json(new
             {
-                statusCode = 402,
-                message = "Error",
-                data = bank
+                statusCode = 200,
+                message = "Success"
             }, JsonRequestBehavior.AllowGet);
         }
         // POST: Admin/BankAccounts/Edit/5
         [HttpPost]
         public ActionResult Edit(BankAccounts bank)
         {
-            if (ModelState.IsValid)
-            {
-                BankAccounts bank1 = bankaccounts.Get(bank.BankAccountId);
-                bank1.AccountId = bank.AccountId;
-                bank1.CurrencyId = bank.CurrencyId;
-                bank1.Name = bank.Name;
-                bank1.Balance = bank.Balance;
-                bank1.Status = bank.Status;
-                bank1.CreatedAt = bank.CreatedAt;
-                bank1.UpdatedAt = bank.UpdatedAt;
-                bankaccounts.Edit(bank1);
+            if (!ModelState.IsValid)
                 return Json(new
                 {
-                    statusCode = 200,
-                    message = "Success"
+                    statusCode = 402,
+                    message = "Error",
+                    data = bank
                 }, JsonRequestBehavior.AllowGet);
-            }
+            var bank1 = bankAccounts.Get(bank.BankAccountId);
+            bank1.AccountId = bank.AccountId;
+            bank1.CurrencyId = bank.CurrencyId;
+            bank1.Name = bank.Name;
+            bank1.Balance = bank.Balance;
+            bank1.Status = bank.Status;
+            bank1.CreatedAt = bank.CreatedAt;
+            bank1.UpdatedAt = bank.UpdatedAt;
+            bankAccounts.Edit(bank1);
             return Json(new
             {
-                statusCode = 402,
-                message = "Error",
-                data = bank
+                statusCode = 200,
+                message = "Success"
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -203,19 +190,19 @@ namespace Backend.Areas.Admin.Controllers
 
 
         // POST: Admin/BankAccounts/Delete/5
-        [HttpPost]
-        public ActionResult Delete(int id, FormCollection collection)
-        {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View();
-            }
-        }
+        // [HttpPost]
+        // public ActionResult Delete(int id, FormCollection collection)
+        // {
+        //     try
+        //     {
+        //         // 
+        //
+        //         return RedirectToAction("Index");
+        //     }
+        //     catch
+        //     {
+        //         return View();
+        //     }
+        // }
     }
 }

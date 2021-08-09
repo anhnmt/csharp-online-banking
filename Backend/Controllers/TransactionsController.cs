@@ -46,6 +46,26 @@ namespace Backend.Controllers
                 var receiverAccount = bankaccounts.Get(BankDequeue.ToId);
                 var sourceCurrency = sourceAccount.Currency.Name;
                 var receiverCurrency = receiverAccount.Currency.Name;
+                var sourceStatus = sourceAccount.Status;
+                var receiverStatus = receiverAccount.Status;
+                if (sourceStatus != 0)
+                {
+                    return Json(new
+                    {
+                        data = "Tải khoản nguồn chưa được kích hoạt",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                if (receiverStatus != 0)
+                {
+                    return Json(new
+                    {
+                        data = "Tải khoản nhận chưa được kích hoạt",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
                 if (sourceCurrency != receiverCurrency)
                 {
                     return Json(new
@@ -94,7 +114,7 @@ namespace Backend.Controllers
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
                 }
-                BankDequeue.Status = 0;
+                BankDequeue.Status = 1;
                 BankDequeue.CreatedAt = DateTime.Now;
                 BankDequeue.UpdatedAt = DateTime.Now;
                 BankDequeue.BalancedFrom = sourceAccount.Balance;
