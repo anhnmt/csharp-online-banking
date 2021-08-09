@@ -82,7 +82,7 @@
                     </div>
 
                     <div class="card-body">
-                        <a href="#" class="btn btn-primary btn-sm mb-3 btn-add">New Account Number</a>
+                        <a href="#/" class="btn btn-primary btn-sm mb-3 btn-add">New Account Number</a>
                         <div class="form-horizontal">
                             <table class="table table-hover">
                                 <thead>
@@ -97,6 +97,34 @@
                                 </thead>
                                 <tbody id="tbl_banks"></tbody>
 
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer d-flex justify-content-center">
+
+                    </div>
+                    <!-- /.card-body -->
+                </div>
+
+                <div class="card card-info">
+                    <div class="card-header">
+                        <h3 class="card-title">Cheque Books</h3>
+                        <button class="btn btn-primary btn-sm mb-3 text-right" id="btnAddChequeBook">New Cheque Book</button>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="form-horizontal">
+                            <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatablesChequeBook" role="grid" aria-describedby="example4_info">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Code</th>
+                                        <th>User's Name</th>
+                                        <th>Status</th>
+                                        <th>Cheques Used</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
                             </table>
                         </div>
                     </div>
@@ -265,7 +293,7 @@
                             ii++;
                         }
                         $('#tbl_banks').html(_html);
-                        
+
                     }
                 });
             },
@@ -295,7 +323,7 @@
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
                             var AccountId = $("#AccountId").val();
-                            managerBank.load(AccountId);
+                            maModelagerBank.load(AccountId);
                             toastr.success('Updated Successfully')
                         }
                     }
@@ -319,13 +347,112 @@
                 })
             }
         }
+
+
+        //Cheque Book
+        var managerChequeBook = {
+            get: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: "/Admin/ChequeBooks/FindId",
+                    data: { id: id },
+                    success: function (res) {
+                        console.log(res);
+                    }
+                })
+            },
+            put: function (chequeBook) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/ChequeBooks/Edit",
+                    data: chequeBook,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $('#datatables').DataTable().ajax.reload();
+                            $("#myModal").modal("hide");
+                            toastr.success('Updated Successfully')
+                        }
+                    }
+
+                })
+            },
+            post: function (chequeBook) {
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/ChequeBooks/Create",
+                    data: chequeBook,
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $('#datatablesChequeBook').DataTable().ajax.reload();
+                            toastr.success('Created Successfully')
+                        }
+                    }
+
+                })
+            }
+        }
+
+        $('#datatablesChequeBook').DataTable({
+            "paging": true,
+            "ordering": true,
+            "autoWidth": false,
+            "responsive": true,
+            "processing": true,
+            "filter": true,
+            "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+            "ajax": {
+                'url': '/Admin/ChequeBooks/GetAccountData',
+                'data': { AccountId: @Model.AccountId},
+            },
+            "order": [
+                [0, 'asc']
+            ],
+            "columns": [
+                {
+                    data: 'ChequeBookId',
+                    className: 'align-middle text-center'
+                },
+                {
+                    data: 'Code',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'AccountName',
+                    className: 'align-middle',
+                },
+
+                {
+                    data: 'StatusName',
+                    className: 'align-middle text-center',
+                    "orderable": false,
+                },
+                {
+                    data: 'ChequesUsed',
+                    className: 'align-middle text-center',
+                    "orderable": false
+                },
+                {
+                    data: 'ChequeBookId',
+                    "render": function (data, type, row) {
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a></div></div>'
+                    }
+                },
+            ]
+        })
+
+
         $(function () {
             $(document).on("click", ".btn-detail", function () {
                 let bankId = $(this).data("id");
                 window.location.assign("/Admin/Transactions/ProfileAccountNumber/" + bankId)
             })
 
-
+            $(document).on("click", "#btnAddChequeBook", function () {
+                var chequebook = {
+                    AccountId: @Model.AccountId,
+                }
+                managerChequeBook.post(chequebook);
+            })
 
             var AccountId = $("#AccountId").val();
             managerBank.load(AccountId);
@@ -335,6 +462,17 @@
                 $("#myModal").modal("show");
                 $(".modal-title").html("Create Account Number");
             })
+
+            $(document).on("click", ".btn-manager", function () {
+                $("#type").val("TRANSFER");
+                loadStatus();
+                loadCurrency();
+                loadAccountNumber(AccountId);
+                $("#MoneyManament").modal("show");
+                $(".modal-MoneyManament").html("Money management");
+
+            })
+
             $(document).on("click", ".btn-manager", function () {
                 $("#type").val("TRANSFER");
                 loadStatus();
@@ -366,7 +504,7 @@
                     bank.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
                     managerBank.post(bank);
                 }
-               
+
             })
         })
     </script>

@@ -15,9 +15,11 @@ namespace Backend.Areas.Admin.Controllers
     {
         private ApplicationDbContext db = new ApplicationDbContext();
         private IRepository<ChequeBooks> chequebooks;
+        private IRepository<Accounts> accounts;
         public ChequeBooksController()
         {
             chequebooks = new Repository<ChequeBooks>();
+            accounts = new Repository<Accounts>();
         }
 
         // GET: Admin/ChequeBooks
@@ -43,7 +45,7 @@ namespace Backend.Areas.Admin.Controllers
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
                 StatusName = ((ChequeBookStatus)x.Status).ToString()
-            }); ;
+            });
 
             return Json(new
             {
@@ -54,9 +56,81 @@ namespace Backend.Areas.Admin.Controllers
 
         }
 
+        public ActionResult GetAccountData(int AccountId)
+        {
+            ViewBag.ChequeBooks = "active";
+            var data = chequebooks.Get(x => x.AccountId == AccountId).Select(x => new ChequeBookViewModel
+            {
+                ChequeBookId = x.ChequeBookId,
+                Code = x.Code,
+                AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
+                ChequesUsed = x.Cheques.Count,
+                StatusName = ((ChequeBookStatus)x.Status).ToString()
+            });
+
+            return Json(new
+            {
+                data = data.ToList(),
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult GetStatus()
         {
             var data = Enum.GetValues(typeof(ChequeBookStatus)).Cast<ChequeBookStatus>().Select(v => v.ToString()).ToArray();
+            return Json(data, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        //[ValidateAntiForgeryToken]
+        public ActionResult Create(ChequeBooks chequeBook)
+        {
+            Dictionary<string, string> errors = new Dictionary<string, string>();
+            bool check = true;
+            if (!accounts.CheckDuplicate(x => x.AccountId == chequeBook.AccountId))
+            {
+                check = false;
+                errors.Add("AccountId", "Account does not exist!");
+            }
+
+            if (check)
+            {
+                string random;
+                do
+                {
+                    random = Utils.RandomString(16);
+                } while (chequebooks.CheckDuplicate(x=> x.Code == random));
+
+                chequeBook.Code = random;
+                chequebooks.Add(chequeBook);
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+                
+            
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error",
+                data = errors
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult FindId(int id)
+        {
+            var x = chequebooks.Get(id);
+            var data = new ChequeBookViewModel
+            {
+                ChequeBookId = x.ChequeBookId,
+                Code = x.Code,
+                AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
+                ChequesUsed = x.Cheques.Count,
+                StatusName = ((ChequeBookStatus)x.Status).ToString()
+            };
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
