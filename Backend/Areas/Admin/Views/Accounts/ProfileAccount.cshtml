@@ -434,7 +434,7 @@
                 {
                     data: 'ChequeBookId',
                     "render": function (data, type, row) {
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a></div></div>'
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a></div></div>'
                     }
                 },
             ]
@@ -445,6 +445,11 @@
             $(document).on("click", ".btn-detail", function () {
                 let bankId = $(this).data("id");
                 window.location.assign("/Admin/Transactions/ProfileAccountNumber/" + bankId)
+            })
+
+            $(document).on("click", ".btn-detail-2", function () {
+                let bookId = $(this).data("id");
+                window.location.assign("/Admin/Cheques/?ChequeBookId=" + bookId + "&AccountId=" + @Model.AccountId);
             })
 
             $(document).on("click", "#btnAddChequeBook", function () {
