@@ -53,11 +53,11 @@ namespace OnlineBanking.BLL.Repositories
             }
         }
 
-        public bool Delete(T entity)
+        public bool Delete(T e)
         {
             try
             {
-                tbl.Remove(entity);
+                tbl.Remove(e);
                 cnn.SaveChanges();
                 return true;
             }

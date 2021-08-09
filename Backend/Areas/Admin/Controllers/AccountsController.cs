@@ -14,9 +14,9 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class AccountsController : Controller
     {
-        private ApplicationDbContext db = new ApplicationDbContext();
-        private IRepository<Accounts> users;
-        private IRepository<Roles> roles;
+        private readonly ApplicationDbContext db = new ApplicationDbContext();
+        private readonly IRepository<Accounts> users;
+        private readonly IRepository<Roles> roles;
         public AccountsController()
         {
             users = new Repository<Accounts>();
@@ -49,19 +49,11 @@ namespace Backend.Areas.Admin.Controllers
                 StatusName = ((AccountStatus)x.Status).ToString(),
                 RoleName = x.Role.Name,
                 Address = x.Address,
-                NumberID = x.NumberID,
+                NumberId = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             });
-            //int pageSize = 5;
-            //if (!string.IsNullOrEmpty(key))
-            //{
-            //    data = data.Where(x => x.Email.Contains(key));
-            //}
-            //decimal totalPages = Math.Ceiling((decimal)data.Count() / pageSize);
             return Json(new { 
-                //totalPages = totalPages,
-                //currentPage = page,
                 data = data.ToList(),
                 message = "Success",
                 statusCode = 200
@@ -85,7 +77,7 @@ namespace Backend.Areas.Admin.Controllers
                 RoleName = x.Role.Name,
                 RoleId = x.RoleId,
                 Address = x.Address,
-                NumberID = x.NumberID,
+                NumberId = x.NumberID,
                 CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
                 UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
             };
@@ -185,23 +177,7 @@ namespace Backend.Areas.Admin.Controllers
                 {
                     return View();
                 }
-                var data = new AccountViewModel
-                {
-                    AccountId = x.AccountId,
-                    Name = x.Name,
-                    Email = x.Email,
-                    Password = x.Password,
-                    Phone = x.Phone,
-                    Birthday = x.Birthday?.ToString("dd-MM-yyyy"),
-                    Status = x.Status,
-                    StatusName = ((AccountStatus)x.Status).ToString(),
-                    RoleName = x.Role.Name,
-                    RoleId = x.RoleId,
-                    Address = x.Address,
-                    NumberID = x.NumberID,
-                    CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy"),
-                    UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy")
-                };
+                var data = new AccountViewModel(x);
                 return View(data);
             }
             else

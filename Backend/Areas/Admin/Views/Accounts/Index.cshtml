@@ -1,12 +1,11 @@
-﻿@{
+﻿
+@{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 @section css{
     <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet" />
 }
-
-
 <div class="page-titles">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
@@ -44,8 +43,6 @@
 
 <div class="modal fade " id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">
-
-        <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
                 <h4 class="modal-title">Update Infomation Account</h4>
@@ -56,41 +53,41 @@
                 <input type="hidden" name="type" id="type" value="CREATE" />
                 <form method="post" id="Form">
                     <div class="form-group">
-                        <label for="exampleInputName">Name</label>
+                        <label for="exampleInputName">Name <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="Name" placeholder="Name...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Email</label>
+                        <label for="exampleInputName">Email <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="Email" placeholder="Email...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Password</label>
+                        <label for="exampleInputName">Password <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="Password" placeholder="Password...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Phone</label>
+                        <label for="exampleInputName">Phone <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="Phone" placeholder="Phone...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputClass">Address</label>
+                        <label for="exampleInputClass">Address <span class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="Address" placeholder="Address...">
                         <span class="error text-danger"></span>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="exampleInputAge">Birthday</label>
+                                <label for="exampleInputAge">Birthday <span class="text-danger">*</span></label>
                                 <div class="input-group date" id="reservationdate" data-target-input="nearest">
                                     <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
                                 </div>
                             </div>
                             <span class="error text-danger"></span>
                             <div class="col-md-6">
-                                <label for="exampleInputClass">NumberID</label>
+                                <label for="exampleInputClass">NumberID <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="NumberID" placeholder="NumberID...">
                                 <span class="error text-danger"></span>
                             </div>
@@ -99,13 +96,13 @@
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Role</label>
+                                <label for="exampleInputClass">Role <span class="text-danger">*</span></label>
                                 <select class="form-control" id="RoleId" name="RoleId">
                                 </select>
                                 <span class="error text-danger"></span>
                             </div>
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Status</label>
+                                <label for="exampleInputClass">Status <span class="text-danger">*</span></label>
                                 <select class="form-control" id="Status" name="Status">
                                 </select>
                                 <span class="error text-danger"></span>
@@ -140,7 +137,7 @@
                     console.log(res)
                     var html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
+                        html += "<option value = '" + key + "' " + ((parseInt(status)) === key ? 'selected' : '') + ">" + value + " </option>";
                     });
                     $('#Status').html(html);
                 }
@@ -154,13 +151,12 @@
                     console.log(res)
                     var html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                        html += "<option value = '" + value.RoleId + "' " + (roleId === value.RoleId  ? 'selected' : '') + ">" + value.Name + " </option>";
                     });
                     $('#RoleId').html(html);
                 }
             })
         }
-
         var managerAcc = {
             get: function (id) {
                 $.ajax({
@@ -189,9 +185,9 @@
                     url: "/Admin/Accounts/Edit",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAcc.load();
+                             $('#datatables').DataTable().ajax.reload();
                             toastr.success('Updated Successfully')
                         }
                     }
@@ -204,9 +200,9 @@
                     url: "/Admin/Accounts/Create",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAcc.load();
+                            $('#datatables').DataTable().ajax.reload();
                             toastr.success('Created Successfully')
                         }
                     }
@@ -241,16 +237,16 @@
                         className: 'align-middle',
                     },
                     {
-                        data: 'RoleName',
-                        className: 'align-middle',
+                        "data": 'RoleName',
+                        "className": 'align-middle',
                         "searchable": false,
-                        "orderable": false
+                        "orderable": false,
                     },
                     {
                         data: 'StatusName',
                         className: 'align-middle text-center',
                         "searchable": false,
-                        "orderable": false
+                        "orderable": false,
                     },
                     {
                         data: 'AccountId',
@@ -266,14 +262,15 @@
                 let userId = $(this).data("id");
                 let a = managerAcc.get(userId);
             })
-
+            
             $(document).on("click", ".btn-add", function () {
-                loadRole(1);
-                loadStatus(1);
+                loadRole(0);
+                loadStatus(0);
                 $(".modal-title").html("Create Account");
                 $("#Form").trigger("reset");
                 $("#myModal").modal("show");
             })
+            
             $(document).on("click", ".btn-detail", function () {
                 let userId = $(this).data("id");
                 window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
@@ -290,15 +287,12 @@
                     Phone: $("#Phone").val(),
                     NumberID: $("#NumberID").val(),
                     RoleId: $("#RoleId").val(),
-                    Address: $("#Address").val(),
                     Status: parseInt(($("#Status").val()))
                 }
                 if ($("#type").val() == "EDIT") {
-                    user.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
                     user.AccountId = $("#Id").val();
                     managerAcc.put(user);
                 } else {
-                    user.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
                     managerAcc.post(user);
                 }
             })

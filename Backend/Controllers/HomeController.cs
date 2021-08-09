@@ -214,7 +214,7 @@ namespace Backend.Controllers
                 Phone = acc.Phone,
                 Birthday = acc.Birthday?.ToString("dd/MM/yyyy"),
                 RoleName = acc.Role.Name,
-                NumberID = acc.NumberID,
+                NumberId = acc.NumberID,
                 StatusName = ((AccountStatus)acc.Status).ToString(),
                 Address = acc.Address,
             };
