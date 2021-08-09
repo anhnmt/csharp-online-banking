@@ -41,11 +41,11 @@ namespace Backend.Areas.Admin.Controllers
                 data = data.Where(x => x.Name.Contains(key));
             }
 
-            var totalpage = Math.Ceiling((decimal) data.Count() / pageSize);
+            var totalPage = Math.Ceiling((decimal) data.Count() / pageSize);
 
             return Json(new
             {
-                totalPages = totalpage,
+                totalPages = totalPage,
                 currentPage = page,
                 data = data.Skip((page - 1) * pageSize).Take(pageSize)
             }, JsonRequestBehavior.AllowGet);

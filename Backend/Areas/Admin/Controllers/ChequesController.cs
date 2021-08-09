@@ -7,7 +7,7 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class ChequesController : Controller
     {
-        private IRepository<Cheques> cheques;
+        private readonly IRepository<Cheques> cheques;
         private IRepository<ChequeBooks> chequebooks;
 
         public ChequesController()
@@ -19,7 +19,7 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Cheques
         public ActionResult Index(int chequeBookId, int accountId)
         {
-            ChequesInformationViewModel chequesInformationViewModel = new ChequesInformationViewModel
+            var chequesInformationViewModel = new ChequesInformationViewModel
             {
                 ChequeBookId = chequeBookId,
                 AccountId = accountId
