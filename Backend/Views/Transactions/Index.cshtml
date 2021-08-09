@@ -2,6 +2,8 @@
     ViewBag.Title = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@using OnlineBanking.DAL
+@{ var user = (Accounts)Session["user"]; }
 
 @section customCss{
     <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet"/>
@@ -166,7 +168,7 @@
 
 
         $(function () {
-            loadAccountNumber("@Session["userId"]");
+            loadAccountNumber("@user.AccountId");
             $("#Form").trigger("reset");
 
             $(document).on('change', '#FromId', function () {

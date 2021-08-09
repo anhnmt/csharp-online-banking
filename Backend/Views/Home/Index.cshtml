@@ -1,6 +1,8 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
+@using OnlineBanking.DAL
+@{ var user = (Accounts)Session["user"]; }
 
 <!-- Content Header (Page header) -->
 <section class="content-header">
@@ -107,7 +109,6 @@
                                           </tr>`
                         }
                         $('#tbl_user').html(_html);
-                        var pages = '';
                     }
                 });
             },
@@ -118,9 +119,9 @@
                     data: bank,
                     success: function (res) {
                         console.log(bank)
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAccBank.load("@Session["userId"]");
+                            managerAccBank.load("@user.AccountId");
                             toastr.success('Created Successfully')
                         }
                     }
@@ -128,7 +129,7 @@
             },
         }
         $(function () {
-            managerAccBank.load("@Session["userId"]");
+            managerAccBank.load("@user.AccountId");
             $(document).on("click", ".btn-add", function () {
                 loadCurrency();
                 $("#myModal").modal("show");
@@ -137,7 +138,7 @@
             $(document).on("click", "#btnSave", function () {
                 var today = new Date();
                 var bank = {
-                    AccountId: "@Session["userId"]",
+                    AccountId: "@user.AccountId",
                     CurrencyId: $("#CurrencyId").val()
                 };
                 if ($("#type").val() == "EDIT") {

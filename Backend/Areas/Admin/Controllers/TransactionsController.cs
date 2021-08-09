@@ -127,7 +127,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (Session["email"] == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
 
