@@ -74,14 +74,49 @@
 
 @section scripts{
     <script>
-        var currencyManager = {
+        const validator = $("#formData").validate({
+            rules: {
+                "Name": {
+                    required: true
+                },
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).parents(".form-group > div").append(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+
+            submitHandler: function () {
+                const currency = {
+                    Name: $("#Name").val(),
+                };
+
+                if ($("#type").val() === "EDIT") {
+                    currency.CurrencyId = $("#Id").val(),
+                        currencyManager.put(currency);
+                } else {
+                    currencyManager.post(currency);
+                }
+
+                
+            }
+        });
+        
+        const currencyManager = {
             post: function (currency) {
                 $.ajax({
                     type: "POST",
                     url: "/Admin/Currencies/PostData",
                     data: currency,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
                             toastr.success('Created Successfully');
@@ -98,7 +133,7 @@
                     url: "/Admin/Currencies/PutData",
                     data: currency,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
                             toastr.success('Updated Successfully');
@@ -123,48 +158,13 @@
                 $.ajax({
                     type: "GET",
                     url: `/Admin/Currencies/Delete/${id}`,
-                    success: function (res) {
+                    success: function () {
                         $('#datatables').DataTable().ajax.reload();
                         toastr.success('Deleted Successfully');
                     }
                 })
             }
-        }
-
-        var validator = $("#formData").validate({
-            rules: {
-                "Name": {
-                    required: true
-                },
-            },
-            ignore: [],
-            errorClass: "invalid-feedback animated fadeInUp",
-            errorElement: "div",
-            errorPlacement: function (e, a) {
-                jQuery(a).parents(".form-group > div").append(e)
-            },
-            highlight: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
-            },
-            success: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
-            },
-
-            submitHandler: function (form) {
-                var currency = {
-                    Name: $("#Name").val(),
-                }
-
-                if ($("#type").val() == "EDIT") {
-                    currency.CurrencyId = $("#Id").val(),
-                        currencyManager.put(currency);
-                } else {
-                    currencyManager.post(currency);
-                }
-
-                return;
-            }
-        });
+        };
 
         $(function () {
             $('#datatables').DataTable({
@@ -217,12 +217,10 @@
             $(document).on("click", ".item-page", function () {
                 let page = $(this).text();
                 let key = $("#key").val();
-                currencyManager.load(page, key);
             });
 
             $("#key").keyup(function () {
                 let key = $("#key").val();
-                currencyManager.load(1, key);
             });
 
             $(document).on("click", ".btn-edit", function () {
@@ -242,7 +240,7 @@
             $('#modifyModal').on('shown.bs.modal', function () {
                 validator.resetForm();
             });
-        })
+        });
 
     </script>
 }
