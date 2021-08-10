@@ -103,7 +103,7 @@ namespace Backend.Controllers
                 Phone = acc.Phone,
                 Birthday = acc.Birthday?.ToString("yyyy-MM-dd"),
                 RoleName = acc.RoleId != 2 ? acc.Role.Name : null,
-                NumberID = acc.NumberID,
+                NumberId = acc.NumberId,
                 StatusName = ((AccountStatus) acc.Status).ToString(),
                 Address = acc.Address,
             };
@@ -163,8 +163,8 @@ namespace Backend.Controllers
                 errors.Add("Phone", "Your phone has been used!");
             }
 
-            if (!IsNullOrEmpty(acc.NumberID) &&
-                accounts.CheckDuplicate(x => x.NumberID == acc.NumberID && x.AccountId != userId))
+            if (!IsNullOrEmpty(acc.NumberId) &&
+                accounts.CheckDuplicate(x => x.NumberId == acc.NumberId && x.AccountId != userId))
             {
                 check = false;
                 errors.Add("NumberID", "Your NumberId has been used!");
@@ -178,7 +178,7 @@ namespace Backend.Controllers
                 acc1.Phone = acc.Phone;
                 acc1.Birthday = IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
-                acc1.NumberID = acc.NumberID;
+                acc1.NumberId = acc.NumberId;
                 acc1.UpdatedAt = DateTime.Now;
                 accounts.Edit(acc1);
 
@@ -215,7 +215,7 @@ namespace Backend.Controllers
                 Phone = acc.Phone,
                 Birthday = acc.Birthday?.ToString("dd/MM/yyyy"),
                 RoleName = acc.Role.Name,
-                NumberId = acc.NumberID,
+                NumberId = acc.NumberId,
                 StatusName = ((AccountStatus) acc.Status).ToString(),
                 Address = acc.Address,
             };

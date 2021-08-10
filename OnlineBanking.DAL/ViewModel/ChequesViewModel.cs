@@ -12,7 +12,9 @@ namespace OnlineBanking.DAL
         public int ChequeId { get; set; }
         public string Code { get; set; }
         public string Address { get; set; }
-        public bool Status { get; set; }
+        public float Amount { get; set; }
+        public int Status { get; set; }
+        public string StatusName { get; set; }
         public string FromBankAccountName { get; set; }
         public string ToBankAccountName { get; set; }
     }

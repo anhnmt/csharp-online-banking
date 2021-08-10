@@ -19,7 +19,7 @@
             RoleName = account.Role.Name;
             RoleId = account.RoleId;
             Address = account.Address;
-            NumberId = account.NumberID;
+            NumberId = account.NumberId;
             CreatedAt = account.CreatedAt?.ToString("dd-MM-yyyy");
             UpdatedAt = account.UpdatedAt?.ToString("dd-MM-yyyy");
         }
