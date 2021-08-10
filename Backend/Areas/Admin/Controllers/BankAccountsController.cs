@@ -9,27 +9,32 @@ namespace Backend.Areas.Admin.Controllers
     public class BankAccountsController : Controller
     {
         private readonly IRepository<BankAccounts> bankAccounts;
+
         // GET: Admin/BankAccounts
         public BankAccountsController()
         {
             bankAccounts = new Repository<BankAccounts>();
         }
+
         public ActionResult Index()
         {
             return View();
         }
+
         public ActionResult ProfileBankAccount(int id)
         {
-            if (((Accounts)Session["user"]) != null)
+            if (((Accounts) Session["user"]) != null)
             {
-                var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
+                var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x))
+                    .FirstOrDefault();
                 return data == null ? View() : View(data);
             }
             else
             {
-                return RedirectToAction("Login", "Home", new { area = "" });
+                return RedirectToAction("Login", "Home", new {area = ""});
             }
         }
+
         [HttpPost]
         public ActionResult ReceiveMoney(int id, int money)
         {
@@ -56,16 +61,19 @@ namespace Backend.Areas.Admin.Controllers
                     statusCode = 200
                 }, JsonRequestBehavior.AllowGet);
             }
+
             return Json(new
             {
                 message = "Error",
                 statusCode = 404
             }, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         public ActionResult GetBalance(int bankId)
         {
-            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels { 
+            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels
+            {
                 Balance = x.Balance,
                 BankId = x.BankAccountId,
                 Currency = x.Currency.Name
@@ -77,9 +85,11 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetInfoBankAccount(string name)
         {
-            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels { 
+            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels
+            {
                 Name = x.Account.Name,
                 Id = x.BankAccountId
             });
@@ -90,6 +100,7 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetData(int account)
         {
             ViewBag.Accounts = "active";
@@ -102,7 +113,7 @@ namespace Backend.Areas.Admin.Controllers
                 Name = x.Name,
                 Balance = x.Balance,
                 Status = x.Status,
-                StatusName = ((BankAccountStatus)x.Status).ToString()
+                StatusName = ((BankAccountStatus) x.Status).ToString()
             });
             return Json(new
             {
@@ -110,8 +121,8 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
-
         }
+
         public ActionResult GetAllData()
         {
             ViewBag.Accounts = "active";
@@ -124,7 +135,7 @@ namespace Backend.Areas.Admin.Controllers
                 Name = x.Name,
                 Balance = x.Balance,
                 Status = x.Status,
-                StatusName = ((BankAccountStatus)x.Status).ToString()
+                StatusName = ((BankAccountStatus) x.Status).ToString()
             });
             return Json(new
             {
@@ -132,12 +143,13 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
-
         }
+
         // GET: Admin/BankAccounts/Details/5
         public ActionResult GetStatus()
         {
-            var data = Enum.GetValues(typeof(BankAccountStatus)).Cast<BankAccountStatus>().Select(v => v.ToString()).ToArray();
+            var data = Enum.GetValues(typeof(BankAccountStatus)).Cast<BankAccountStatus>().Select(v => v.ToString())
+                .ToArray();
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -159,6 +171,7 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Success"
             }, JsonRequestBehavior.AllowGet);
         }
+
         // POST: Admin/BankAccounts/Edit/5
         [HttpPost]
         public ActionResult Edit(BankAccounts bank)
@@ -185,24 +198,5 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Success"
             }, JsonRequestBehavior.AllowGet);
         }
-
-        // GET: Admin/BankAccounts/Delete/5
-
-
-        // POST: Admin/BankAccounts/Delete/5
-        // [HttpPost]
-        // public ActionResult Delete(int id, FormCollection collection)
-        // {
-        //     try
-        //     {
-        //         // 
-        //
-        //         return RedirectToAction("Index");
-        //     }
-        //     catch
-        //     {
-        //         return View();
-        //     }
-        // }
     }
 }
