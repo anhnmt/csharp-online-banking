@@ -141,9 +141,9 @@
                 url: "/Admin/Accounts/GetStatus",
                 success: function (res) {
                     console.log(res)
-                    var html;
+                    let html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
+                        html += "<option value = '" + key + "' " + ((parseInt(status)) === key ? 'selected' : '') + ">" + value + " </option>";
                     });
                     $('#Status').html(html);
                 }
@@ -155,9 +155,9 @@
                 url: "/Admin/Accounts/GetRole",
                 success: function (res) {
                     console.log(res)
-                    var html;
+                    let html;
                     $.each(res, function (key, value) {
-                        html += "<option value = '" + value.RoleId + "' " + (roleId == value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                        html += "<option value = '" + value.RoleId + "' " + (roleId === value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
                     });
                     $('#RoleId').html(html);
                 }
@@ -192,7 +192,7 @@
                     url: "/Admin/Accounts/Edit",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
                             managerAcc.load();
                             toastr.success('Updated Successfully')
@@ -207,7 +207,7 @@
                     url: "/Admin/Accounts/Create",
                     data: user,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
                             managerAcc.load();
                             toastr.success('Created Successfully')
