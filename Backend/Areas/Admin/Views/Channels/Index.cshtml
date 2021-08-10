@@ -88,13 +88,13 @@
     <!--SignalR script to update the chat page and send messages.-->
 
     <script>
-        $.connection.hub.qs = { "userId": '@user.AccountId' };
+        $.connection.hub.qs = { "userId": @user.AccountId };
 
-        const connection = $.connection;
-        const chatHub = connection.chatHub;
-        const accountId = connection.hub.qs.userId;
+        let connection = $.connection;
+        let chatHub = connection.chatHub;
+        let accountId = connection.hub.qs.userId;
 
-        const managerChannel = {
+        let managerChannel = {
             load: function (page = 1, key = null) {
                 $.ajax({
                     type: "GET",
@@ -162,7 +162,7 @@
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.newMessage = function (messageView) {
-                const msg = convertMessage(accountId, messageView);
+                let msg = convertMessage(accountId, messageView);
 
                 $('#discussion')
                     .append(msg)
@@ -262,7 +262,7 @@
 
             $(document).on("click", "#discussion .btn-loader", function () {
                 $(this).hide().remove();
-                const msg = $(".direct-chat-msg").first().data("message");
+                let msg = $(".direct-chat-msg").first().data("message");
 
                 chatHub.server.getMessageHistory($("#channel").val(), msg ?? 0).done(function (historyMessages) {
                     let msg = "";
@@ -281,12 +281,12 @@
             });
 
             function convertMessage(accountId, messageView) {
-                const image = `<div class="image-bx ${accountId === messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
+                let image = `<div class="image-bx ${accountId === messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
                                 <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">
                                 <span class="active"></span>
                             </div>`;
 
-                const username = `${accountId !== messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
+                let username = `${accountId !== messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
 
                 return `
                         <div class="direct-chat-msg media mb-4 justify-content-${accountId === messageView.AccountId ? 'end' : 'start'}

@@ -2952,7 +2952,7 @@ textarea.form-control {
 
 .btn:focus, .btn.focus {
     outline: 0;
-    box-shadow: 0 0 0 0.2rem rgba(41, 83, 232, 0.25);
+    box-shadow: none;
 }
 
 .btn.disabled, .btn:disabled {
@@ -3260,7 +3260,7 @@ fieldset:disabled a.btn {
     }
 
     .btn-outline-primary:focus, .btn-outline-primary.focus {
-        box-shadow: 0 0 0 0.2rem rgba(41, 83, 232, 0.5);
+        box-shadow: none;
     }
 
     .btn-outline-primary.disabled, .btn-outline-primary:disabled {

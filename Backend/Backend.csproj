@@ -594,7 +594,6 @@
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.ttf" />
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff" />
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff2" />
-    <Content Include="Areas\Admin\Views\Cheque\Index.cshtml" />
     <Content Include="Areas\Admin\Views\ChequeBooks\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Cheques\Index.cshtml" />
     <Content Include="Areas\Admin\Views\BankAccounts\ProfileBankAccount.cshtml" />
