@@ -19,7 +19,7 @@ namespace OnlineBanking.DAL
         [DefaultValue("01-01-1970")] public DateTime? Birthday { get; set; }
         public int? Status { get; set; } // active, delete, lock
         [DefaultValue(0)] public int RoleId { get; set; } // Quyền
-        public string NumberID { get; set; }
+        public string NumberId { get; set; }
         [DefaultValue(0)] public int AttemptLogin { get; set; }
         [ForeignKey("RoleId")] public virtual Roles Role { get; set; }
 

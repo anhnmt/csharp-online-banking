@@ -91,7 +91,7 @@ namespace Backend.Areas.Admin.Controllers
             acc1.Phone = acc.Phone;
             acc1.Birthday = acc.Birthday;
             acc1.Address = acc.Address;
-            acc1.NumberID = acc.NumberID;
+            acc1.NumberId = acc.NumberId;
             acc1.RoleId = acc.RoleId;
             acc1.Status = acc.Status;
             acc1.UpdatedAt = acc.UpdatedAt;
