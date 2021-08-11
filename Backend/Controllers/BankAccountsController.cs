@@ -25,42 +25,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost]
-        public ActionResult ReceiveMoney(int id, int money)
-        {
-            var data = bankAccounts.Get(id);
-            
-            if (data != null)
-            {
-                if (data.Balance == 0)
-                {
-                    data.Balance = money;
-                }
-                else
-                {
-                    var balance1 = Convert.ToInt32(data.Balance);
-                    var balance = balance1 + money;
-                    data.Balance = balance;
-                }
-            }
-
-            if (bankAccounts.Edit(data))
-            {
-                return Json(new
-                {
-                    message = "Success",
-                    statusCode = 200
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            return Json(new
-            {
-                message = "Error",
-                statusCode = 404
-            }, JsonRequestBehavior.AllowGet);
-        }
-
-        [HttpPost]
-        public ActionResult GetBanlace(int bankId)
+        public ActionResult GetBalance(int bankId)
         {
             var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels
             {

@@ -137,7 +137,7 @@
                         data: { Amount: 'Amount', FromId: 'FromId'},
                         render: function(data) {
                             let fromId = $("#fromId").val();
-                            return (data.Amount) == null ? "" : ((data.FromId === fromId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
+                            return (data.Amount) == null ? "" : ((data.FromId === @Model.BankAccountId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
                         },
                         className: 'align-middle',
                     },
@@ -145,7 +145,7 @@
                         data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo:"BalancedTo"},
                         render: function (data) {
                             let fromId = $("#fromId").val();
-                            return ((data.FromId === fromId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
+                            return ((data.FromId === @Model.BankAccountId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
                         },
                         className: 'align-middle',
                         "searchable": false,

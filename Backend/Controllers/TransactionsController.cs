@@ -14,11 +14,13 @@ namespace Backend.Controllers
     {
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<Accounts> accounts;
 
         public TransactionsController()
         {
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
+            accounts = new Repository<Accounts>();
         }
 
         // GET: Admin/Transactions
@@ -32,25 +34,83 @@ namespace Backend.Controllers
             tran.Status = 0;
             var bankQueue = new Queue<Transactions>();
             bankQueue.Enqueue(tran);
-            if (tran.Amount <= 0)
-            {
-                return Json(new
-                {
-                    data = "Số nhập vào phải ở dạng số",
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
-
+            
             var bankDequeue = bankQueue.Dequeue();
             do
             {
-                var sourceAccount = bankAccounts.Get(bankDequeue.FromId);
                 var receiverAccount = bankAccounts.Get(bankDequeue.ToId);
+                var receiverStatus = receiverAccount.Status;
+                if (accounts.Get(x => x.AccountId == bankDequeue.FromId).FirstOrDefault()?.RoleId == 1)
+                {
+                    if (tran.Amount <= 0)
+                    {
+                        return Json(new
+                        {
+                            data = "Số nhập vào phải ở dạng số",
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    
+                    if (receiverStatus != 0)
+                    {
+                        return Json(new
+                        {
+                            data = "Tải khoản nhận chưa được kích hoạt",
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    receiverAccount.Balance += bankDequeue.Amount;
+                    if (bankAccounts.Edit(receiverAccount) != true)
+                        return Json(new
+                        {
+                            data = "Lỗi cộng tiền tài khoản đích",
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    bankDequeue.Status = 1;
+                    bankDequeue.CreatedAt = DateTime.Now;
+                    bankDequeue.UpdatedAt = DateTime.Now;
+                    bankDequeue.BalancedTo = receiverAccount.Balance;
+                    if (string.IsNullOrEmpty(bankDequeue.Messages))
+                    {
+                        bankDequeue.Messages = "Tranfers from Admin to " + bankDequeue.ToId;
+                    }
+
+                    if (transactions.Add(bankDequeue))
+                    {
+                        return Json(new
+                        {
+                            data = "Chuyển khoản thành công",
+                            message = "Success",
+                            statusCode = 200
+                        });
+                    }
+
+                    return Json(new
+                    {
+                        data = "Chuyển khoản thất bại",
+                        message = "Error",
+                        statusCode = 404
+                    });
+                }
+                var sourceAccount = bankAccounts.Get(bankDequeue.FromId);
                 var sourceCurrency = sourceAccount.Currency.Name;
                 var receiverCurrency = receiverAccount.Currency.Name;
                 var sourceStatus = sourceAccount.Status;
-                var receiverStatus = receiverAccount.Status;
+                
+                
+                if (tran.Amount <= 0)
+                {
+                    return Json(new
+                    {
+                        data = "Số nhập vào phải ở dạng số",
+                        message = "Error",
+                        statusCode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
                 if (sourceStatus != 0)
                 {
                     return Json(new
@@ -81,7 +141,7 @@ namespace Backend.Controllers
                     }, JsonRequestBehavior.AllowGet);
                 }
 
-                if (Utils.IsNullOrEmpty(sourceCurrency))
+                if (Utils.IsNullOrEmpty(receiverAccount))
                 {
                     return Json(new
                     {

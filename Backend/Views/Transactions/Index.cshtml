@@ -6,12 +6,11 @@
 @{ var user = (Accounts)Session["user"]; }
 
 @section customCss{
-    <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet"/>
+    @* <link href="~/Content/custom/notify/css/line.min.css" rel="stylesheet"/> *@
     <link href="~/Content/custom/notify/css/OverlayScrollbars.min.css" rel="stylesheet"/>
     <link href="~/Content/custom/notify/css/prism.css" rel="stylesheet"/>
     <link href="~/Content/custom/notify/css/simple-notify.min.css" rel="stylesheet"/>
     <link href="~/Content/custom/notify/css/reset.css" rel="stylesheet"/>
-    <link href="~/Content/custom/notify/css/demo.css" rel="stylesheet"/>
 }
 
 <!-- Content Header (Page header) -->
@@ -132,10 +131,10 @@
                     if (res.statusCode === 200) {
                         $("#myModal").modal("hide");
                         notifySuccess("Transfers Success", "Transfers Success");
-                        sleep(3000).then(() => {
-                            let bankId = $("#FromId").val();
-                            window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
-                        });
+                        // sleep(3000).then(() => {
+                        //     let bankId = $("#FromId").val();
+                        //     window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
+                        // });
                     } else {
                         notifyError("Transfers Error", res.data);
                     }
@@ -232,7 +231,12 @@
                 if (tran.Amount[0] === "0") {
                     notifyError("Error","Nhập sai")
                 } else {
-                    transfer(tran)
+                    for (let i = 0; i < 20; i++) {
+                        
+                            transfer(tran)
+                        
+                    }
+                   
                 }
 
             })

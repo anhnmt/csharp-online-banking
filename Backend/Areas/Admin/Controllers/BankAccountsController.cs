@@ -27,52 +27,18 @@ namespace Backend.Areas.Admin.Controllers
             var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x))
                 .FirstOrDefault();
             return data == null ? View() : View(data);
-
         }
-
         [HttpPost]
-        public ActionResult ReceiveMoney(int id, int money)
+        public ActionResult FindId(int id)
         {
-            var data = bankAccounts.Get(id);
-            if (data != null)
-            {
-                if (data.Balance != 0)
-                {
-                    var balance1 = Convert.ToInt32(data.Balance);
-                    var balance = balance1 + money;
-                    data.Balance = balance;
-                }
-                else
-                {
-                    data.Balance = money;
-                }
-            }
-
-            if (bankAccounts.Edit(data))
-            {
-                return Json(new
-                {
-                    message = "Success",
-                    statusCode = 200
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            return Json(new
-            {
-                message = "Error",
-                statusCode = 404
-            }, JsonRequestBehavior.AllowGet);
+            var x = bankAccounts.Get(id);
+            var data = new BankAccountsViewModels(x);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
-
         [HttpPost]
         public ActionResult GetBalance(int bankId)
         {
-            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels
-            {
-                Balance = x.Balance,
-                BankId = x.BankAccountId,
-                Currency = x.Currency.Name
-            });
+            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels(x));
             return Json(new
             {
                 data,
@@ -99,17 +65,7 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult GetData(int account)
         {
             ViewBag.Accounts = "active";
-            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
-            {
-                AccountId = x.AccountId,
-                BankAccountId = x.BankAccountId,
-                CurrencyId = x.CurrencyId,
-                CurrencyName = x.Currency.Name,
-                Name = x.Name,
-                Balance = x.Balance,
-                Status = x.Status,
-                StatusName = ((BankAccountStatus) x.Status).ToString()
-            });
+            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels(x));
             return Json(new
             {
                 data,
@@ -121,17 +77,7 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult GetAllData()
         {
             ViewBag.Accounts = "active";
-            var data = bankAccounts.Get().Select(x => new BankAccountsViewModels
-            {
-                AccountId = x.AccountId,
-                BankAccountId = x.BankAccountId,
-                CurrencyId = x.CurrencyId,
-                CurrencyName = x.Currency.Name,
-                Name = x.Name,
-                Balance = x.Balance,
-                Status = x.Status,
-                StatusName = ((BankAccountStatus) x.Status).ToString()
-            });
+            var data = bankAccounts.Get().Select(x => new BankAccountsViewModels(x));
             return Json(new
             {
                 data,
@@ -152,6 +98,7 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Create(BankAccounts bank)
         {
+            
             if (!ModelState.IsValid)
                 return Json(new
                 {
@@ -184,13 +131,29 @@ namespace Backend.Areas.Admin.Controllers
             bank1.Name = bank.Name;
             bank1.Balance = bank.Balance;
             bank1.Status = bank.Status;
-            bank1.CreatedAt = bank.CreatedAt;
-            bank1.UpdatedAt = bank.UpdatedAt;
             bankAccounts.Edit(bank1);
             return Json(new
             {
                 statusCode = 200,
                 message = "Success"
+            }, JsonRequestBehavior.AllowGet);
+        }
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            if (bankAccounts.Delete(id))
+            {
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error"
             }, JsonRequestBehavior.AllowGet);
         }
     }
