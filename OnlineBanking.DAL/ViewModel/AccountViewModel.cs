@@ -13,7 +13,7 @@
             Email = account.Email;
             Password = account.Password;
             Phone = account.Phone;
-            Birthday = account.Birthday?.ToString("dd-MM-yyyy");
+            Birthday = account.Birthday?.ToString("yyyy-MM-dd");
             Status = account.Status;
             StatusName = ((AccountStatus) account.Status).ToString();
             RoleName = account.Role.Name;
