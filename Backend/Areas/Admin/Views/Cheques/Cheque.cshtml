@@ -1,7 +1,87 @@
-﻿
-@{
+﻿@{
     ViewBag.Title = "title";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h2>title</h2>
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>Cheque Monitor</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">Home</a>
+                    </li>
+                    <li class="breadcrumb-item active">Cheque Monitor</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="content">
+    <div class="col-md-12">
+        <div class="card card-success">
+            <div class="card-header">
+                <h3 class="card-title">Cheque</h3>
+            </div>
+            <div class="card-body">
+                <input type="hidden" name="type" id="type" value="CREATE"/>
+                <form method="post" id="Form">
+                    <div class="form-group">
+                        <label for="Code">Code</label>
+                        <input type="text" name="Code" id="Code" class="form-control" placeholder="Code...">
+                    </div>
+                    <div class="form-group">
+                        <label for="Address">Address</label>
+                        <input type="text" class="form-control" id="Address" name="Address" placeholder="Messages...">
+                    </div>
+                    <div class="form-group">
+                        <label for="">Payment method</label>
+                        <div>
+                            <label class="radio-inline mr-3">
+                                <input type="radio" name="payment" value="cash" checked> Cash
+                            </label>
+                            <label class="radio-inline mr-3">
+                                <input type="radio" name="payment" value="bank-account"> Bank Account Transfer
+                            </label>
+                        </div>
+                        <div class="form-group destination-account mt-2" style="display: none">
+                            <label for="ToBankAccountId">Bank Account Destination</label>
+                            <input type="text" name="ToBankAccountId" id="ToBankAccountId" class="form-control" placeholder="Bank Account Destination...">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Reset</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script >
+    const chequeManager = {
+        post: function (){
+            $.ajax({
+                type: "POST",
+                urls: "@Url.Action("ChequeExec", "Cheques")"
+            })
+        },
+    }
+    
+    $(function(){
+        $("input:radio[name='payment']").change(function() {
+          if ($(this).val() === "bank-account"){
+              $(".destination-account").show();
+          }else{
+              $(".destination-account").hide();
+          }
+        })
+    })
+    </script>
+}
