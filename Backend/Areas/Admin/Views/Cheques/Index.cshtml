@@ -59,6 +59,17 @@
                                 <select class="form-control" name="bankAccountId" id="bankAccountId">
                                 </select>
                             </div>
+                            <div>
+                                <p>Balance: <span id="balance"></span></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="bankAccountId">
+                                Amount <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <input type="text" name="Amount" id="Amount" class="form-control">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -79,21 +90,24 @@
             url: "@Url.Action("GetData", "BankAccounts")",
             data: { account: @Model.AccountId },
             success: function (res){
+                console.log(res);
                 let html = "";
                 for(let i = 0; i < res.data.length; i++) {
-                    html += '<option value="' + res.data[i].BankAccountId + '">' + res.data[i].Name + '</option>';
+                    html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + res.data[i].Balance + " " + res.data[i].CurrencyName + '">' + res.data[i].Name + '</option>';
                 }
                 $("#bankAccountId").html(html);
-           ; }
+                $("#balance").html($("#bankAccountId :selected").data('balance'));
+            }
         })
     }
     const chequesManager = {
-        post: function (bankAccountId) {
+        post: function (obj) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("PostData", "Cheques")",
-                data: {chequeBookId: @Model.ChequeBookId, bankAccountId: bankAccountId},
+                data: obj,
                 success: function (res) {
+                    console.log(res);
                     if (res.statusCode === 200) {
                         $("#modifyModal").modal("hide");
                         $('#datatables').DataTable().ajax.reload();
@@ -137,9 +151,14 @@
 
     const validator = $("#formData").validate({
         rules: {
-            "Name": {
-                required: true
+            "bankAccountId": {
+                required: true,
             },
+            "Amount": {
+                required: true,
+                number: true,
+                min: 0,
+            }
         },
         ignore: [],
         errorClass: "invalid-feedback animated fadeInUp",
@@ -154,10 +173,15 @@
             jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
         },
         submitHandler: function (form) {
+            let obj = {
+                FromBankAccountId: $("#bankAccountId").val(),
+                Amount: $("#Amount").val(),
+                ChequeBookId: @Model.ChequeBookId,
+            };
             if ($("#type").val() === "EDIT") {
                 
             } else {
-                chequesManager.post($("#bankAccountId").val());
+                chequesManager.post(obj);
             }
         }
     });
@@ -190,7 +214,7 @@
                     className: 'align-middle',
                 },
                 {
-                    data: 'Address',
+                    data: 'Amount',
                     className: 'align-middle',
                 },
                 {
@@ -236,6 +260,10 @@
         $(document).on("click", ".btn-delete", function () {
             let currencyId = $(this).data("id");
             chequesManager.delete(currencyId);
+        });
+        
+        $(document).on("change", "#bankAccountId", function () {
+            $("#balance").html($("#bankAccountId :selected").data("balance"));
         });
         
         $('#modifyModal').on('shown.bs.modal', function () {
