@@ -42,10 +42,10 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 Address = x.Address,
                 ChequeId = x.ChequeId,
-                StatusName = ((ChequeStatus)x.Status).ToString(),
+                StatusName = ((ChequeStatus) x.Status).ToString(),
                 Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
                 FromBankAccountName = x.FromBankAccount.Name,
-                ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name 
+                ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
             });
             return Json(new
             {
@@ -66,7 +66,7 @@ namespace Backend.Areas.Admin.Controllers
 
             chequeInformation.Code = code;
             chequeInformation.Status = (int) ChequeStatus.Actived;
-            
+
             if (cheques.Add(chequeInformation))
             {
                 return Json(new
@@ -81,6 +81,37 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Error",
                 statusCode = 400,
                 data = ModelState
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult ChequeExec(Cheques chequeExec)
+        {
+            if (cheques.CheckDuplicate(x => x.Code == chequeExec.Code))
+            {
+                var cheque = cheques.Get(x => x.Code == chequeExec.Code).FirstOrDefault();
+                var fromBankAccount = cheque.FromBankAccount;
+
+                if (fromBankAccount.Balance < cheque.Amount)
+                {
+                    return Json(new
+                    {
+                        message = "Error",
+                        statusCode = 400,
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                return Json(new
+                {
+                    message = "Success",
+                    statusCode = 200,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                message = "Error",
+                statusCode = 400,
             }, JsonRequestBehavior.AllowGet);
         }
     }
