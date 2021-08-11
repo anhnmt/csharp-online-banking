@@ -21,9 +21,8 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult Index()
         {
-            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             return View();
-
         }
 
         public ActionResult GetData()
@@ -69,7 +68,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                     data = accounts
                 }, JsonRequestBehavior.AllowGet);
-          
+
             if (Utils.IsNullOrEmpty(accounts))
             {
                 if (DateTime.TryParse(accounts.Birthday.ToString(), out var dateTime))
@@ -88,18 +87,20 @@ namespace Backend.Areas.Admin.Controllers
                     errors.Add("Birthday", "Your birthday is not valid!");
                 }
             }
+
             if (users.CheckDuplicate(x => x.Email == accounts.Email))
             {
                 check = false;
                 errors.Add("Email", "Your email has been used!");
             }
+
             if (users.CheckDuplicate(x => x.Phone == accounts.Phone))
             {
                 check = false;
                 errors.Add("Phone", "Your Phone has been used!");
             }
 
-            
+
             // if ()
             // {
             //     check = false;
@@ -110,7 +111,7 @@ namespace Backend.Areas.Admin.Controllers
                 check = false;
                 errors.Add("NumberId", "Your NumberId has been used!");
             }
-            
+
             if (accounts.NumberId.Length >= 10)
             {
                 check = false;
@@ -126,6 +127,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
+
             foreach (var k in ModelState.Keys)
             foreach (var err in ModelState[k].Errors)
             {
@@ -140,35 +142,99 @@ namespace Backend.Areas.Admin.Controllers
                 message = "Error",
                 data = errors
             }, JsonRequestBehavior.AllowGet);
-            
         }
 
         [HttpPost]
-        public ActionResult Edit(Accounts acc)
+        public ActionResult Edit(Accounts accounts)
         {
+            var acc1 = users.Get(accounts.AccountId);
+            var errors = new Dictionary<string, string>();
+            var check = true;
             if (!ModelState.IsValid)
                 return Json(new
                 {
                     statusCode = 402,
                     message = "Error",
-                    data = acc
+                    data = accounts
                 }, JsonRequestBehavior.AllowGet);
-            var acc1 = users.Get(acc.AccountId);
-            acc1.Name = acc.Name;
-            acc1.Email = acc.Email;
-            acc1.Password = acc.Password;
-            acc1.Phone = acc.Phone;
-            acc1.Birthday = acc.Birthday;
-            acc1.Address = acc.Address;
-            acc1.NumberId = acc.NumberId;
-            acc1.RoleId = acc.RoleId;
-            acc1.Status = acc.Status;
-            users.Edit(acc1);
+
+            if (Utils.IsNullOrEmpty(accounts))
+            {
+                if (DateTime.TryParse(accounts.Birthday.ToString(), out var dateTime))
+                {
+                    var today = DateTime.Today;
+                    var age = today.Year - DateTime.Parse(accounts.Birthday.ToString()).Year;
+                    if (age < 18)
+                    {
+                        check = false;
+                        errors.Add("Birthday", "Your age must be greater than 18");
+                    }
+                }
+                else
+                {
+                    check = false;
+                    errors.Add("Birthday", "Your birthday is not valid!");
+                }
+            }
+
+            if (users.CheckDuplicate(x => x.Email == accounts.Email && x.AccountId != acc1.AccountId) )
+            {
+                check = false;
+                errors.Add("Email", "Your email has been used!");
+            }
+
+            if (users.CheckDuplicate(x => x.Phone == accounts.Phone && x.AccountId != acc1.AccountId))
+            {
+                check = false;
+                errors.Add("Phone", "Your Phone has been used!");
+            }
+
+            if (users.CheckDuplicate(x => x.NumberId == accounts.NumberId && x.AccountId != acc1.AccountId))
+            {
+                check = false;
+                errors.Add("NumberId", "Your NumberId has been used!");
+            }
+
+            if (accounts.NumberId.Length >= 10)
+            {
+                check = false;
+                errors.Add("NumberId", "Your NumberId must be more than 10 characters");
+            }
+
+            if (ModelState.IsValid && check)
+            {
+                
+                acc1.Name = accounts.Name;
+                acc1.Email = accounts.Email;
+                acc1.Password = accounts.Password;
+                acc1.Phone = accounts.Phone;
+                acc1.Birthday = accounts.Birthday;
+                acc1.Address = accounts.Address;
+                acc1.NumberId = accounts.NumberId;
+                acc1.RoleId = accounts.RoleId;
+                acc1.Status = accounts.Status;
+                users.Edit(acc1);
+
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            foreach (var k in ModelState.Keys)
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
 
             return Json(new
             {
-                statusCode = 200,
-                message = "Success"
+                statusCode = 400,
+                message = "Error",
+                data = errors
             }, JsonRequestBehavior.AllowGet);
         }
 
@@ -192,7 +258,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileAccount(int id)
         {
-            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             var x = users.Get(id);
             if (x == null)
             {
