@@ -43,8 +43,9 @@ namespace Backend.Areas.Admin.Controllers
                 Address = x.Address,
                 ChequeId = x.ChequeId,
                 StatusName = ((ChequeStatus)x.Status).ToString(),
+                Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
                 FromBankAccountName = x.FromBankAccount.Name,
-                ToBankAccountName = x.ToBankAccount.Name
+                ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name 
             });
             return Json(new
             {
@@ -55,23 +56,18 @@ namespace Backend.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult PostData(int chequeBookId, int bankAccountId)
+        public ActionResult PostData(Cheques chequeInformation)
         {
-            string code;
+            string code = Utils.RandomString(16);
             do
             {
                 code = Utils.RandomString(16);
             } while (cheques.CheckDuplicate(x => x.Code == code));
 
-            var cheque = new Cheques()
-            {
-                Code = code,
-                Status = (int) ChequeStatus.Actived,
-                ChequeBookId = chequeBookId,
-                FromBankAccountId = bankAccountId,
-            };
-
-            if (cheques.Add(cheque))
+            chequeInformation.Code = code;
+            chequeInformation.Status = (int) ChequeStatus.Actived;
+            
+            if (cheques.Add(chequeInformation))
             {
                 return Json(new
                 {
@@ -84,6 +80,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 message = "Error",
                 statusCode = 400,
+                data = ModelState
             }, JsonRequestBehavior.AllowGet);
         }
     }
