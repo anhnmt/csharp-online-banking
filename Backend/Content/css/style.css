@@ -34054,7 +34054,7 @@ svg text {
 
 .form-control:disabled,
 .form-control[readonly] {
-    background: #fff;
+    background-color: #e9ecef!important;
     opacity: 1;
 }
 
