@@ -51,7 +51,6 @@
                         <h3 class="card-title">Total Account Number</h3>
                     </div>
                     <div class="card-body">
-                        <input type="hidden" name="Id" id="fromId" value="@Model.BankAccountId"/>
                         <div class="form-horizontal">
                             <table class="table table-hover" id="datatables">
                                 <thead>
@@ -77,30 +76,7 @@
 @section scripts{
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
     <script>
-
-        var managerTran = {
-            post: function (tran) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Transactions/Transfers",
-                    data: tran,
-                    success: function (res) {
-                        if (res.statusCode === 200) {
-                            $("#myModal").modal("hide");
-                            let fromId = $("#fromId").val();
-                            console.log(res)
-                            managerTran.load(fromId);
-                            toastr.success('Created Successfully')
-                        } else {
-                            console.log(res)
-                            toastr.error('Created Fail')
-                        }
-                    }
-                })
-            }
-        }
         $(function () {
-            //let fromId = $("#fromId").val();
             $('#datatables').DataTable({
                 "paging": true,
                 "ordering": true,
@@ -111,10 +87,7 @@
                 "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
                 "ajax": {
                     url: "/Transactions/GetData",
-                    data: 
-                        function (d) {
-                            d.fromId = $("#fromId").val();
-                        }
+                    data: {fromId : @Model.BankAccountId},
                     
                 },
                 "order": [
@@ -159,69 +132,6 @@
                     },
 
                 ]
-            })
-
-            
-            //if (fromId != null) {
-            //    managerTran.load(fromId);
-            //}
-
-            $("#key").keyup(function () {
-                let key = $("#key").val();
-                managerTran.load(fromId, 1, key);
-            })
-            $(document).on("click", ".item-page", function () {
-                let page = $(this).text();
-                let key = $("#key").val();
-                managerTran.load(fromId, page, key);
-            })
-            $(document).on("click", ".btn-test", function () {
-                $("#Form").trigger("reset");
-                document.getElementById('text1').hidden = true;
-                document.getElementById('text2').hidden = true;
-                document.getElementById('infoReceiver').hidden = true;
-                document.getElementById('infoSource').hidden = true;
-                loadAccountNumber(1);
-                $(".modal-title").html("Tranfer Money");
-                $("#myModal").modal("show");
-            })
-            $(document).on('change', '#FromId', function () {
-                let dataBalance = loadBalance(this.value)
-                document.getElementById('text1').hidden = false;
-                document.getElementById('infoSource').hidden = false;
-                document.getElementById('infoSource').innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: dataBalance[0].Currency }).format(dataBalance[0].Balance);
-            });
-            $(document).on('blur keydown', '#ToId', function () {
-                let dataInfoBankAccount;
-                if (this.value.length === 0) {
-                    document.getElementById('text2').hidden = true;
-                    document.getElementById('infoReceiver').hidden = true;
-                } else {
-                    dataInfoBankAccount = loadInfoBankAccount(this.value)
-                    document.getElementById('text2').hidden = false;
-                }
-                if (dataInfoBankAccount.length > 0) {
-                    $("#BankId").val(dataInfoBankAccount[0].Id);
-                    document.getElementById('infoReceiver').hidden = false;
-                    document.getElementById('infoReceiver').innerHTML = dataInfoBankAccount[0].Name;
-                } else {
-                    $("#BankId").val("");
-                    document.getElementById('infoReceiver').hidden = false;
-                    document.getElementById('infoReceiver').innerHTML = "Account doesn't exist";
-                }
-            });
-            $(document).on("click", "#btnSave", function () {
-                let tran = {
-                    FromId: $("#FromId").val(),
-                    ToId: $("#BankId").val(),
-                    Amount: $("#Amount").val()
-                };
-                //managerTran.post(tran);
-                for (let i = 0; i < 10; i++) {
-                    setTimeout(managerTran.post(tran), 5000);
-                }
-
-
             })
         })
     </script>

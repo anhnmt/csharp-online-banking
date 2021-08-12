@@ -355,7 +355,17 @@
                         "orderable": false,
                     },
                     {
-                        data: 'StatusName',
+                        data: {Status: Status,StatusName:'StatusName'},
+                        render: function (data) {
+                            if (data.Status === 0){
+                                return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                            }else if(data.Status === 1){
+                                return '<span class="badge light badge-warning"><i class="fa fa-circle text-warning mr-1"></i>'+data.StatusName+'</span>';
+                            }else {
+                                return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
+                            }
+                           
+                        },
                         className: 'align-middle text-center',
                         "searchable": false,
                         "orderable": false,
@@ -385,6 +395,7 @@
                 loadStatus(0);
                 $(".modal-title").html("Create Account");
                 $("#formData").trigger("reset");
+                $("#type").val("CREATE");
                 $("#myModal").modal("show");
             })
             $(document).on("click", ".btn-delete", function () {

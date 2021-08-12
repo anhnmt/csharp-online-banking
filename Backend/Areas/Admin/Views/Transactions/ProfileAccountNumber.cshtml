@@ -24,17 +24,15 @@
 
     <!-- Main content -->
     <section class="content">
-        <a href="#" class="btn btn-primary mb-3 btn-test">Tesst</a>
         <div class="row">
             <div class="col-md-12">
                 <div class="card card-info">
                     <div class="card-header">
-                        <h3 class="card-title">Total Account Number</h3>
+                        <h3 class="card-title">Total Transactions AccountNumber: @Model.Name</h3>
                     </div>
                     <div class="card-body">
-                        <input type="hidden" name="Id" id="fromId" value="@Model.BankAccountId" />
-                        <div class="form-horizontal">
-                            <table class="table table-hover">
+                         <div class="table-responsive">
+                               <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
                                 <thead>
                                     <tr>
                                         <th>No</th>
@@ -43,16 +41,10 @@
                                         <th>Amount </th>
                                         <th>Banlanced </th>
                                         <th>Status </th>
-                                        <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody id="tbl_trans"></tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="card-footer d-flex justify-content-center">
-                        <ul class="pagination" id="pagination">
-                        </ul>
                     </div>
                 </div>
             </div>
@@ -104,175 +96,70 @@
 </div>
 @section scripts{
     <script>
-        function loadAccountNumber(accountId) {
-            let data;
-            $.ajax({
-                type: "GET",
-                url: "/Admin/BankAccounts/GetData",
-                data: { Account: accountId },
-                async: false,
-                success: function (res) {
-                    console.log(res)
-                    var html;
-                    $.each(res.data, function (key, value) {
-                        html += "<option value = '" + value.BankAccountId + "'  >" + value.Name + " </option>";
-                    });
-                    $('#FromId').html(html);
-                    data = res.data;
-                }
-            });
-            return data;
-        }
-        function loadBalance(bankId) {
-            let data;
-            $.ajax({
-                type: "POST",
-                url: "/Admin/BankAccounts/GetBalance",
-                data: { bankId: bankId },
-                async: false,
-                success: function (res) {
-                    data = res.data;
-                }
-
-            });
-            return data;
-        }
-        function loadInfoBankAccount(name) {
-            let data;
-            $.ajax({
-                type: "GET",
-                url: "/Admin/BankAccounts/GetInfoBankAccount",
-                data: { name: name },
-                async: false,
-                success: function (res) {
-                    data = res.data;
-                }
-
-            });
-            return data;
-        }
-
-        var managerTran = {
-            load: function (fromId,page = 1, key = null) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Transactions/GetData",
-                    data: {fromId : fromId, page: page, key: key },
-                    success: function (res) {
-                        let _html = "";
-                        var ii = 1;
-                        console.log(res)
-                        for (let item of res.data) {
-                            
-                            _html += `<tr>
-                                        <td>${ii}</td>
-                                        <td>${(item.CreatedAt) == null ? "" : item.CreatedAt}</td>
-                                        <td>${(item.Messages) == null ? "" : item.Messages}</td>
-                                        <td>${(item.Amount) == null ? "" : ((item.FromId == fromId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.Amount)}</td>
-                                        <td>${((item.FromId == fromId) ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.BalancedFrom) : new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(item.BalancedTo)) }</td>
-                                        <td>${(item.StatusName) == null ? "" : item.StatusName}</td>
-                                        <td class="btn-group"><button data-id="${item.TransactionId}" class='btn btn-primary btn-detail'>Detail</button><button data-id="${item.TransactionId}" class='btn btn-warning btn-edit'>Edit</button><button data-id="${item.TransactionId}" class='btn btn-danger'>Detele</button></td>
-                                    </tr>`
-                            ii++;
-                        }
-                        $('#tbl_trans').html(_html);
-                        var pages = '';
-                        for (var i = 1; i <= res.totalPages; i++) {
-                            if (i == res.currentPage) {
-                                pages += `<li class=" page-item active"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
-                            } else {
-                                pages += `<li class="page-item"><a href="javascript:void(0)" class="item-page page-link">${i}</a></li>`;
-                            }
-                        }
-                        $(".pagination").html(pages);
-                    }
-                });
-            },
-            post: function (tran) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Transactions/Transfers",
-                    data: tran,
-                    success: function (res) {
-                        if (res.statusCode == 200) {
-                            $("#myModal").modal("hide");
-                            let fromId = $("#fromId").val();
-                            console.log(res)
-                            managerTran.load(fromId);
-                            toastr.success('Created Successfully')
-                        } else {
-                            console.log(res)
-                            toastr.error('Created Fail')
-                        }
-                    }
-                })
-            }
-        }
+        $('#datatables').DataTable({
+                        "paging": true,
+                        "ordering": true,
+                        "autoWidth": false,
+                        "responsive": true,
+                        "processing": true,
+                        "filter": true,
+                        "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+                        "ajax": {
+                            url: "/Admin/Transactions/GetData",
+                            data: function (d) {
+                                      d.fromId = @Model.BankAccountId;
+                                  },
+                        },
+                        "order": [
+                            [1, 'desc']
+                        ],
+                        "columns": [
+                            {
+                                data: 'TransactionId',
+                                className: 'align-middle text-center'
+                            },
+                            {
+                                data: 'CreatedAt',
+                                className: 'align-middle',
+                            },
+                            {
+                                data: 'Messages',
+                                className: 'align-middle',
+                            },
+                            {
+                                data: { Amount: 'Amount', FromId: 'FromId'},
+                                render: function(data) {
+                                    let fromId = $("#fromId").val();
+                                    return (data.Amount) == null ? "" : ((data.FromId === @Model.BankAccountId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
+                                },
+                                className: 'align-middle',
+                            },
+                            {
+                                data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo:"BalancedTo"},
+                                render: function (data) {
+                                    let fromId = $("#fromId").val();
+                                    return ((data.FromId === @Model.BankAccountId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
+                                },
+                                className: 'align-middle',
+                                "searchable": false,
+                                "orderable": false
+                            },
+                            {
+                                data: {StatusName:'StatusName'},
+                                render: function (data) {
+                                    return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                                },
+                                className: 'align-middle text-center',
+                                "searchable": false,
+                                "orderable": false
+                            },
+        
+                        ]
+                    })
         $(function () {
             
 
-            let fromId = $("#fromId").val();
-            if (fromId != null) {
-                managerTran.load(fromId);
-            }
-            
-            $("#key").keyup(function () {
-                let key = $("#key").val();
-                managerTran.load(fromId,1, key);
-            })
-            $(document).on("click", ".item-page", function () {
-                let page = $(this).text();
-                let key = $("#key").val();
-                managerTran.load(fromId,page, key);
-            })
-            $(document).on("click", ".btn-test", function () {
-                $("#Form").trigger("reset");
-                document.getElementById('text1').hidden = true;
-                document.getElementById('text2').hidden = true;
-                document.getElementById('infoReceiver').hidden = true;
-                document.getElementById('infoSource').hidden = true;
-                loadAccountNumber(1);
-                $(".modal-title").html("Tranfer Money");
-                $("#myModal").modal("show");
-            })
-            $(document).on('change', '#FromId', function () {
-                let dataBalance = loadBalance(this.value)
-                document.getElementById('text1').hidden = false;
-                document.getElementById('infoSource').hidden = false;
-                document.getElementById('infoSource').innerHTML = new Intl.NumberFormat('vi-VN', { style: 'currency', currency: dataBalance[0].Currency }).format(dataBalance[0].Balance);
-            });
-            $(document).on('blur keydown', '#ToId', function () {
-                let dataInfoBankAccount;
-                if (this.value.length == 0) {
-                    document.getElementById('text2').hidden = true;
-                    document.getElementById('infoReceiver').hidden = true;
-                } else {
-                    dataInfoBankAccount = loadInfoBankAccount(this.value)
-                    document.getElementById('text2').hidden = false;
-                }
-                if (dataInfoBankAccount.length > 0) {
-                    $("#BankId").val(dataInfoBankAccount[0].Id);
-                    document.getElementById('infoReceiver').hidden = false;
-                    document.getElementById('infoReceiver').innerHTML = dataInfoBankAccount[0].Name;
-                } else {
-                    $("#BankId").val("");
-                    document.getElementById('infoReceiver').hidden = false;
-                    document.getElementById('infoReceiver').innerHTML = "Account doesn't exist";
-                }
-            });
-            $(document).on("click", "#btnSave", function () {
-                var today = new Date();
-                var tran = {
-                    FromId: $("#FromId").val(),
-                    ToId: $("#BankId").val(),
-                    Amount: $("#Amount").val()
-                }
-                //managerTran.post(tran);
-                for (var i = 0; i < 10; i++) {
-                    setTimeout(managerTran.post(tran),5000);
-                }
-            })
         })
     </script>
-    }
+}
 
