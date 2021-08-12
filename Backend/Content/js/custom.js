@@ -370,7 +370,7 @@ jQuery(document).ready(function () {
 
     $('[data-toggle="popover"]').popover();
 
-    $.fn.dataTable.ext.classes.sPageButton = 'btn btn-sm btn-outline-primary paginate_button';
+    // $.fn.dataTable.ext.classes.sPageButton = 'btn btn-sm btn-outline-primary paginate_button';
 });
 /* Document.ready END */
 
