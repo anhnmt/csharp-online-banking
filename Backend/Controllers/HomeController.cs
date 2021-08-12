@@ -235,60 +235,12 @@ namespace Backend.Controllers
         public ActionResult CheckLogin(string email, string password)
         {
             var errors = new Dictionary<string, string>();
-            IRepository<Accounts> users = new Repository<Accounts>();
-            if (users.CheckDuplicate(x => x.Email == email))
+            var obj = accounts.Get(x => x.Email == email).FirstOrDefault();
+
+            if (Utils.IsNullOrEmpty(obj))
             {
-                var obj = users.Get(x => x.Email == email).FirstOrDefault();
-                if (password == obj.Password && obj.Status != ((int) AccountStatus.Locked) && obj.AttemptLogin < 3)
-                {
-                    Session["user"] = obj;
+                errors.Add("Email", "Email is not exists!");
 
-                    obj.AttemptLogin = 0;
-                    users.Update(obj);
-
-                    switch (obj.RoleId)
-                    {
-                        case 1:
-                            return Json(new
-                            {
-                                statusCode = 200,
-                                message = "Success",
-                                url = "Admin/Home"
-                            }, JsonRequestBehavior.AllowGet);
-                        case 2:
-                            return Json(new
-                            {
-                                statusCode = 200,
-                                message = "Success",
-                                url = "Admin/Home"
-                            }, JsonRequestBehavior.AllowGet);
-                        default:
-                            return Json(new
-                            {
-                                statusCode = 200,
-                                message = "Success",
-                                url = "Home"
-                            }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-
-                if (obj.AttemptLogin == 3)
-                {
-                    obj.Status = ((int) AccountStatus.Locked);
-                    users.Update(obj);
-                    errors.Add("Email",
-                        "Your account is locked because you entered the wrong password more than 3 times!");
-                    return Json(new
-                    {
-                        statusCode = 400,
-                        message = "Error",
-                        data = errors
-                    }, JsonRequestBehavior.AllowGet);
-                }
-
-                obj.AttemptLogin++;
-                users.Update(obj);
-                errors.Add("Password", "Your password is wrong!");
                 return Json(new
                 {
                     statusCode = 400,
@@ -297,22 +249,62 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            errors.Add("Email", "Email is not exists!");
-
-            foreach (var k in ModelState.Keys)
-            foreach (var err in ModelState[k].Errors)
+            if (obj.AttemptLogin >= 3)
             {
-                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                if (!errors.ContainsKey(key))
-                    errors.Add(key, err.ErrorMessage);
+                const int statusLock = (int) AccountStatus.Locked;
+                if (obj.Status != statusLock)
+                {
+                    obj.Status = statusLock;
+                    accounts.Update(obj);
+                }
+
+                errors.Add("Email",
+                    "Your account is locked because you entered the wrong password more than 3 times!");
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
             }
 
-            return Json(new
+            if (!password.Equals(obj.Password))
             {
-                statusCode = 400,
-                message = "Error",
-                data = errors
-            }, JsonRequestBehavior.AllowGet);
+                obj.AttemptLogin++;
+                accounts.Update(obj);
+                errors.Add("Password", "Your password is wrong!" + obj.AttemptLogin);
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            Session["user"] = obj;
+            obj.AttemptLogin = 0;
+            accounts.Update(obj);
+
+            switch (obj.RoleId)
+            {
+                case 1:
+                case 2:
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success",
+                        url = "Admin/Home"
+                    }, JsonRequestBehavior.AllowGet);
+                default:
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success",
+                        url = "Home"
+                    }, JsonRequestBehavior.AllowGet);
+            }
         }
 
         public ActionResult Logout()
