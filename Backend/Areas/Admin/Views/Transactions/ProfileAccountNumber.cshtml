@@ -33,7 +33,11 @@
                         <h3 class="card-title">Total Transactions AccountNumber: @Model.Name</h3>
                         <div class="example">
                             <p class="mb-1">Date Range Pick</p>
-                            <input class="form-control input-daterange-datepicker" type="text" id="daterange" name="daterange" value="08/01/2021 - 08/31/2021">
+                            <div id="daterange" style="background: #fff; cursor: pointer; padding: 5px 10px; border: 1px solid #ccc; width: 100%">
+                                <i class="fa fa-calendar"></i>&nbsp;
+                                <span></span> <i class="fa fa-caret-down"></i>
+                            </div>
+                            @* <input class="form-control input-daterange-datepicker" type="text" id="daterange" name="daterange" value="08/01/2021 - 08/31/2021"> *@
                         </div>
                     </div>
                     <div class="card-body">
@@ -105,8 +109,10 @@
     <script src="~/Content/vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script src="~/Content/js/plugins-init/bs-daterange-picker-init.js"></script>
     <script>
+        let startDate;
+        let endDate;
         
-        $('#datatables').DataTable({
+        let datatables = $('#datatables').DataTable({
                         "paging": true,
                         "ordering": true,
                         "autoWidth": false,
@@ -116,7 +122,11 @@
                         "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
                         "ajax": {
                             url: "/Admin/Transactions/GetData",
-                            data: {fromId: @Model.BankAccountId},
+                            data: function(d){
+                                d.fromId= @Model.BankAccountId;
+                                d.startDate= startDate;
+                                d.endDate= endDate;
+                            },
                         },
                         "order": [
                             [1, 'desc']
@@ -166,13 +176,31 @@
                     })
         $(function () {
             $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-              $('#tbl_banks').DataTable({  
-              "ajax": {
-                 url: "/Admin/Transactions/GetData",
-                 data: {fromId: @Model.BankAccountId,startDate: picker.startDate.format('YYYY-MM-DD'),endDate:picker.endDate.format('YYYY-MM-DD')},
-             }
-             ,}).ajax.reload();
+                startDate = picker.startDate.format('YYYY-MM-DD');
+                endDate = picker.endDate.format('YYYY-MM-DD');
+              datatables.ajax.reload();
             });
+             var start = moment().subtract(29, 'days');
+                var end = moment();
+            
+                function cb(start, end) {
+                    $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+                }
+            
+                $('#daterange').daterangepicker({
+                    startDate: start,
+                    endDate: end,
+                    ranges: {
+                       'Today': [moment(), moment()],
+                       'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                       'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                       'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                       'This Month': [moment().startOf('month'), moment().endOf('month')],
+                       'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+                    }
+                }, cb);
+            
+                cb(start, end);
         })
     </script>
 }
