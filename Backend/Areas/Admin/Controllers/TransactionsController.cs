@@ -2,6 +2,7 @@
 using OnlineBanking.DAL;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -24,14 +25,20 @@ namespace Backend.Areas.Admin.Controllers
         {
             return View();
         }
-        
-        public ActionResult GetData(int fromId)
+
+        public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
-            var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId)
-                .OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            var data = transactions.Get(x => x.FromId == fromId || x.ToId == fromId);
+            if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
+            {
+                endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+                data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            }
+
+            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
             return Json(new
             {
-                data = data.ToList(),
+                data = data2.ToList(),
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
@@ -39,10 +46,9 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
-
         }
     }
 }
