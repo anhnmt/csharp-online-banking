@@ -238,6 +238,7 @@
     
                 submitHandler: function () {
                    var bank = {
+                       AccountId : "@Model.AccountId",
                        CurrencyId: $("#CurrencyId").val(),
                        Status: parseInt(($("#Status").val())),
                        Balance: $("#Balance").val(),
