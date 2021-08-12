@@ -145,17 +145,6 @@
                 }
             });
 
-            $("#key").keyup(function () {
-                let key = $("#key").val();
-                managerChannel.load(1, key);
-            });
-
-            $(document).on("click", ".item-page", function () {
-                let page = $(this).text();
-                let key = $("#key").val();
-                managerChannel.load(page, key);
-            });
-
             chatHub.client.updateUser = function (userView) {
                 console.log(userView);
             };

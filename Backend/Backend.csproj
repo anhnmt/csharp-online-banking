@@ -633,7 +633,6 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
-    <Content Include="Views\Home\Register3.cshtml" />
     <Content Include="Views\Home\InfoAccount.cshtml" />
     <Content Include="Views\Home\PageNotFound.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />

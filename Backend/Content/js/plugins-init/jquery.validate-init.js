@@ -90,7 +90,7 @@ jQuery(".form-valide").validate({
     errorClass: "invalid-feedback animated fadeInUp",
     errorElement: "div",
     errorPlacement: function(e, a) {
-        jQuery(a).parents(".form-group > div").append(e)
+        jQuery(a).after(e)
     },
     highlight: function(e) {
         jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
@@ -127,7 +127,7 @@ jQuery(".form-valide-with-icon").validate({
     errorClass: "invalid-feedback animated fadeInUp",
     errorElement: "div",
     errorPlacement: function(e, a) {
-        jQuery(a).parents(".form-group > div").append(e)
+        jQuery(a).after(e)
     },
     highlight: function(e) {
         jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
