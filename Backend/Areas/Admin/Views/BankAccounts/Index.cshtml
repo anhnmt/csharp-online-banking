@@ -1,4 +1,6 @@
-﻿
+﻿@model OnlineBanking.DAL.AccountViewModel
+@using OnlineBanking.DAL
+@{ var user = (Accounts)Session["user"]; }
 @{
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -17,10 +19,9 @@
 </div>
 <div class="row">
     <div class="col-md-12">
-        <a href="#" class="btn btn-primary mb-3 btn-add">Create New User</a>
         <div class="card card-success">
             <div class="card-header">
-                <h3 class="card-title">User Management</h3>
+                <h3 class="card-title">Bank Accounts Management</h3>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -35,8 +36,6 @@
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="tbl_user"></tbody>
-
                     </table>
                 </div>
             </div>
@@ -44,97 +43,155 @@
     </div>
 </div>
 
-<div class="modal fade " id="myModal" role="dialog">
-    <div class="modal-dialog modal-lg">
-
-        <!-- Modal content-->
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">Update Infomation Account</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="Id" id="Id" value="" />
-                <input type="hidden" name="type" id="type" value="CREATE" />
-                <form method="post" id="Form">
+            <form method="post" id="FormBank" novalidate="novalidate">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value=""/>
+                    <input type="hidden" name="type" id="type" value="CREATE"/>
                     <div class="form-group">
-                        <label for="exampleInputName">Name</label>
-                        <input type="text" class="form-control" id="Name" placeholder="Name...">
-                        <span class="error text-danger"></span>
+                        <label>Account Number</label>
+                        <div class="error">
+                            <input type="text" class="form-control" id="NameBank" name="NameBank" placeholder="Account Number...">
+                        </div>
                     </div>
                     <div class="form-group">
-                        <label for="exampleInputName">Email</label>
-                        <input type="text" class="form-control" id="Email" placeholder="Email...">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputName">Password</label>
-                        <input type="text" class="form-control" id="Password" placeholder="Password...">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputName">Phone</label>
-                        <input type="text" class="form-control" id="Phone" placeholder="Phone...">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label for="exampleInputClass">Address</label>
-                        <input type="text" class="form-control" id="Address" placeholder="Address...">
-                        <span class="error text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <label for="exampleInputAge">Birthday</label>
-                                <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                    <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
-                                </div>
-                            </div>
-                            <span class="error text-danger"></span>
-                            <div class="col-md-6">
-                                <label for="exampleInputClass">NumberID</label>
-                                <input type="text" class="form-control" id="NumberID" placeholder="NumberID...">
-                                <span class="error text-danger"></span>
-                            </div>
+                        <label>Balance</label>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Balance" name="Balance" placeholder="Balance...">
                         </div>
                     </div>
                     <div class="form-group">
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Role</label>
-                                <select class="form-control" id="RoleId" name="RoleId">
+                                <label>Currency</label>
+                                <select class="form-control" id="CurrencyId" name="CurrencyId">
                                 </select>
-                                <span class="error text-danger"></span>
                             </div>
                             <div class="col-md-6">
-                                <label for="exampleInputClass">Status</label>
-                                <select class="form-control" id="Status" name="Status">
+                                <label>Status</label>
+                                <select class="form-control" id="Status" name="StatusBank">
                                 </select>
-                                <span class="error text-danger"></span>
                             </div>
                         </div>
                     </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success" >Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="MoneyManagement" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="Form2" novalidate="novalidate">
+                <div class="modal-header">
+                    <h4 class="modal-MoneyManagement">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="BankAccountId" id="BankAccountId" value=""/>
+                    <input type="hidden" name="type" id="type" value="CREATE"/>
+                    <div class="form-group">
+                        <label>Account Number</label>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Id" name="BankAccountId" placeholder="Balance..." disabled>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Balance</label>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Amount" name="Amount" placeholder="Balance...">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+             </form>
         </div>
     </div>
 </div>
 @section AdminlteJs{
-    <script src="~/Content/plugins/moment/moment.min.js"></script>
-    <script src="~/Content/plugins/tempusdominus-bootstrap-4/js/tempusdominus-bootstrap-4.min.js"></script>
-    <!-- DataTables  & Plugins -->
-
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
 
 @section scripts{
-
     <script>
+        const validator = $("#FormBank").validate({
+                    rules: {
+                        "NameBank": {
+                            required: true
+                        },
+                        "Balance": {
+                            required: true
+                        },
+                    },
+                    ignore: [],
+                    errorClass: "invalid-feedback animated fadeInUp",
+                    errorElement: "div",
+                    errorPlacement: function (e, a) {
+                        jQuery(a).parents(".form-group .error").append(e)
+                    },
+                    highlight: function (e) {
+                        jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+                    },
+                    success: function (e) {
+                        jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+                    },
+        
+                    submitHandler: function () {
+                       var bank = {
+                           CurrencyId: $("#CurrencyId").val(),
+                           Status: parseInt(($("#Status").val())),
+                           Balance: $("#Balance").val(),
+                           Name: $("#NameBank").val()
+                       };
+                       if ($("#type").val() === "EDIT") {
+                           bank.BankAccountId = $("#Id").val();
+                           managerBank.put(bank);
+                       }  else {
+                           managerBank.post(bank);
+                       }
+                    }
+                });
+        const validator2 = $("#Form2").validate({
+                            rules: {
+                                "Amount": {
+                                    required: true
+                                },
+                            },
+                            ignore: [],
+                            errorClass: "invalid-feedback animated fadeInUp",
+                            errorElement: "div",
+                            errorPlacement: function (e, a) {
+                                jQuery(a).parents(".form-group .error").append(e)
+                            },
+                            highlight: function (e) {
+                                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+                            },
+                            success: function (e) {
+                                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+                            },
+                
+                            submitHandler: function () {
+                               var trans = {
+                                   FromId: "@user.AccountId",
+                                   Amount: $("#Amount").val(),
+                                   ToId: $("#BankId").val(),
+                               };
+                               managerBank.receiveMoney(trans);
+                            }
+                        });
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",
@@ -149,73 +206,69 @@
                 }
             })
         }
-        function loadRole(roleId = null) {
+        function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Accounts/GetRole",
+                url: "/Admin/Currencies/GetData",
+                data: { page: page, key: key, pageSize: pageSize},
                 success: function (res) {
-                    console.log(res)
-                    let html;
-                    $.each(res, function (key, value) {
-                        html += "<option value = '" + value.RoleId + "' " + (roleId === value.RoleId ? 'selected' : '') + ">" + value.Name + " </option>";
+                    var html;
+                    $.each(res.data, function (key, value) {
+                        html += "<option value = '" + value.CurrencyId + "' " + ((parseInt(CurrencyId))=== value.CurrencyId ? 'selected' : '') + ">" + value.Name + " </option>";
                     });
-                    $('#RoleId').html(html);
+                    $('#CurrencyId').html(html);
                 }
             })
         }
 
-        var managerAcc = {
+        var managerBank = {
             get: function (id) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Accounts/FindId",
-                    data: { id: id },
+                 $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("FindId", "BankAccounts")",
+                    data: {id : id},
                     success: function (res) {
-                        console.log(res);
-                        $("#Id").val(res.AccountId);
-                        $("#Name").val(res.Name);
-                        $("#Email").val(res.Email);
-                        $("#Password").val(res.Password);
-                        $("#Phone").val(res.Phone);
-                        $("#Address").val(res.Address);
-                        $("#Birthday").val((res.Birthday));
-                        $("#NumberID").val(res.NumberID);
-                        loadRole(res.RoleId);
+                        $("#Id").val(res.BankAccountId);
+                        $("#Balance").val(res.Balance);
+                        $("#NameBank").val(res.Name);
                         loadStatus(res.Status);
+                        loadCurrency(res.CurrencyId);
                         $("#myModal").modal("show");
                     }
-                })
-            },
-            put: function (user) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Accounts/Edit",
-                    data: user,
-                    success: function (res) {
-                        if (res.statusCode === 200) {
-                            $("#myModal").modal("hide");
-                            managerAcc.load();
-                            toastr.success('Updated Successfully')
-                        }
-                    }
 
                 })
             },
-            post: function (user) {
+            put: function (bank) {
                 $.ajax({
                     type: "POST",
-                    url: "/Admin/Accounts/Create",
-                    data: user,
+                    url: "@Url.Action("Edit", "BankAccounts")",
+                    data: bank,
                     success: function (res) {
                         if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAcc.load();
-                            toastr.success('Created Successfully')
+                            $('#datatables').DataTable().ajax.reload();
+                            notifySuccess('Updated Successfully',"Updated BankAccounts Successfully");
+                        }else{
+                            validator.showErrors(res.data);
                         }
                     }
-
+    
                 })
-            }
+            },
+            delete: function (id) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "BankAccounts")/"+id,
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        notifySuccess('Deleted Successfully',"Deleted BankAccounts Successfully");
+                    }else {
+                        notifyError('Error',"Deleted BankAccounts Error");
+                    }
+                     $('#datatables').DataTable().ajax.reload();
+                }
+            })
+        },
         }
         $(function () {
             $('#datatables').DataTable({
@@ -257,11 +310,13 @@
                         "orderable": false
                     },
                     {
-                        data: 'BankAccountId',
-                        "render": function (data, type, row) {
+                        data: {BankAccountId:'BankAccountId'},
+                        "render": function ( data) {
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
-                                '<a data-id="' + row.BankAccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a>' +
-                                '<a data-id="' + row.BankAccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                                '<a data-id="'+data.BankAccountId+'" class="dropdown-item btn-manager" href="javascript:void(0);" >Money Managment</a>' +
+                                '<a data-id="' + data.BankAccountId + '" class="dropdown-item btn-detail" href="javascript:void(0);">Details</a>' +
+                                '<a  data-id="'+data.BankAccountId+'" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a>' +
+                                '<a data-id="' + data.BankAccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                         }
                     },
                 ]
@@ -269,44 +324,24 @@
 
             $(document).on("click", ".btn-edit", function () {
                 $("#type").val("EDIT");
-                let userId = $(this).data("id");
-                let a = managerAcc.get(userId);
+                let bankId = $(this).data("id");
+                let a = managerBank.get(bankId);
             })
 
-            $(document).on("click", ".btn-add", function () {
-                $(".modal-title").html("Create Account");
-                $("#Form").trigger("reset");
-                $("#myModal").modal("show");
-            })
             $(document).on("click", ".btn-detail", function () {
                 let userId = $(this).data("id");
                 window.location.assign("/Admin/BankAccounts/ProfileBankAccount/" + userId)
             })
+            $(document).on("click", ".btn-delete", function () {
+                let BankId = $(this).data("id");
+                managerBank.delete(BankId);
+            });
+            $(document).on("click", ".btn-manager", function () {
+                $("#type").val("TRANSFER");
+                $("#MoneyManagement").modal("show");
+                $(".modal-MoneyManagement").html("Money management");
 
-            $(document).on("click", "#btnSave", function () {
-                var today = new Date();
-                var user = {
-                    Name: $("#Name").val(),
-                    Email: $("#Email").val(),
-                    Password: $("#Password").val(),
-                    Birthday: $("#Birthday").val(),
-                    Address: $("#Address").val(),
-                    Phone: $("#Phone").val(),
-                    NumberID: $("#NumberID").val(),
-                    RoleId: $("#RoleId").val(),
-                    Address: $("#Address").val(),
-                    Status: parseInt(($("#Status").val()))
-                }
-                if ($("#type").val() == "EDIT") {
-                    user.UpdatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    user.AccountId = $("#Id").val();
-                    managerAcc.put(user);
-                } else {
-                    user.CreatedAt = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-                    managerAcc.post(user);
-                }
             })
-
         })
 
     </script>

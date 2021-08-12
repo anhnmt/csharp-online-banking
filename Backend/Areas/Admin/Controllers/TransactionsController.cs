@@ -25,22 +25,13 @@ namespace Backend.Areas.Admin.Controllers
             return View();
         }
         
-        public ActionResult GetData(int fromId, int page = 1, string key = null)
+        public ActionResult GetData(int fromId)
         {
             var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId)
                 .OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
-            const int pageSize = 5;
-            if (!string.IsNullOrEmpty(key))
-            {
-                data = data.Where(x => false);
-            }
-
-            var totalPages = Math.Ceiling((decimal) data.Count() / pageSize);
             return Json(new
             {
-                totalPages,
-                currentPage = page,
-                data = data.Skip((page - 1) * pageSize).Take(pageSize),
+                data = data.ToList(),
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);

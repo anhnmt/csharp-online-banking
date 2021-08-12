@@ -1,4 +1,6 @@
 ﻿@model OnlineBanking.DAL.AccountViewModel
+@using OnlineBanking.DAL
+@{ var user = (Accounts)Session["user"]; }
 @{
     ViewBag.Title = "ProfileAccount";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
@@ -125,11 +127,6 @@
                             </div>
                         </div>
                     </div>
-                    <div class="card-footer d-flex justify-content-center">
-
-                    </div>
-
-                    <!-- /.card-body -->
                 </div>
             </div>
         </div>
@@ -153,9 +150,9 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Email</label>
-                         <div class="error">
-                            <input type="text" class="form-control" id="BalanceBank" name="BalanceBank" placeholder="Balance...">
+                        <label>Balance</label>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Balance" name="Balance" placeholder="Balance...">
                         </div>
                     </div>
                     <div class="form-group">
@@ -181,35 +178,36 @@
         </div>
     </div>
 </div>
+
 <div class="modal fade" id="MoneyManagement" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-MoneyManagement">Update Infomation Account</h4>
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <input type="hidden" name="BankAccountId" id="BankAccountId" value=""/>
-                <input type="hidden" name="type" id="type" value="CREATE"/>
-                <form method="post" id="Form2">
+            <form method="post" id="Form2" novalidate="novalidate">
+                <div class="modal-header">
+                    <h4 class="modal-MoneyManagement">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="Id" value=""/>
+                    <input type="hidden" name="type" id="type" value="CREATE"/>
                     <div class="form-group">
                         <label>Account Number</label>
-                        <label>Currency</label>
-                        <select class="form-control" id="BankId" placeholder="Account Number...">
-                        </select>
-                        <span class="error text-danger"></span>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Balance..." disabled>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label>Balance</label>
-                        <input type="text" class="form-control" id="Amount" placeholder="Balance...">
-                        <span class="error text-danger"></span>
+                        <div class="error">
+                            <input type="text" class="form-control" id="Amount" name="Amount" placeholder="Balance...">
+                        </div>
                     </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success" id="btnSave">Save</button>
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
-            </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                </div>
+             </form>
         </div>
     </div>
 </div>
@@ -221,7 +219,7 @@
                     "NameBank": {
                         required: true
                     },
-                    "BalanceBank": {
+                    "Balance": {
                         required: true
                     },
                 },
@@ -240,28 +238,47 @@
     
                 submitHandler: function () {
                    var bank = {
-                       AccountId: "@Model.AccountId",
                        CurrencyId: $("#CurrencyId").val(),
                        Status: parseInt(($("#Status").val())),
-                       Balance: $("#BalanceBank").val(),
+                       Balance: $("#Balance").val(),
                        Name: $("#NameBank").val()
                    };
                    if ($("#type").val() === "EDIT") {
                        bank.BankAccountId = $("#Id").val();
                        managerBank.put(bank);
-                   } else if ($("#type").val() === "TRANSFER") {
-                       const trans = {
-                           FromId: @Model.AccountId,
-                           ToId: $("#BankId").val(),
-                           Messages: $("#Messages").val(),
-                           Amount: $("#Amount").val()
-                       };
-                       managerBank.receiveMoney(trans);
                    } else {
                        managerBank.post(bank);
                    }
                 }
             });
+    const validator2 = $("#Form2").validate({
+                    rules: {
+                        "Amount": {
+                            required: true
+                        },
+                    },
+                    ignore: [],
+                    errorClass: "invalid-feedback animated fadeInUp",
+                    errorElement: "div",
+                    errorPlacement: function (e, a) {
+                        jQuery(a).parents(".form-group .error").append(e)
+                    },
+                    highlight: function (e) {
+                        jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+                    },
+                    success: function (e) {
+                        jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+                    },
+        
+                    submitHandler: function () {
+                       var trans = {
+                           FromId: "@user.AccountId",
+                           Amount: $("#Amount").val(),
+                           ToId: $("#Id").val(),
+                       };
+                       managerBank.receiveMoney(trans);
+                    }
+                });
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",
@@ -313,11 +330,24 @@
                     data: {id : id},
                     success: function (res) {
                         $("#Id").val(res.BankAccountId);
-                        $("#BalanceBank").val(res.Balance);
+                        $("#Balance").val(res.Balance);
                         $("#NameBank").val(res.Name);
                         loadStatus(res.Status);
                         loadCurrency(res.CurrencyId);
                         $("#myModal").modal("show");
+                    }
+
+                })
+            },
+            get2: function (id) {
+                 $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("FindId", "BankAccounts")",
+                    data: {id : id},
+                    success: function (res) {
+                        $("#Id").val(res.BankAccountId);
+                        $("#Name").val(res.Name);
+                        $("#MoneyManagement").modal("show");
                     }
 
                 })
@@ -332,7 +362,7 @@
                         if (res.statusCode == 200) {
                             $("#myModal").modal("hide");
                             $('#tbl_banks').DataTable().ajax.reload();
-                            toastr.success('Created Successfully')
+                            notifySuccess('Created Successfully',"Created BankAccounts Successfully")
                         }else {
                             validator.showErrors(res.data);
                         }
@@ -363,10 +393,10 @@
                     url: "@Url.Action("Delete", "BankAccounts")/"+id,
                     success: function (res) {
                         if (res.statusCode === 200) {
-                            notifySuccess('Successfully',"Deleted Successfully");
+                            notifySuccess('Deleted Successfully',"Deleted BankAccounts Successfully");
                             $('#tbl_banks').DataTable().ajax.reload();
                         }else {
-                            notifyError('Error',"Deleted Error");
+                            notifyError('Error',"Deleted BankAccounts Error");
                             $('#tbl_banks').DataTable().ajax.reload();
                         }
                         
@@ -391,8 +421,7 @@
                 })
             }
         }
-
-
+        
         //Cheque Book
         var managerChequeBook = {
             get: function (id) {
@@ -554,6 +583,7 @@
                 loadStatus();
                 loadCurrency();
                 $("#FormBank").trigger("reset");
+                $("#type").val("CREATE");
                 validator.resetForm();
                 $("#myModal").modal("show");
                 $(".modal-title").html("Create Account Number");
@@ -565,9 +595,9 @@
             })
             $(document).on("click", ".btn-manager", function () {
                 $("#type").val("TRANSFER");
-                loadAccountNumber(@Model.AccountId);
-                $("#MoneyManagement").modal("show");
-                $(".modal-MoneyManagement").html("Money management");
+                let bankId = $(this).data("id");
+                let a = managerBank.get2(bankId);
+               
 
             })
 

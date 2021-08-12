@@ -46,7 +46,7 @@ namespace Backend.Controllers
                     {
                         return Json(new
                         {
-                            data = "Số nhập vào phải ở dạng số",
+                            data = "Your Amount must be number",
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -56,7 +56,7 @@ namespace Backend.Controllers
                     {
                         return Json(new
                         {
-                            data = "Tải khoản nhận chưa được kích hoạt",
+                            data = "Receipt download has not been activated",
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -65,7 +65,7 @@ namespace Backend.Controllers
                     if (bankAccounts.Edit(receiverAccount) != true)
                         return Json(new
                         {
-                            data = "Lỗi cộng tiền tài khoản đích",
+                            data = "Error adding target account money",
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -75,14 +75,14 @@ namespace Backend.Controllers
                     bankDequeue.BalancedTo = receiverAccount.Balance;
                     if (string.IsNullOrEmpty(bankDequeue.Messages))
                     {
-                        bankDequeue.Messages = "Tranfers from Admin to " + bankDequeue.ToId;
+                        bankDequeue.Messages = "Transfer from Admin to " + bankDequeue.ToId;
                     }
 
                     if (transactions.Add(bankDequeue))
                     {
                         return Json(new
                         {
-                            data = "Chuyển khoản thành công",
+                            data = "Successful transfer",
                             message = "Success",
                             statusCode = 200
                         });
@@ -90,7 +90,7 @@ namespace Backend.Controllers
 
                     return Json(new
                     {
-                        data = "Chuyển khoản thất bại",
+                        data = "Transfer failed",
                         message = "Error",
                         statusCode = 404
                     });
@@ -135,7 +135,7 @@ namespace Backend.Controllers
                 {
                     return Json(new
                     {
-                        data = "Đơn vị tiền tệ người nhận không đúng",
+                        data = "Recipient currency does not match",
                         message = "Error",
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
@@ -145,7 +145,7 @@ namespace Backend.Controllers
                 {
                     return Json(new
                     {
-                        data = "Số tài khoản không tồn tại",
+                        data = "Account number doesn't exist",
                         message = "Error",
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
@@ -156,7 +156,7 @@ namespace Backend.Controllers
                 {
                     return Json(new
                     {
-                        data = "Số dư không đủ",
+                        data = "Amount isn't enough",
                         message = "Error",
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
@@ -167,7 +167,7 @@ namespace Backend.Controllers
                 {
                     return Json(new
                     {
-                        data = "Lỗi trừ tiền tài khoản nguồn",
+                        data = "Error deducting money from source account",
                         message = "Error",
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
@@ -177,7 +177,7 @@ namespace Backend.Controllers
                 if (bankAccounts.Edit(receiverAccount) != true)
                     return Json(new
                     {
-                        data = "Lỗi cộng tiền tài khoản đích",
+                        data = "Error adding target account money",
                         message = "Error",
                         statusCode = 404
                     }, JsonRequestBehavior.AllowGet);
@@ -189,14 +189,14 @@ namespace Backend.Controllers
                 bankDequeue.BalancedTo = receiverAccount.Balance;
                 if (string.IsNullOrEmpty(bankDequeue.Messages))
                 {
-                    bankDequeue.Messages = "Tranfers from " + bankDequeue.FromId + " to " + bankDequeue.ToId;
+                    bankDequeue.Messages = "Transfer from " + bankDequeue.FromId + " to " + bankDequeue.ToId;
                 }
 
                 if (transactions.Add(bankDequeue))
                 {
                     return Json(new
                     {
-                        data = "Chuyển khoản thành công",
+                        data = "Successful transfer",
                         message = "Success",
                         statusCode = 200
                     });
@@ -204,7 +204,7 @@ namespace Backend.Controllers
 
                 return Json(new
                 {
-                    data = "Chuyển khoản thất bại",
+                    data = "Transfer failed",
                     message = "Error",
                     statusCode = 404
                 });
@@ -221,21 +221,7 @@ namespace Backend.Controllers
         public ActionResult GetData(int fromId)
         {
             var data = transactions.Get().Where(x => x.FromId == fromId || x.ToId == fromId)
-                .OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels
-                {
-                    TransactionId = x.TransactionId,
-                    FromId = x.FromId,
-                    ToId = x.ToId,
-                    Amount = x.Amount,
-                    Messages = x.Messages,
-                    BalancedFrom = x.BalancedFrom,
-                    BalancedTo = x.BalancedTo,
-                    Status = x.Status,
-                    StatusName = ((BankingActivity) x.Status).ToString(),
-                    CreatedAt = x.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
-                    UpdatedAt = x.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss"),
-                });
-
+                .OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
             return Json(new
             {
                 data = data.ToList(),
