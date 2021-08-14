@@ -161,6 +161,22 @@
                 }
             })
         },
+        
+        delete: function (id){
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteData", "Cheques")",
+                data: {chequeId: id},
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $('#datatables').DataTable().ajax.reload();
+                        toastr.success(res.data);
+                    } else {
+                        toastr.error(res.data);
+                    }
+                }
+            })
+        }
     };
 
     const validator = $("#formData").validate({
@@ -275,8 +291,8 @@
         });
 
         $(document).on("click", ".btn-delete", function () {
-            let currencyId = $(this).data("id");
-            chequesManager.delete(currencyId);
+            let chequeId = $(this).data("id");
+            chequesManager.delete(chequeId);
         });
         
         $(document).on("change", "#bankAccountId", function () {

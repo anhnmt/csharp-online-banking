@@ -38,17 +38,18 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetData(int chequeBookId)
         {
-            var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int) ChequeStatus.Deleted).Select(x => new ChequesViewModel
-            {
-                ChequeBookId = x.ChequeBookId,
-                Code = x.Code,
-                NumberId = x.NumberId,
-                ChequeId = x.ChequeId,
-                StatusName = ((ChequeStatus) x.Status).ToString(),
-                Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
-                FromBankAccountName = x.FromBankAccount.Name,
-                ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
-            });
+            var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int) ChequeStatus.Deleted)
+                .Select(x => new ChequesViewModel
+                {
+                    ChequeBookId = x.ChequeBookId,
+                    Code = x.Code,
+                    NumberId = x.NumberId,
+                    ChequeId = x.ChequeId,
+                    StatusName = ((ChequeStatus) x.Status).ToString(),
+                    Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
+                    FromBankAccountName = x.FromBankAccount.Name,
+                    ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
+                });
             return Json(new
             {
                 data = data.ToList(),
@@ -385,6 +386,40 @@ namespace Backend.Areas.Admin.Controllers
             {
                 message = "Success",
                 data = "Using cheque successfully!",
+                statusCode = 200,
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpPost]
+        public ActionResult DeleteData(int chequeId)
+        {
+            var cheque = cheques.Get(chequeId);
+            if (cheque == null)
+            {
+                return Json(new
+                {
+                    message = "Error",
+                    data = "This cheque is not exist",
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (cheque.Status != (int) ChequeStatus.Actived)
+            {
+                return Json(new
+                {
+                    message = "Error",
+                    data = "This cheque is not active",
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
+            cheque.Status = (int) ChequeStatus.Deleted;
+            cheques.Edit(cheque);
+            return Json(new
+            {
+                message = "Success",
+                data = "Delete Successfully",
                 statusCode = 200,
             }, JsonRequestBehavior.AllowGet);
         }
