@@ -13,8 +13,7 @@
         <div class="card">
             <div class="card-header align-middle">
                 <h4 class="card-title">Cheques Management</h4>
-                <button class="btn btn-primary btn-generate text-right">Generate Cheque</button>
-                <button class="btn btn-primary btn-test text-right">Test</button>
+                <button class="btn btn-primary btn-sm btn-generate text-right">Generate Cheque</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -71,6 +70,19 @@
                                 <input type="text" name="Amount" id="Amount" class="form-control">
                             </div>
                         </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="bankAccountId">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <select name="Status" id="Status" class="form-control">
+                                    <option value="0">Active</option>
+                                    <option value="1">Received</option>
+                                    <option value="2">Stopped</option>
+                                    <option value="3">Deleted</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Save</button>
@@ -90,7 +102,6 @@
             url: "@Url.Action("GetData", "BankAccounts")",
             data: { account: @Model.AccountId },
             success: function (res){
-                console.log(res);
                 let html = "";
                 for(let i = 0; i < res.data.length; i++) {
                     html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + res.data[i].Balance + " " + res.data[i].CurrencyName + '">' + res.data[i].Name + '</option>';
@@ -119,11 +130,11 @@
             })
         },
         
-        put: function (currency) {
+        put: function (obj) {
             $.ajax({
                 type: "POST",
-                url: "/Admin/Currencies/PutData",
-                data: currency,
+                url: "@Url.Action("PutData", "Cheques")",
+                data: obj,
                 success: function (res) {
                     if (res.statusCode === 200) {
                         $("#modifyModal").modal("hide");
@@ -139,10 +150,13 @@
         get: function (id) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Currencies/FindId",
-                data: { id: id },
+                url: "@Url.Action("FindId", "Cheques")",
+                data: { chequeId: id },
                 success: function (res) {
-                    $("#Name").val(res.Name);
+                    console.log(res);
+                    $("#bankAccountId").val(res.data.FromBankAccountId);
+                    $("#Amount").val(res.data.AmountNumber);
+                    $("#Status").val(res.data.Status);
                     $("#modifyModal").modal("show");
                 }
             })
@@ -157,7 +171,7 @@
             "Amount": {
                 required: true,
                 number: true,
-                min: 0,
+                min: 1,
             }
         },
         ignore: [],
@@ -177,9 +191,11 @@
                 FromBankAccountId: $("#bankAccountId").val(),
                 Amount: $("#Amount").val(),
                 ChequeBookId: @Model.ChequeBookId,
+                Status: $("#Status").val(),
             };
             if ($("#type").val() === "EDIT") {
-                
+                obj.ChequeId = $("#Id").val();
+                chequesManager.put(obj);
             } else {
                 chequesManager.post(obj);
             }
@@ -233,7 +249,7 @@
                     bSortable: false,
                     className: 'align-middle text-right',
                     "render": function (data, type, row) {
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id=" ' + row.CurrencyId + ' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.CurrencyId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                     }
                 },
             ]
@@ -241,7 +257,7 @@
 
         $(".btn-generate").click(function () {
             $("#formData").trigger("reset");
-            $(".modal-title").html("Create new Currency");
+            $(".modal-title").html("Create new cheque");
             $("#modifyModal").modal("show");
             $("#type").val("CREATE");
             $("#Id").val("");
@@ -252,9 +268,10 @@
             $("#formData").trigger("reset");
             $(".modal-title").html("Update Currency");
             $("#type").val("EDIT");
-            let currencyId = $(this).data("id");
-            $("#Id").val(currencyId);
-            chequesManager.get(currencyId);
+            let chequeId = $(this).data("id");
+            $("#Id").val(chequeId);
+            chequesManager.get(chequeId);
+            loadBankAccount();
         });
 
         $(document).on("click", ".btn-delete", function () {

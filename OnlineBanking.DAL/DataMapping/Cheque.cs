@@ -14,8 +14,11 @@ namespace OnlineBanking.DAL
         public string Code { get; set; }
         public string NumberId { get; set; }
         public int Status { get; set; }
+        [Required]
         public float Amount { get; set; }
+        [Required]
         public int FromBankAccountId { get; set; }
+        [Required]
         public int ChequeBookId { get; set; }
         public Nullable<int> ToBankAccountId { get; set; }
 
