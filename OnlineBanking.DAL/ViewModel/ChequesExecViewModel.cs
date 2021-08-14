@@ -9,7 +9,7 @@ namespace OnlineBanking.DAL
         [Required]
         [MinLength(10)]
         public string NumberId { get; set; }
-        public int ToBankAccountId { get; set; }
+        public string ToBankAccountName { get; set; }
         [Required]
         public string PaymentMethod { get; set; }
     }

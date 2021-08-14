@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
@@ -63,7 +65,7 @@ namespace Backend.Areas.Admin.Controllers
             string code = Utils.RandomString(16);
             bool check = true;
             BankAccounts fromBankAccount = null;
-            
+
             if (!Utils.IsNullOrEmpty(chequeInformation.FromBankAccountId))
             {
                 fromBankAccount = bankAccounts.Get(chequeInformation.FromBankAccountId);
@@ -105,57 +107,99 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult ChequeExec(ChequesExecViewModel chequeExec)
         {
+            var errors = new Dictionary<string, string>();
             var cheque = cheques.Get(x => x.Code.Equals(chequeExec.Code)).FirstOrDefault();
-            if (!Utils.IsNullOrEmpty(cheque))
+
+            if (!ModelState.IsValid)
             {
-                if (cheque.Status != (int) ChequeStatus.Actived)
+                foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
                 {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (cheque == null)
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+
+            if (cheque.Status != (int) ChequeStatus.Actived)
+            {
+                errors.Add("Code", "Cheque is not valid or has been used!");
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            BankAccounts toBankAccounts;
+            if (chequeExec.PaymentMethod == "bank-account" && !Utils.IsNullOrEmpty(chequeExec.ToBankAccountName))
+            {
+                toBankAccounts = bankAccounts.Get(x => x.Name == chequeExec.ToBankAccountName).FirstOrDefault();
+                if (toBankAccounts != null)
+                {
+                    cheque.ToBankAccountId = toBankAccounts.BankAccountId;
+                }
+                else
+                {
+                    errors.Add("ToBankAccountName", "Your bank account is not exist!");
                     return Json(new
                     {
                         message = "Error",
+                        data = errors,
                         statusCode = 400,
-                    }, JsonRequestBehavior.AllowGet);
-                }
-
-                if (chequeExec.PaymentMethod == "bank-account" && !Utils.IsNullOrEmpty(chequeExec.ToBankAccountId))
-                {
-                    if (bankAccounts.CheckDuplicate(x => x.BankAccountId == chequeExec.ToBankAccountId))
-                    {
-                        cheque.ToBankAccountId = chequeExec.ToBankAccountId;
-                    }
-                    else
-                    {
-                        return Json(new
-                        {
-                            message = "Error",
-                            statusCode = 400,
-                        }, JsonRequestBehavior.AllowGet);
-                    }
-                }
-
-                cheque.Status = (int) ChequeStatus.Received;
-                cheque.NumberId = chequeExec.NumberId;
-                if (cheques.Edit(cheque))
-                {
-                    if (chequeExec.PaymentMethod == "bank-account" && !Utils.IsNullOrEmpty(chequeExec.ToBankAccountId))
-                    {
-                        var toBankAccount = cheque.ToBankAccount;
-                        toBankAccount.Balance += cheque.Amount;
-                        bankAccounts.Edit(toBankAccount);
-                    }
-
-                    return Json(new
-                    {
-                        message = "Success",
-                        statusCode = 200,
                     }, JsonRequestBehavior.AllowGet);
                 }
             }
 
+            toBankAccounts = bankAccounts.Get(x => x.Name == chequeExec.ToBankAccountName).FirstOrDefault();
+            cheque.Status = (int) ChequeStatus.Received;
+            cheque.NumberId = chequeExec.NumberId;
+
+            if (toBankAccounts != null)
+            {
+                cheque.ToBankAccountId = toBankAccounts.AccountId;
+            }
+
+            if (!cheques.Edit(cheque))
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            
+            if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
+                return Json(new
+                {
+                    message = "Success",
+                    data = "Using cheque successfully!",
+                    statusCode = 200,
+                }, JsonRequestBehavior.AllowGet);
+            
+            toBankAccounts.Balance += cheque.Amount;
+            bankAccounts.Edit(toBankAccounts);
+
             return Json(new
             {
-                message = "Error",
-                statusCode = 400,
+                message = "Success",
+                data = "Using cheque successfully!",
+                statusCode = 200,
             }, JsonRequestBehavior.AllowGet);
         }
     }

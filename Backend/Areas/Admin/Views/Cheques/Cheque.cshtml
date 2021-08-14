@@ -23,24 +23,23 @@
 
 <section class="content">
     <div class="col-md-12">
-        <div class="card card-success">
-            <div class="card-header">
-                <h3 class="card-title">Cheque</h3>
-            </div>
-            <div class="card-body">
-                <input type="hidden" name="type" id="type" value="CREATE"/>
-                <form method="post" id="Form">
+        <form method="post" id="formData">
+            <div class="card card-success">
+                <div class="card-header">
+                    <h3 class="card-title">Cheque</h3>
+                </div>
+                <div class="card-body">
                     <div class="form-group">
                         <label for="Code">Code</label>
                         <input type="text" name="Code" id="Code" class="form-control" placeholder="Code...">
                     </div>
                     <div class="form-group">
-                        <label for="Address">Number Id</label>
-                        <input type="text" class="form-control" id="NumberId" name="NumberId" placeholder="Messages...">
+                        <label for="NumberId">Number Id</label>
+                        <input type="text" class="form-control" id="NumberId" name="NumberId" placeholder="Number Id...">
                     </div>
                     <div class="form-group">
                         <label for="">Payment method</label>
-                        <div>
+                        <div id="PaymentMethod">
                             <label class="radio-inline mr-3">
                                 <input type="radio" name="payment" value="cash" checked> Cash
                             </label>
@@ -50,35 +49,67 @@
                         </div>
                         <div class="form-group destination-account mt-2" style="display: none">
                             <label for="ToBankAccountId">Bank Account Destination</label>
-                            <input type="text" name="ToBankAccountId" id="ToBankAccountId" class="form-control" placeholder="Bank Account Destination...">
+                            <input type="text" name="ToBankAccountName" id="ToBankAccountName" class="form-control" placeholder="Bank Account Destination...">
                         </div>
                     </div>
-                </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
+                    <button type="button" class="btn btn-warning" data-dismiss="modal">Reset</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-success toastrDefaultSuccess" id="btnSave">Save</button>
-                <button type="button" class="btn btn-warning" data-dismiss="modal">Reset</button>
-            </div>
-        </div>
+        </form>
     </div>
 </section>
 
 @section scripts{
     <script >
-    const chequeManager = {
-        post: function (){
-            var obj = {
+    const validator = $("#formData").validate({
+        rules: {
+            "Code": {
+                required: true
+            },
+            "NumberId":{
+                required: true,
+                minlength: 10,
+            },
+        },
+        ignore: [],
+        errorClass: "invalid-feedback animated fadeInUp",
+        errorElement: "div",
+        errorPlacement: function (e, a) {
+            jQuery(a).after(e)
+        },
+        highlight: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+        },
+        success: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+        },
+        submitHandler: function () {
+            const obj = {
                 Code: $("#Code").val(), 
                 NumberId: $("#NumberId").val(),
                 PaymentMethod: $("input[name='payment']:checked").val(), 
-                ToBankAccountId: $("#ToBankAccountId").val(),
+                ToBankAccountName: $("#ToBankAccountName").val(),
             };
+           chequeManager.post(obj);
+        }
+    });
+    
+    const chequeManager = {
+        post: function (obj){
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("ChequeExec", "Cheques")",
                 data: obj, 
                 success: function (res){
-                    console.log(res);
+                    if (res.statusCode === 400){
+                        validator.showErrors(res.data);
+                    }else{
+                        toastr.success(res.data);
+                        $("#formData").trigger("reset");
+                    }
                 }
             })
         },
@@ -92,10 +123,6 @@
               $(".destination-account").hide();
               $("#ToBankAccountId").val("");
           }
-        })
-        
-        $("#btnSave").click(function (){
-            chequeManager.post();  
         })
     })
     </script>
