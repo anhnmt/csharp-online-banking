@@ -72,7 +72,7 @@ namespace Backend.Controllers
                 {
                     number += random.Next(10).ToString();
                 }
-            } while (!bankAccounts.CheckDuplicate(x => number != null && x.Name == number));
+            } while (bankAccounts.CheckDuplicate(x => x.Name == number));
 
             bank.Name = number;
             bank.Status = 2;
