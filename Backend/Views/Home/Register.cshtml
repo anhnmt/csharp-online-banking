@@ -25,39 +25,34 @@
                     <div class="row no-gutters">
                         <div class="col-xl-12">
                             <div class="auth-form">
-                                <div class="text-center mb-3">
-                                    <a href="index.html">
-                                        <img src="~/Content/images/logo-full.png" alt="">
-                                    </a>
-                                </div>
-                                <h4 class="text-center mb-4 text-white">Sign up your account</h4>
+                                <h2 class="text-center mb-4 text-white text-uppercase">Sign up your account</h2>
                                 <form id="formData">
                                     <div class="form-group">
                                         <label class="mb-1 text-white">
-                                            <strong>Username</strong>
+                                            Name
                                         </label>
                                         <input type="text" id="Name" name="Name" class="form-control" placeholder="Name">
                                     </div>
                                     <div class="form-group">
                                         <label class="mb-1 text-white">
-                                            <strong>Email</strong>
+                                            Email
                                         </label>
                                         <input type="email" id="Email" name="Email" class="form-control" placeholder="hello@example.com">
                                     </div>
                                     <div class="form-group">
                                         <label class="mb-1 text-white">
-                                            <strong>Password</strong>
+                                            Password
                                         </label>
                                         <input type="password" id="Password" name="Password" class="form-control" placeholder="Password">
                                     </div>
                                     <div class="form-group">
                                         <label class="mb-1 text-white">
-                                            <strong>Confirm Password</strong>
+                                            Confirm Password
                                         </label>
                                         <input type="password" id="RePassword" name="RePassword" class="form-control" placeholder="Confirm Password">
                                     </div>
                                     <div class="text-center mt-4">
-                                        <button type="submit" class="btn bg-white text-primary btn-block">Sign me up</button>
+                                        <button type="submit" class="btn btn-block btn-pill btn-outline-light btn-rounded">Sign me up</button>
                                     </div>
                                 </form>
                                 <div class="new-account mt-3">
@@ -82,7 +77,7 @@ Scripts
 <script src="~/Content/js/dlabnav-init.js" type="text/javascript"></script>
 <script src="~/Content/vendor/jquery-validation/jquery.validate.min.js"></script>
 <script>
-        var validator = $("#formData").validate({
+        let validator = $("#formData").validate({
             rules: {
                 Name: {
                     required: true,
@@ -101,6 +96,18 @@ Scripts
                     equalTo: "#Password",
                 }
             },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
             submitHandler: function (form) {
                 $.ajax({
                     type: "POST",
@@ -112,10 +119,10 @@ Scripts
                         RePassword: $("#RePassword").val()
                     },
                     success: function (res) {
-                        if (res.statusCode == 400) {
-                            validator.showErrors(res.data);
-                        } else if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             window.location.replace(`/${res.url}`);
+                        } else {
+                            validator.showErrors(res.data);
                         }
                     }
                 })

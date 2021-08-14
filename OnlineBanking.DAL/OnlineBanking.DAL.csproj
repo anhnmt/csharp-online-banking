@@ -63,14 +63,15 @@
     <Compile Include="DataMapping\Messages.cs" />
     <Compile Include="DataMapping\Roles.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
-    <Compile Include="Migrations\202108041039401_Initial.cs" />
-    <Compile Include="Migrations\202108041039401_Initial.Designer.cs">
-      <DependentUpon>202108041039401_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202108111334085_test.cs" />
+    <Compile Include="Migrations\202108111334085_test.Designer.cs">
+      <DependentUpon>202108111334085_test.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ViewModel\ChannelViewModel.cs" />
     <Compile Include="ViewModel\ChequeBookViewModel.cs" />
+    <Compile Include="ViewModel\ChequesExecViewModel.cs" />
     <Compile Include="ViewModel\ChequesInformationViewModel.cs" />
     <Compile Include="ViewModel\ChequesViewModel.cs" />
     <Compile Include="ViewModel\CurencyViewModel.cs" />
@@ -91,8 +92,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202108041039401_Initial.resx">
-      <DependentUpon>202108041039401_Initial.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202108111334085_test.resx">
+      <DependentUpon>202108111334085_test.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

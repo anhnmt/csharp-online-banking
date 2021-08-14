@@ -22,7 +22,7 @@
         <div class="card card-success">
             <div class="card-header">
                 <h3 class="card-title">User Management</h3>
-                        <button class="btn btn-sm btn-primary btn-add">Create New User</button>
+                <button class="btn btn-sm btn-primary btn-add">Create New User</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -49,7 +49,7 @@
 <div class="modal fade " id="myModal" role="dialog">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="formData" action="#" method="POST" novalidate="novalidate">
+            <form id="formData" method="POST" novalidate="novalidate">
                 <div class="modal-header">
                     <h4 class="modal-title">Update Infomation Account</h4>
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -61,31 +61,31 @@
 
                     <div class="form-group">
                         <label>Name <span class="text-danger">*</span></label>
-                        <div>
+                        <div class="error">
                             <input type="text" class="form-control" id="Name" name="Name" placeholder="Name...">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Email <span class="text-danger">*</span></label>
-                        <div>
+                        <div class="error">
                             <input type="text" class="form-control" id="Email" name="Email" placeholder="Email...">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Password <span class="text-danger">*</span></label>
-                        <div>
+                        <div class="error">
                             <input type="text" class="form-control" id="Password" name="Password" placeholder="Password...">
                         </div>
                     </div>
                     <div class="form-group">
                         <label>Phone <span class="text-danger">*</span></label>
-                        <div>
+                        <div class="error"> 
                             <input type="text" class="form-control" id="Phone" name="Phone" placeholder="Phone...">
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Address <span class="text-danger">*</span></label>
-                        <div>
+                        <label>Address </label>
+                        <div class="error">
                             <input type="text" class="form-control" id="Address" name="Address" placeholder="Address...">
                         </div>
                     </div>
@@ -93,17 +93,15 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <label>Birthday <span class="text-danger">*</span></label>
-                                <div class="input-group date" id="reservationdate" data-target-input="nearest">
-                                    <div>
-                                        <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
-                                    </div>
+                                <div class="error input-group date" id="reservationdate" data-target-input="nearest">
+                                    <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
                                 </div>
                             </div>
-                            <span class="error text-danger"></span>
+
                             <div class="col-md-6">
                                 <label>NumberID <span class="text-danger">*</span></label>
-                                <div>
-                                    <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="NumberID...">
+                                <div class="error">
+                                    <input type="text" class="form-control" id="NumberId" name="NumberId" placeholder="NumberID...">
                                 </div>
                             </div>
                         </div>
@@ -128,7 +126,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success ">Save</button>
+                    <button type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
@@ -143,6 +141,15 @@
 @section scripts{
 
     <script>
+    $.validator.addMethod("minAge", function (value, element, min) {
+                if (this.optional(element)) {
+                    return true;
+                }
+                var today = new Date();
+                var birthDate = new Date(value);
+                var age = today.getFullYear() - birthDate.getFullYear();
+                return age >= min;
+            }, "You are not old enough!");
         const validator = $("#formData").validate({
             rules: {
                 "Name": {
@@ -155,7 +162,8 @@
                     required: true
                 },
                 "Birthday": {
-                    required: true
+                    required: true,
+                    minAge: 18,
                 },
                 "Address": {
                     required: true
@@ -173,11 +181,16 @@
                     required: true
                 },
             },
+            messages: {
+                Birthday: {
+                    minAge: "Your age must be greater than 18"
+                }
+            },
             ignore: [],
             errorClass: "invalid-feedback animated fadeInUp",
             errorElement: "div",
             errorPlacement: function (e, a) {
-                jQuery(a).parents(".form-group > div").append(e)
+               jQuery(a).after(e)
             },
             highlight: function (e) {
                 jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
@@ -187,7 +200,6 @@
             },
 
             submitHandler: function () {
-                const today = new Date();
                 const user = {
                     Name: $("#Name").val(),
                     Email: $("#Email").val(),
@@ -195,7 +207,7 @@
                     Birthday: $("#Birthday").val(),
                     Address: $("#Address").val(),
                     Phone: $("#Phone").val(),
-                    NumberID: $("#NumberID").val(),
+                    NumberId: $("#NumberId").val(),
                     RoleId: $("#RoleId").val(),
                     Status: parseInt(($("#Status").val()))
                 };
@@ -250,8 +262,8 @@
                         $("#Password").val(res.Password);
                         $("#Phone").val(res.Phone);
                         $("#Address").val(res.Address);
-                        $("#Birthday").val((res.Birthday));
-                        $("#NumberID").val(res.NumberID);
+                        $("#Birthday").val(res.Birthday);
+                        $("#NumberId").val(res.NumberId);
                         loadRole(res.RoleId);
                         loadStatus(res.Status);
                         $("#myModal").modal("show");
@@ -265,9 +277,11 @@
                     data: user,
                     success: function (res) {
                         if (res.statusCode === 200) {
+                            notifySuccess('Updated Successfully',"Updated Successfully");
                             $("#myModal").modal("hide");
-                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Updated Successfully')
+                            $('#datatables').DataTable().ajax.reload();
+                        }else {
+                            validator.showErrors(res.data);
                         }
                     }
 
@@ -280,12 +294,31 @@
                     data: user,
                     success: function (res) {
                         if (res.statusCode === 200) {
+                            notifySuccess('Created Successfully',"Created Successfully");
                             $("#myModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Created Successfully')
+                        }
+                        else {
+                             validator.showErrors(res.data);
                         }
                     }
 
+                })
+            },
+            delete: function (id) {
+                $.ajax({
+                    type: "GET",
+                    url: `/Admin/Accounts/Delete/${id}`,
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            notifySuccess('Successfully',"Deleted Successfully");
+                            $('#datatables').DataTable().ajax.reload();
+                        }else {
+                            notifyError('Error',"Deleted Error");
+                            $('#datatables').DataTable().ajax.reload();
+                        }
+                        
+                    }
                 })
             }
         };
@@ -322,7 +355,17 @@
                         "orderable": false,
                     },
                     {
-                        data: 'StatusName',
+                        data: {Status: Status,StatusName:'StatusName'},
+                        render: function (data) {
+                            if (data.Status === 0){
+                                return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                            }else if(data.Status === 1){
+                                return '<span class="badge light badge-warning"><i class="fa fa-circle text-warning mr-1"></i>'+data.StatusName+'</span>';
+                            }else {
+                                return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
+                            }
+                           
+                        },
                         className: 'align-middle text-center',
                         "searchable": false,
                         "orderable": false,
@@ -332,7 +375,9 @@
                         "render": function (data) {
                             let detail = "@Url.Action("ProfileAccount", "Accounts")/"+data.AccountId;
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
-                             '<a href="'+detail+'" class="dropdown-item btn-detail" >Details</a><a  data-id=" '+ data.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                             '<a href="'+detail+'" class="dropdown-item btn-detail" >Details</a>' +
+                              '<a  data-id=" '+ data.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a>' +
+                               '<a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                              }
                     },
                 ]
@@ -345,19 +390,17 @@
             })
             
             $(document).on("click", ".btn-add", function () {
+                validator.resetForm();
                 loadRole(0);
                 loadStatus(0);
                 $(".modal-title").html("Create Account");
-                $("#Form").trigger("reset");
+                $("#formData").trigger("reset");
+                $("#type").val("CREATE");
                 $("#myModal").modal("show");
             })
-            
-            // $(document).on("click", ".btn-detail", function () {
-            //     let userId = $(this).data("id");
-            //     window.location.assign("/Admin/Accounts/ProfileAccount/" + userId)
-            // })
-            $('#myModal').on('shown.bs.modal', function () {
-                validator.resetForm();
+            $(document).on("click", ".btn-delete", function () {
+                let userId = $(this).data("id");
+                managerAcc.delete(userId);
             });
         })
 

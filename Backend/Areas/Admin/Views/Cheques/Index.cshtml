@@ -12,9 +12,8 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header align-middle">
-                <h4 class="card-title">Currencies Management</h4>
-                <button class="btn btn-primary btn-add text-right">Generate Cheque</button>
-                <button class="btn btn-primary btn-test text-right">Test</button>
+                <h4 class="card-title">Cheques Management</h4>
+                <button class="btn btn-primary btn-sm btn-generate text-right">Generate Cheque</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -23,12 +22,13 @@
                         <tr>
                             <th>ChequeId</th>
                             <th>Code</th>
-                            <th>Address</th>
+                            <th>Amount</th>
+                            <th>Source Bank Account</th>
+                            <th>Destination Bank Account</th>
                             <th>Status</th>
                             <th></th>
                         </tr>
                         </thead>
-                        <tbody></tbody>
                     </table>
                 </div>
             </div>
@@ -39,12 +39,11 @@
 <!-- /.content -->
 <div class="modal fade" id="modifyModal" role="dialog">
     <div class="modal-dialog">
-        <!-- Modal content-->
         <div class="modal-content">
             <div class="form-validation">
                 <form id="formData" action="#" method="POST" novalidate="novalidate">
                     <div class="modal-header">
-                        <h4 class="modal-title">Create new Currency</h4>
+                        <h4 class="modal-title">Create new Cheque</h4>
                         <button type="button" class="close" data-dismiss="modal">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -52,11 +51,36 @@
                         <input type="hidden" name="type" id="type" value="CREATE"/>
 
                         <div class="form-group">
-                            <label class="col-form-label" for="Name">
-                                Name <span class="text-danger">*</span>
+                            <label class="col-form-label" for="bankAccountId">
+                                Bank Account <span class="text-danger">*</span>
                             </label>
                             <div>
-                                <input type="text" class="form-control" id="Name" name="Name" placeholder="Name...">
+                                <select class="form-control" name="bankAccountId" id="bankAccountId">
+                                </select>
+                            </div>
+                            <div>
+                                <p>Balance: <span id="balance"></span></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="bankAccountId">
+                                Amount <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <input type="text" name="Amount" id="Amount" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="bankAccountId">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <select name="Status" id="Status" class="form-control">
+                                    <option value="0">Active</option>
+                                    <option value="1">Received</option>
+                                    <option value="2">Stopped</option>
+                                    <option value="3">Deleted</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -72,167 +96,212 @@
 
 @section scripts{
     <script>
-        var currencyManager = {
-            post: function (currency) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Currencies/PostData",
-                    data: currency,
-                    success: function (res) {
-                        if (res.statusCode === 200) {
-                            $("#modifyModal").modal("hide");
-                            $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Created Successfully');
-                        } else {
-                            validator.showErrors(res.data);
-                        }
-                    }
-
-                })
-            },
-            put: function (currency) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/Currencies/PutData",
-                    data: currency,
-                    success: function (res) {
-                        if (res.statusCode === 200) {
-                            $("#modifyModal").modal("hide");
-                            $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Updated Successfully');
-                        } else {
-                            validator.showErrors(res.data);
-                        }
-                    }
-                })
-            },
-            get: function (id) {
-                $.ajax({
-                    type: "GET",
-                    url: "/Admin/Currencies/FindId",
-                    data: { id: id },
-                    success: function (res) {
-                        $("#Name").val(res.Name);
-                        $("#modifyModal").modal("show");
-                    }
-                })
-            },
-        }
-
-        var validator = $("#formData").validate({
-            rules: {
-                "Name": {
-                    required: true
-                },
-            },
-            ignore: [],
-            errorClass: "invalid-feedback animated fadeInUp",
-            errorElement: "div",
-            errorPlacement: function (e, a) {
-                jQuery(a).parents(".form-group > div").append(e)
-            },
-            highlight: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
-            },
-            success: function (e) {
-                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
-            },
-
-            submitHandler: function (form) {
-                var currency = {
-                    Name: $("#Name").val(),
+    const loadBankAccount = function() {
+        $.ajax({
+            type:"GET" ,
+            url: "@Url.Action("GetData", "BankAccounts")",
+            data: { account: @Model.AccountId },
+            success: function (res){
+                let html = "";
+                for(let i = 0; i < res.data.length; i++) {
+                    html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + res.data[i].Balance + " " + res.data[i].CurrencyName + '">' + res.data[i].Name + '</option>';
                 }
-
-                if ($("#type").val() === "EDIT") {
-                    currency.CurrencyId = $("#Id").val(),
-                        currencyManager.put(currency);
-                } else {
-                    currencyManager.post(currency);
-                }
-                
+                $("#bankAccountId").html(html);
+                $("#balance").html($("#bankAccountId :selected").data('balance'));
             }
+        })
+    }
+    const chequesManager = {
+        post: function (obj) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("PostData", "Cheques")",
+                data: obj,
+                success: function (res) {
+                    console.log(res);
+                    if (res.statusCode === 200) {
+                        $("#modifyModal").modal("hide");
+                        $('#datatables').DataTable().ajax.reload();
+                        toastr.success('Created Successfully');
+                    } else {
+                        validator.showErrors(res.data);
+                    }
+                }
+            })
+        },
+        
+        put: function (obj) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("PutData", "Cheques")",
+                data: obj,
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $("#modifyModal").modal("hide");
+                        $('#datatables').DataTable().ajax.reload();
+                        toastr.success('Updated Successfully');
+                    } else {
+                        validator.showErrors(res.data);
+                    }
+                }
+            })
+        },
+        
+        get: function (id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("FindId", "Cheques")",
+                data: { chequeId: id },
+                success: function (res) {
+                    console.log(res);
+                    $("#bankAccountId").val(res.data.FromBankAccountId);
+                    $("#Amount").val(res.data.AmountNumber);
+                    $("#Status").val(res.data.Status);
+                    $("#modifyModal").modal("show");
+                }
+            })
+        },
+        
+        delete: function (id){
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteData", "Cheques")",
+                data: {chequeId: id},
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $('#datatables').DataTable().ajax.reload();
+                        toastr.success(res.data);
+                    } else {
+                        toastr.error(res.data);
+                    }
+                }
+            })
+        }
+    };
+
+    const validator = $("#formData").validate({
+        rules: {
+            "bankAccountId": {
+                required: true,
+            },
+            "Amount": {
+                required: true,
+                number: true,
+                min: 1,
+            }
+        },
+        ignore: [],
+        errorClass: "invalid-feedback animated fadeInUp",
+        errorElement: "div",
+        errorPlacement: function (e, a) {
+            jQuery(a).after(e)
+        },
+        highlight: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+        },
+        success: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+        },
+        submitHandler: function (form) {
+            let obj = {
+                FromBankAccountId: $("#bankAccountId").val(),
+                Amount: $("#Amount").val(),
+                ChequeBookId: @Model.ChequeBookId,
+                Status: $("#Status").val(),
+            };
+            if ($("#type").val() === "EDIT") {
+                obj.ChequeId = $("#Id").val();
+                chequesManager.put(obj);
+            } else {
+                chequesManager.post(obj);
+            }
+        }
+    });
+    
+    $(function () {
+        $('#datatables').DataTable({
+            "paging": true,
+            "ordering": true,
+            "autoWidth": false,
+            "responsive": true,
+            "processing": true,
+            "filter": true,
+            "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+            "ajax":{
+                "url": "@Url.Action("GetData", "Cheques")",
+                "data": {ChequeBookId: @Model.ChequeBookId},
+            }, 
+            "order": [
+                [0, 'asc']
+            ],
+            "columns": [
+                {
+                    className: 'align-middle',
+                    "render": function (data, type, row) {
+                        return `#${row.ChequeId}`;
+                    }
+                },
+                {
+                    data: 'Code',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'Amount',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'FromBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'ToBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'StatusName',
+                    className: 'align-middle',
+                },
+                {
+                    bSortable: false,
+                    className: 'align-middle text-right',
+                    "render": function (data, type, row) {
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                    }
+                },
+            ]
         });
 
-        $(function () {
-            $('#datatables').DataTable({
-                "paging": true,
-                "ordering": true,
-                "autoWidth": false,
-                "responsive": true,
-                "processing": true,
-                "filter": true,
-                "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
-                "ajax":{
-                    "url": "@Url.Action("GetData", "Cheques")",
-                    "data": {ChequeBookId: @Model.ChequeBookId},
-                }, 
-                "order": [
-                    [0, 'asc']
-                ],
-                "columns": [
-                    {
-                        data: 'CurrencyId',
-                        className: 'align-middle',
-                        "render": function (data, type, row) {
-                            return `#${row.CurrencyId}`;
-                        }
-                    },
-                    {
-                        data: 'Name',
-                        className: 'align-middle',
-                    },
-                    {
-                        data: 'StatusName',
-                        className: 'align-middle',
-                    },
-                    {
-                        bSortable: false,
-                        data: '',
-                        className: 'align-middle text-right',
-                        "render": function (data, type, row) {
-                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id=" ' + row.CurrencyId + ' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.CurrencyId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
-                        }
-                    },
-                ]
-            });
+        $(".btn-generate").click(function () {
+            $("#formData").trigger("reset");
+            $(".modal-title").html("Create new cheque");
+            $("#modifyModal").modal("show");
+            $("#type").val("CREATE");
+            $("#Id").val("");
+            loadBankAccount();
+        });
 
-            $(".btn-add").click(function () {
-                $("#formData").trigger("reset");
-                $(".modal-title").html("Create new Currency");
-                $("#modifyModal").modal("show");
-                $("#type").val("CREATE");
-                $("#Id").val("");
-            });
+        $(document).on("click", ".btn-edit", function () {
+            $("#formData").trigger("reset");
+            $(".modal-title").html("Update Currency");
+            $("#type").val("EDIT");
+            let chequeId = $(this).data("id");
+            $("#Id").val(chequeId);
+            chequesManager.get(chequeId);
+            loadBankAccount();
+        });
 
-            $(document).on("click", ".item-page", function () {
-                let page = $(this).text();
-                let key = $("#key").val();
-                currencyManager.load(page, key);
-            });
-
-            $("#key").keyup(function () {
-                let key = $("#key").val();
-                currencyManager.load(1, key);
-            });
-
-            $(document).on("click", ".btn-edit", function () {
-                $("#formData").trigger("reset");
-                $(".modal-title").html("Update Currency");
-                $("#type").val("EDIT");
-                let currencyId = $(this).data("id");
-                $("#Id").val(currencyId);
-                currencyManager.get(currencyId);
-            });
-
-            $(document).on("click", ".btn-delete", function () {
-                let currencyId = $(this).data("id");
-                currencyManager.delete(currencyId);
-            });
-
-            $('#modifyModal').on('shown.bs.modal', function () {
-                validator.resetForm();
-            });
-        })
-
+        $(document).on("click", ".btn-delete", function () {
+            let chequeId = $(this).data("id");
+            chequesManager.delete(chequeId);
+        });
+        
+        $(document).on("change", "#bankAccountId", function () {
+            $("#balance").html($("#bankAccountId :selected").data("balance"));
+        });
+        
+        $('#modifyModal').on('shown.bs.modal', function () {
+            validator.resetForm();
+        });
+    })
     </script>
 }

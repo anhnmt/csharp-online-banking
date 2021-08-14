@@ -76,6 +76,7 @@
     <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="mscorlib" />
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -86,6 +87,10 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Text.RegularExpressions, Version=4.1.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\packages\System.Text.RegularExpressions.4.3.1\lib\net463\System.Text.RegularExpressions.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Web.DynamicData" />
     <Reference Include="System.Web.Entity" />
     <Reference Include="System.Web.ApplicationServices" />
@@ -227,6 +232,7 @@
     <Content Include="Areas\Admin\Content\ckeditor5\translations\zh-cn.js" />
     <Content Include="Areas\Admin\Content\ckeditor5\translations\zh.js" />
     <Content Include="Areas\Admin\Content\ckeditor5\vendor.js" />
+    <Content Include="Areas\Admin\Views\Cheques\Cheque.cshtml" />
     <Content Include="Content\css\style.css" />
     <Content Include="Content\custom\custom-notify.js" />
     <Content Include="Content\custom\notify\css\demo.css" />
@@ -594,7 +600,6 @@
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.ttf" />
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff" />
     <Content Include="Content\vendor\fontawesome\webfonts\fa-solid-900.woff2" />
-    <Content Include="Areas\Admin\Views\Cheque\Index.cshtml" />
     <Content Include="Areas\Admin\Views\ChequeBooks\Index.cshtml" />
     <Content Include="Areas\Admin\Views\Cheques\Index.cshtml" />
     <Content Include="Areas\Admin\Views\BankAccounts\ProfileBankAccount.cshtml" />
@@ -628,7 +633,6 @@
     <Content Include="Views\Home\Contact.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Home\Login.cshtml" />
-    <Content Include="Views\Home\Register3.cshtml" />
     <Content Include="Views\Home\InfoAccount.cshtml" />
     <Content Include="Views\Home\PageNotFound.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
@@ -641,7 +645,6 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Content\js\" />
-    <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineBanking.BLL\OnlineBanking.BLL.csproj">

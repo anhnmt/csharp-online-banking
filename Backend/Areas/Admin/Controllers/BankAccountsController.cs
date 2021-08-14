@@ -1,7 +1,10 @@
 ﻿using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 using System;
+using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 
 namespace Backend.Areas.Admin.Controllers
@@ -9,67 +12,38 @@ namespace Backend.Areas.Admin.Controllers
     public class BankAccountsController : Controller
     {
         private readonly IRepository<BankAccounts> bankAccounts;
+
         // GET: Admin/BankAccounts
         public BankAccountsController()
         {
             bankAccounts = new Repository<BankAccounts>();
         }
+
         public ActionResult Index()
         {
             return View();
         }
+
         public ActionResult ProfileBankAccount(int id)
         {
-            if (((Accounts)Session["user"]) != null)
-            {
-                var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x)).FirstOrDefault();
-                return data == null ? View() : View(data);
-            }
-            else
-            {
-                return RedirectToAction("Login", "Home", new { area = "" });
-            }
+            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x))
+                .FirstOrDefault();
+            return data == null ? View() : View(data);
         }
-        [HttpPost]
-        public ActionResult ReceiveMoney(int id, int money)
-        {
-            var data = bankAccounts.Get(id);
-            if (data != null)
-            {
-                if (data.Balance != 0)
-                {
-                    var balance1 = Convert.ToInt32(data.Balance);
-                    var balance = balance1 + money;
-                    data.Balance = balance;
-                }
-                else
-                {
-                    data.Balance = money;
-                }
-            }
 
-            if (bankAccounts.Edit(data))
-            {
-                return Json(new
-                {
-                    message = "Success",
-                    statusCode = 200
-                }, JsonRequestBehavior.AllowGet);
-            }
-            return Json(new
-            {
-                message = "Error",
-                statusCode = 404
-            }, JsonRequestBehavior.AllowGet);
+        [HttpPost]
+        public ActionResult FindId(int id)
+        {
+            var x = bankAccounts.Get(id);
+            var data = new BankAccountsViewModels(x);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
+
         [HttpPost]
         public ActionResult GetBalance(int bankId)
         {
-            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels { 
-                Balance = x.Balance,
-                BankId = x.BankAccountId,
-                Currency = x.Currency.Name
-            });
+            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels(x));
             return Json(new
             {
                 data,
@@ -77,9 +51,11 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetInfoBankAccount(string name)
         {
-            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels { 
+            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels
+            {
                 Name = x.Account.Name,
                 Id = x.BankAccountId
             });
@@ -90,54 +66,36 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
+
         public ActionResult GetData(int account)
         {
             ViewBag.Accounts = "active";
-            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
-            {
-                AccountId = x.AccountId,
-                BankAccountId = x.BankAccountId,
-                CurrencyId = x.CurrencyId,
-                CurrencyName = x.Currency.Name,
-                Name = x.Name,
-                Balance = x.Balance,
-                Status = x.Status,
-                StatusName = ((BankAccountStatus)x.Status).ToString()
-            });
+            var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels(x));
             return Json(new
             {
                 data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
-
         }
+
         public ActionResult GetAllData()
         {
             ViewBag.Accounts = "active";
-            var data = bankAccounts.Get().Select(x => new BankAccountsViewModels
-            {
-                AccountId = x.AccountId,
-                BankAccountId = x.BankAccountId,
-                CurrencyId = x.CurrencyId,
-                CurrencyName = x.Currency.Name,
-                Name = x.Name,
-                Balance = x.Balance,
-                Status = x.Status,
-                StatusName = ((BankAccountStatus)x.Status).ToString()
-            });
+            var data = bankAccounts.Get().Select(x => new BankAccountsViewModels(x));
             return Json(new
             {
                 data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
-
         }
+
         // GET: Admin/BankAccounts/Details/5
         public ActionResult GetStatus()
         {
-            var data = Enum.GetValues(typeof(BankAccountStatus)).Cast<BankAccountStatus>().Select(v => v.ToString()).ToArray();
+            var data = Enum.GetValues(typeof(BankAccountStatus)).Cast<BankAccountStatus>().Select(v => v.ToString())
+                .ToArray();
 
             return Json(data, JsonRequestBehavior.AllowGet);
         }
@@ -145,64 +103,113 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Create(BankAccounts bank)
         {
-            if (!ModelState.IsValid)
+            var errors = new Dictionary<string, string>();
+            var check = true;
+
+            if (!int.TryParse(bank.Name, out int i))
+            {
+                check = false;
+                errors.Add("NameBank", "Your name must be number");
+            }
+            
+            if (bankAccounts.CheckDuplicate(x => x.Name == bank.Name))
+            {
+                check = false;
+                errors.Add("NameBank", "Your Name has been used!");
+            }
+
+            if (check && ModelState.IsValid)
+            {
+                bankAccounts.Add(bank);
                 return Json(new
                 {
-                    statusCode = 402,
-                    message = "Error",
-                    data = bank
+                    statusCode = 200,
+                    message = "Success"
                 }, JsonRequestBehavior.AllowGet);
-            bankAccounts.Add(bank);
+            }
+
+            foreach (var k in ModelState.Keys)
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
+
             return Json(new
             {
-                statusCode = 200,
-                message = "Success"
+                statusCode = 400,
+                message = "Error",
+                data = errors
             }, JsonRequestBehavior.AllowGet);
         }
-        // POST: Admin/BankAccounts/Edit/5
+
         [HttpPost]
         public ActionResult Edit(BankAccounts bank)
         {
-            if (!ModelState.IsValid)
+            var errors = new Dictionary<string, string>();
+            var check = true;
+            var bank1 = bankAccounts.Get(bank.BankAccountId);
+            
+            if (!int.TryParse(bank.Name, out int i))
+            {
+                check = false;
+                errors.Add("NameBank", "Your name must be number");
+            }
+
+            if (bankAccounts.CheckDuplicate(x => x.Name == bank.Name && x.BankAccountId != bank.BankAccountId))
+            {
+                check = false;
+                errors.Add("NameBank", "Your Name has been used!");
+            }
+
+            if (check && ModelState.IsValid)
+            {
+                bank1.CurrencyId = bank.CurrencyId;
+                bank1.Name = bank.Name;
+                bank1.Balance = bank.Balance;
+                bank1.Status = bank.Status;
+                bankAccounts.Edit(bank1);
                 return Json(new
                 {
-                    statusCode = 402,
-                    message = "Error",
-                    data = bank
+                    statusCode = 200,
+                    message = "Success"
                 }, JsonRequestBehavior.AllowGet);
-            var bank1 = bankAccounts.Get(bank.BankAccountId);
-            bank1.AccountId = bank.AccountId;
-            bank1.CurrencyId = bank.CurrencyId;
-            bank1.Name = bank.Name;
-            bank1.Balance = bank.Balance;
-            bank1.Status = bank.Status;
-            bank1.CreatedAt = bank.CreatedAt;
-            bank1.UpdatedAt = bank.UpdatedAt;
-            bankAccounts.Edit(bank1);
+            }
+
+            foreach (var k in ModelState.Keys)
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
+
             return Json(new
             {
-                statusCode = 200,
-                message = "Success"
+                statusCode = 400,
+                message = "Error",
+                data = errors
             }, JsonRequestBehavior.AllowGet);
         }
 
-        // GET: Admin/BankAccounts/Delete/5
+        [HttpPost]
+        public ActionResult Delete(int id)
+        {
+            if (bankAccounts.Delete(id))
+            {
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
 
-
-        // POST: Admin/BankAccounts/Delete/5
-        // [HttpPost]
-        // public ActionResult Delete(int id, FormCollection collection)
-        // {
-        //     try
-        //     {
-        //         // 
-        //
-        //         return RedirectToAction("Index");
-        //     }
-        //     catch
-        //     {
-        //         return View();
-        //     }
-        // }
+            return Json(new
+            {
+                statusCode = 402,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
+        }
     }
 }

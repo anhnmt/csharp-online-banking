@@ -222,22 +222,25 @@ namespace Backend.Hubs
             {
                 var connection = Context.ConnectionId;
                 var account = Connections.FirstOrDefault(u => u.AccountId == GetIntegerAccountId());
-
-                if (Utils.NotNullOrEmpty(account) && account.CurrentChannelId != channelId)
+                
+                if (Utils.NotNullOrEmpty(account))
                 {
-                    // Join to new chat room
-                    Leave(account.CurrentChannelId);
-                    Groups.Add(connection, channelId.ToString());
-                    Connections.Remove(account);
+                    if (account != null && account.CurrentChannelId != channelId)
+                    {
+                        // Join to new chat room
+                        Leave(account.CurrentChannelId);
+                        Groups.Add(connection, channelId.ToString());
+                        Connections.Remove(account);
 
-                    account.CurrentChannelId = channelId;
+                        account.CurrentChannelId = channelId;
 
-                    Connections.Add(account);
-                    Clients.All.UpdateUser(account);
+                        Connections.Add(account);
+                        Clients.All.UpdateUser(account);
 
-                    Clients.Client(connection).historyMessages(GetMessageHistory(channelId));
+                        Clients.Client(connection).historyMessages(GetMessageHistory(channelId));
 
-                    return Groups.Add(connection, channelId.ToString());
+                        return Groups.Add(connection, channelId.ToString());
+                    }
                 }
             }
             catch (Exception ex)
