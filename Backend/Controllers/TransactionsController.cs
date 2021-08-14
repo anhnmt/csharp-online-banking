@@ -34,7 +34,7 @@ namespace Backend.Controllers
             tran.Status = 0;
             var bankQueue = new Queue<Transactions>();
             bankQueue.Enqueue(tran);
-            
+            Console.WriteLine("Queue: " + bankQueue.Count());
             var bankDequeue = bankQueue.Dequeue();
             do
             {
@@ -202,14 +202,13 @@ namespace Backend.Controllers
                     });
                 }
 
-                return Json(new
-                {
-                    data = "Transfer failed",
-                    message = "Error",
-                    statusCode = 404
-                });
-
             } while (bankQueue.Count != 0);
+            return Json(new
+            {
+                data = "Successful transfer",
+                message = "Success",
+                statusCode = 200
+            });
         }
 
         [HttpPost]
