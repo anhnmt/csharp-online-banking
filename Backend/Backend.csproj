@@ -370,10 +370,14 @@
     <Content Include="Content\images\users\8.png" />
     <Content Include="Content\images\users\9.jpg" />
     <Content Include="Content\images\users\9.png" />
+    <Content Include="Content\js\buttons.html5.min.js" />
     <Content Include="Content\js\custom.js" />
     <Content Include="Content\js\dashboard\dashboard-1.js" />
+    <Content Include="Content\js\dataTables.buttons.min.js" />
     <Content Include="Content\js\dlabnav-userInit.js" />
     <Content Include="Content\js\dlabnav-init.js" />
+    <Content Include="Content\js\jszip.min.js" />
+    <Content Include="Content\js\pdfmake.min.js" />
     <Content Include="Content\js\plugins-init\bs-daterange-picker-init.js" />
     <Content Include="Content\js\plugins-init\chartist-init.js" />
     <Content Include="Content\js\plugins-init\chartjs-init.js" />
