@@ -6,8 +6,6 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
-using OnlineBanking.BLL.Repositories;
-using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
@@ -49,6 +47,24 @@ namespace Backend.Areas.Admin.Controllers
                 bankAccounts = countBankAccounts,
                 channels = countChannels,
                 transactions = countTransactions
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetTransactions(DateTime? startDate, DateTime? endDate)
+        {
+            var data = transactions.Get();
+            if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
+            {
+                endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+                data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            }
+
+            var result = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            return Json(new
+            {
+                data = result.ToList(),
+                message = "Success",
+                statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
     }
