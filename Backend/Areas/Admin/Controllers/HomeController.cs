@@ -1,11 +1,17 @@
-﻿using System.Linq;
+﻿using OnlineBanking.BLL.Repositories;
+using OnlineBanking.DAL;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IRepository<Accounts> accounts;
         private readonly IRepository<BankAccounts> bankAccounts;
