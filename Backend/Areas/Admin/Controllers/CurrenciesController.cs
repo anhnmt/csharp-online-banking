@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class CurrenciesController : Controller
+    public class CurrenciesController : BaseController
     {
         private readonly ApplicationDbContext db = new ApplicationDbContext();
         private readonly IRepository<Currencies> currencies;
@@ -20,8 +21,6 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Currencies
         public ActionResult Index()
         {
-            if (((Accounts)Session["user"]) == null)
-                return RedirectToAction("Login", "Home", new {area = ""});
             ViewBag.Currency = "active";
             return View();
         }

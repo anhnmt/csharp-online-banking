@@ -6,12 +6,13 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class RolesController : Controller
+    public class RolesController : BaseController
     {
         private readonly IRepository<Roles> roles;
 
@@ -23,9 +24,6 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Roles
         public ActionResult Index()
         {
-            if (((Accounts)Session["user"]) == null)
-                return RedirectToAction("Login", "Home", new {area = ""});
-
             ViewBag.RoleIndex = "active";
             return View();
         }

@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         // GET: Admin/Home
         public ActionResult Index()
         {
-            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             ViewBag.Index = "active";
             return View();
         }

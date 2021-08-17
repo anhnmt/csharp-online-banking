@@ -2,12 +2,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class ChequesController : Controller
+    public class ChequesController : BaseController
     {
         private readonly IRepository<Cheques> cheques;
         private IRepository<ChequeBooks> chequebooks;
