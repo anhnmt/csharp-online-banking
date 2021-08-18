@@ -284,6 +284,30 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+            if (obj.Status == 1)
+            {
+                errors.Add("Email", "Your Account is Locked!");
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (obj.Status == 2)
+            {
+                errors.Add("Email", "Your Account is Deleted!");
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             Session["user"] = obj;
             obj.AttemptLogin = 0;
             accounts.Update(obj);
