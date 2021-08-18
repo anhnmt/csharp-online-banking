@@ -6,11 +6,12 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using Backend.Areas.Admin.Data;
 using static System.String;
 
 namespace Backend.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IRepository<Accounts> accounts;
         private readonly IRepository<BankAccounts> bankAccounts;

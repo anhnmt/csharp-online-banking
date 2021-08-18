@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class AccountsController : Controller
+    public class AccountsController : BaseController
     {
         private readonly IRepository<Accounts> users;
         private readonly IRepository<Roles> roles;
@@ -18,10 +19,9 @@ namespace Backend.Areas.Admin.Controllers
             users = new Repository<Accounts>();
             roles = new Repository<Roles>();
         }
-
+        
         public ActionResult Index()
         {
-            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             return View();
         }
 
