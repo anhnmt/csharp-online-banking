@@ -36,19 +36,44 @@ namespace Backend.Controllers
         {
             lock (Lock)
             {
-                Console.WriteLine("Queue: " + bankQueue.Count());
+                var errors = new Dictionary<string, string>();
+
                 var bankDequeue = bankQueue.Dequeue();
                 do
                 {
+                    
                     var receiverAccount = bankAccounts.Get(bankDequeue.ToId);
+                    if (receiverAccount == null)
+                    {
+                        errors.Add("ToId", "Account doesn't exist");
+                        return Json(new
+                        {
+                            data = errors,
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    if (bankDequeue.FromId == bankDequeue.ToId)
+                    {
+                        errors.Add("ToId", "The number of the receiving account and the sending account is the same");
+                        return Json(new
+                        {
+                            data = errors,
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                     var receiverStatus = receiverAccount.Status;
-                    if (accounts.Get(x => x.AccountId == bankDequeue.FromId).FirstOrDefault()?.RoleId == 1)
+                    var sessionUsers = (Accounts) Session["user"];
+                    if (sessionUsers.RoleId == 1)
                     {
                         if (bankDequeue.Amount <= 0)
                         {
+                            errors.Add("Amount", "Your Amount must be number");
                             return Json(new
                             {
-                                data = "Your Amount must be number",
+                                data = errors,
                                 message = "Error",
                                 statusCode = 404
                             }, JsonRequestBehavior.AllowGet);
@@ -56,9 +81,10 @@ namespace Backend.Controllers
 
                         if (receiverStatus != 0)
                         {
+                            errors.Add("ToId", "Receipt download has not been activated");
                             return Json(new
                             {
-                                data = "Receipt download has not been activated",
+                                data = errors,
                                 message = "Error",
                                 statusCode = 404
                             }, JsonRequestBehavior.AllowGet);
@@ -100,6 +126,16 @@ namespace Backend.Controllers
                     }
 
                     var sourceAccount = bankAccounts.Get(bankDequeue.FromId);
+                    if (sourceAccount == null)
+                    {
+                        errors.Add("FromId", "Account doesn't exist");
+                        return Json(new
+                        {
+                            data = errors,
+                            message = "Error",
+                            statusCode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                    }
                     var sourceCurrency = sourceAccount.Currency.Name;
                     var receiverCurrency = receiverAccount.Currency.Name;
                     var sourceStatus = sourceAccount.Status;
@@ -107,9 +143,10 @@ namespace Backend.Controllers
 
                     if (bankDequeue.Amount <= 0)
                     {
+                        errors.Add("Amount", "Your Amount must be number");
                         return Json(new
                         {
-                            data = "Số nhập vào phải ở dạng số",
+                            data = errors,
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -117,9 +154,10 @@ namespace Backend.Controllers
 
                     if (sourceStatus != 0)
                     {
+                        errors.Add("FormId", "Source account is not activated");
                         return Json(new
                         {
-                            data = "Tải khoản nguồn chưa được kích hoạt",
+                            data = errors,
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -127,9 +165,10 @@ namespace Backend.Controllers
 
                     if (receiverStatus != 0)
                     {
+                        errors.Add("ToId", "Receiver account is not activated");
                         return Json(new
                         {
-                            data = "Tải khoản nhận chưa được kích hoạt",
+                            data = errors,
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -137,9 +176,10 @@ namespace Backend.Controllers
 
                     if (sourceCurrency != receiverCurrency)
                     {
+                        errors.Add("ToId", "Recipient currency does not match");
                         return Json(new
                         {
-                            data = "Recipient currency does not match",
+                            data = errors,
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -147,9 +187,10 @@ namespace Backend.Controllers
 
                     if (Utils.IsNullOrEmpty(receiverAccount))
                     {
+                        errors.Add("ToId", "Account number doesn't exist");
                         return Json(new
                         {
-                            data = "Account number doesn't exist",
+                            data = errors,
                             message = "Error",
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
@@ -207,12 +248,20 @@ namespace Backend.Controllers
                     }
                 } while (bankQueue.Count != 0);
 
+                foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
                 return Json(new
                 {
-                    data = "Successful transfer",
-                    message = "Success",
-                    statusCode = 200
-                });
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
             }
         }
 
