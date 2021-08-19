@@ -7,10 +7,11 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 
 namespace Backend.Controllers
 {
-    public class TransactionsController : Controller
+    public class TransactionsController : BaseController
     {
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;

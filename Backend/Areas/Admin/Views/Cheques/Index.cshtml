@@ -246,8 +246,11 @@
                     className: 'align-middle',
                 },
                 {
-                    data: 'Amount',
-                    className: 'align-middle',
+                       data: { AmountNumber: 'AmountNumber', CurrencyName:"CurrencyName"},
+                        render: function (data) {
+                            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.CurrencyName }).format(data.AmountNumber)
+                        },
+                        className: 'align-middle',
                 },
                 {
                     data: 'FromBankAccountName',

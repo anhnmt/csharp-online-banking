@@ -572,9 +572,9 @@
             })
 
             $(document).on("click", "#btnAddChequeBook", function () {
-                var chequebook = {
+                let chequebook = {
                     AccountId: @Model.AccountId,
-                }
+                };
                 managerChequeBook.post(chequebook);
             })
             //Account Number

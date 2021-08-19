@@ -47,9 +47,10 @@ namespace Backend.Areas.Admin.Controllers
                     NumberId = x.NumberId,
                     ChequeId = x.ChequeId,
                     StatusName = ((ChequeStatus) x.Status).ToString(),
-                    Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
+                    CurrencyName = x.FromBankAccount.Currency.Name,
+                    AmountNumber = x.Amount,
                     FromBankAccountName = x.FromBankAccount.Name,
-                    ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
+                    ToBankAccountName = x.ToBankAccountId == null  ? "None" : x.ToBankAccount.Name
                 });
             return Json(new
             {

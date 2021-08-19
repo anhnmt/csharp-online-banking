@@ -19,7 +19,6 @@
         <div class="card card-success">
             <div class="card-header">
                 <h3 class="card-title">Cheque Book Management</h3>
-                <button class="btn btn-sm btn-primary btn-add" data-toggle="modal" data-target="myModal">Create New Cheque Book</button>
             </div>
             <div class="card-body">
                 <div class="table-responsive">
@@ -48,23 +47,13 @@
         <!-- Modal content-->
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title">Create New Cheque Book</h4>
+                <h4 class="modal-title">Update Cheque Book</h4>
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
             <div class="modal-body">
                 <input type="hidden" name="Id" id="Id" value="" />
                 <input type="hidden" name="type" id="type" value="CREATE" />
                 <form method="post" id="Form">
-                    <div class="form-group row">
-                        <label class="col-lg-4 col-form-label" for="val-username">
-                            Account
-                            <span class="text-danger">*</span>
-                        </label>
-                        <div class="col-lg-8">
-                            <select class="form-control select2" id="AccountId" name="AccountId">
-                            </select>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -75,11 +64,9 @@
     </div>
 </div>
 @section AdminlteJs{
-    <!-- DataTables  & Plugins -->
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
 @section scripts{
-    <script src="~/Content/vendor/select2/js/select22.full.min.js"></script>
     <script>
         function loadStatus(status = null) {
             $.ajax({
@@ -87,7 +74,7 @@
                 url: "/Admin/ChequeBooks/GetStatus",
                 success: function (res) {
                     console.log(res)
-                    var html;
+                    let html;
                     $.each(res, function (key, value) {
                         html += "<option value = '" + key + "' " + ((parseInt(status)) == key ? 'selected' : '') + ">" + value + " </option>";
                     });
@@ -127,7 +114,7 @@
                     url: "/Admin/ChequeBooks/Edit",
                     data: chequeBook,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $('#datatables').DataTable().ajax.reload();
                             $("#myModal").modal("hide");
                             toastr.success('Updated Successfully')
@@ -136,24 +123,8 @@
 
                 })
             },
-            post: function (chequeBook) {
-                $.ajax({
-                    type: "POST",
-                    url: "/Admin/ChequeBooks/Create",
-                    data: chequeBook,
-                    success: function (res) {
-                        if (res.statusCode == 200) {
-                            $('#datatables').DataTable().ajax.reload();
-                            $("#myModal").modal("hide");
-                            toastr.success('Created Successfully')
-                        }
-                    }
-
-                })
-            }
         }
         $(function () {
-            $(".select2").select2();
             $('#datatables').DataTable({
                 "paging": true,
                 "ordering": true,
@@ -199,13 +170,6 @@
                 ]
             })
 
-            $(document).on("click", ".btn-add", function () {
-                $(".modal-title").html("Create Cheque Book");
-                loadAccount();
-                $("#Form").trigger("reset");
-                $("#myModal").modal("show");
-            })
-
             $(document).on("click", ".btn-detail", function () {
                 let chequeBookId = $(this).data("id");
                 window.location.assign("/Admin/ChequeBooks/Cheques/" + chequeBookId)
@@ -215,16 +179,13 @@
                 var chequeBook = {
                     AccountId: $("#AccountId").val(),
                 }
-                if ($("#type").val() == "EDIT") {
-                    chequeBook.AccountId = $("#Id").val();
-                    managerChequeBook.put(chequeBook);
-                } else {
-                    managerChequeBook.post(chequeBook);
-                }
+                chequeBook.AccountId = $("#Id").val();
+                managerChequeBook.put(chequeBook);
             })
-
-            $('.toggle').bootstrapToggle()
+            $(document).on("click", ".btn-detail-2", function () {
+                let bookId = $(this).data("id");
+                window.location.assign("/Admin/Cheques/?ChequeBookId=" + bookId + "&AccountId=" + @Model.AccountId);
+            })
         })
-
     </script>
 }

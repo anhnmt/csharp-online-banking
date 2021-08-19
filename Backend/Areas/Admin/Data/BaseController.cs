@@ -38,13 +38,26 @@ namespace Backend.Areas.Admin.Data
                     }
                 )));
             }
-            
+
             if (obj != null && obj.RoleId == 3 && (string) currentArea == "Admin")
             {
                 filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new RouteValueDictionary(new
                     {
                         action = "Index",
                         controller = "Home",
+                        area = ""
+                    }
+                )));
+            }
+
+            string[] notAllowedController = {"PostData", "EditData", "DeleteData"};
+            if (obj != null && obj.RoleId == 2 && (string) currentArea == "Admin" &&
+                notAllowedController.Contains(currentAction))
+            {
+                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new RouteValueDictionary(new
+                    {
+                        action = "Index",
+                        controller = "Channels",
                         area = ""
                     }
                 )));

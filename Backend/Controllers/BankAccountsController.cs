@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 
 namespace Backend.Controllers
 {
-    public class BankAccountsController : Controller
+    public class BankAccountsController : BaseController
     {
         private readonly IRepository<BankAccounts> bankAccounts;
 
