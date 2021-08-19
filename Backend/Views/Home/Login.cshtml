@@ -45,9 +45,9 @@
                                     </div>
                                     <div class="text-center text-white">
                                         <button type="submit" class="btn btn-block btn-pill btn-outline-light btn-rounded" id="btnLogin">Sign Me In</button>
-                                        <button type="button" class="btn btn-block btn-pill btn-outline-light btn-rounded" id="loading" style="display: none">
-                                            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                                            Loading...
+                                        <button type="button" class="btn btn-block btn-pill btn-outline-light btn-rounded justify-content-center align-items-center" id="loading" style="display: none">
+                                            Loading
+                                            <span class="ml-2 spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
                                         </button>
                                     </div>
                                 </form>
@@ -112,7 +112,7 @@
         $(function (){
             $(document).on("click","#btnLogin", function () {
                  $("#btnLogin").css('display', 'none');
-                 $("#loading").css('display', 'block');
+                 $("#loading").css('display', 'flex');
             })
            
         })
