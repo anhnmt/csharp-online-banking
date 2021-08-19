@@ -11,8 +11,8 @@ namespace Backend.Areas.Admin.Controllers
     public class ChequesController : BaseController
     {
         private readonly IRepository<Cheques> cheques;
-        private IRepository<ChequeBooks> chequebooks;
-        private IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<ChequeBooks> chequebooks;
+        private readonly IRepository<BankAccounts> bankAccounts;
 
         public ChequesController()
         {
@@ -379,7 +379,7 @@ namespace Backend.Areas.Admin.Controllers
                     data = "Using cheque successfully!",
                     statusCode = 200,
                 }, JsonRequestBehavior.AllowGet);
-
+            
             toBankAccounts.Balance += cheque.Amount;
             bankAccounts.Edit(toBankAccounts);
 

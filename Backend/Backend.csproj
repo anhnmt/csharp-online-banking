@@ -650,6 +650,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Content\js\" />
+    <Folder Include="Data" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineBanking.BLL\OnlineBanking.BLL.csproj">
