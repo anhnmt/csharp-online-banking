@@ -61,6 +61,7 @@
     <Compile Include="DataMapping\ChequeBook.cs" />
     <Compile Include="DataMapping\Currencies.cs" />
     <Compile Include="DataMapping\Messages.cs" />
+    <Compile Include="DataMapping\Notifications.cs" />
     <Compile Include="DataMapping\Roles.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
     <Compile Include="Migrations\202108111334085_test.cs" />

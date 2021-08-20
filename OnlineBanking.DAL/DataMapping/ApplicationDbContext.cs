@@ -75,6 +75,7 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Transactions> Transactions { get; set; }
         public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
+        public virtual DbSet<Notifications> Notifications { get; set; }
 
         public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
 

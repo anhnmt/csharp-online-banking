@@ -47,4 +47,16 @@ namespace OnlineBanking.DAL
         Opened = 0,
         Closed = 1,
     }
+
+    public enum NotificationStatus
+    {
+        Read = 0,
+        Unread = 1,
+    }
+
+    public enum NotificationType
+    {
+        Transaction = 0,
+        Message = 1,
+    }
 }
