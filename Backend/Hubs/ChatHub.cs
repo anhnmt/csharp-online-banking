@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.Ajax.Utilities;
 using Microsoft.AspNet.SignalR;
 using Microsoft.AspNet.SignalR.Hubs;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
+using static System.String;
 
 namespace Backend.Hubs
 {
@@ -31,12 +33,16 @@ namespace Backend.Hubs
         private readonly IRepository<Accounts> accountRepo;
         private readonly IRepository<Channels> channelRepo;
         private readonly IRepository<Messages> messageRepo;
+        private readonly IRepository<Notifications> notificationRepo;
+        private readonly IRepository<Transactions> transactionRepo;
 
         public ChatHub()
         {
             accountRepo = new Repository<Accounts>();
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
+            notificationRepo = new Repository<Notifications>();
+            transactionRepo = new Repository<Transactions>();
         }
 
         public int SendPrivate(string message)
@@ -51,7 +57,7 @@ namespace Backend.Hubs
                 {
                     AccountId = account.AccountId,
                     ChannelId = channel.ChannelId,
-                    Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", String.Empty),
+                    Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", Empty),
                 };
                 messageRepo.Add(msg);
 
@@ -82,7 +88,7 @@ namespace Backend.Hubs
                 {
                     AccountId = account.AccountId,
                     ChannelId = channel.ChannelId,
-                    Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", string.Empty),
+                    Content = Regex.Replace(message, @"(?i)<(?!img|a|/a|/img).*?>", Empty),
                 };
                 messageRepo.Add(msg);
 
@@ -131,6 +137,56 @@ namespace Backend.Hubs
                 });
 
             return result;
+        }
+
+        public IEnumerable<NotificationViewModel> GetNotifications()
+        {
+            var notifications = notificationRepo.Get()
+                .Where(m => m.AccountId == GetIntegerAccountId())
+                .OrderByDescending(m => m.CreatedAt);
+
+            var result = notifications
+                .Take(10)
+                .AsEnumerable()
+                .Reverse()
+                .Select(x =>
+                {
+                    var pkObject = transactionRepo
+                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+
+                    return new NotificationViewModel(x, pkObject);
+                });
+
+            return result;
+        }
+
+        protected int SendNotification(Notifications notification)
+        {
+            try
+            {
+                // Create and save notification in database
+                notificationRepo.Add(notification);
+
+                var pkObject = transactionRepo
+                    .Get().FirstOrDefault(y => y.TransactionId == notification.PkId);
+
+                // Broadcast the message
+                var notificationViewModel = new NotificationViewModel(notification, pkObject);
+
+                ConnectionsMap.GetConnections(notification.AccountId.ToString()).ForEach(connectionId =>
+                {
+                    Clients.Client(connectionId).newNotification(notificationViewModel);
+                    Clients.Client(connectionId).reloadNotificationData();
+                });
+
+                return notification.NotificationId;
+            }
+            catch (Exception)
+            {
+                Clients.Caller.onError("Notification can't not send!");
+            }
+
+            return 0;
         }
 
         //private void sendListOnline()
@@ -222,7 +278,7 @@ namespace Backend.Hubs
             {
                 var connection = Context.ConnectionId;
                 var account = Connections.FirstOrDefault(u => u.AccountId == GetIntegerAccountId());
-                
+
                 if (Utils.NotNullOrEmpty(account))
                 {
                     if (account != null && account.CurrentChannelId != channelId)
