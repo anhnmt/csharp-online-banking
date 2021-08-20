@@ -13,12 +13,12 @@ namespace OnlineBanking.DAL
         [Required(AllowEmptyStrings = false)] public string Content { get; set; }
 
         [DefaultValue(NotificationStatus.Read)]
-        public int? Status { get; set; }
+        public int Status { get; set; }
 
         [DefaultValue(NotificationType.Transaction)]
-        public int? PkType { get; set; }
+        public int PkType { get; set; }
 
-        public int? PkId { get; set; }
+        public int PkId { get; set; }
 
         [ForeignKey("AccountId")] public virtual Accounts Account { get; set; }
     }
