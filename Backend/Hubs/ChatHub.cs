@@ -125,7 +125,7 @@ namespace Backend.Hubs
                     .OrderByDescending(m => m.CreatedAt);
             }
 
-            var result = messageHistory
+            return messageHistory
                 .Take(10)
                 .AsEnumerable()
                 .Reverse()
@@ -135,17 +135,15 @@ namespace Backend.Hubs
 
                     return new MessageViewModel(x, account?.Name);
                 });
-
-            return result;
         }
 
-        public IEnumerable<NotificationViewModel> GetNotifications()
+        public IEnumerable<NotificationViewModel> GetNotificationsHistory()
         {
             var notifications = notificationRepo.Get()
                 .Where(m => m.AccountId == GetIntegerAccountId())
                 .OrderByDescending(m => m.CreatedAt);
 
-            var result = notifications
+            return notifications
                 .Take(10)
                 .AsEnumerable()
                 .Reverse()
@@ -156,8 +154,6 @@ namespace Backend.Hubs
 
                     return new NotificationViewModel(x, pkObject);
                 });
-
-            return result;
         }
 
         protected int SendNotification(Notifications notification)
@@ -175,8 +171,7 @@ namespace Backend.Hubs
 
                 ConnectionsMap.GetConnections(notification.AccountId.ToString()).ForEach(connectionId =>
                 {
-                    Clients.Client(connectionId).newNotification(notificationViewModel);
-                    Clients.Client(connectionId).reloadNotificationData();
+                    Clients.Client(connectionId).historyNotifications(GetNotificationsHistory());
                 });
 
                 return notification.NotificationId;
@@ -203,7 +198,7 @@ namespace Backend.Hubs
 
         public override Task OnConnected()
         {
-            var connection = Context.ConnectionId;
+            var connection = GetConnectionId();
             var accountId = GetIntegerAccountId();
 
             try
@@ -214,12 +209,13 @@ namespace Backend.Hubs
                 {
                     var userViewModel = new UserViewModel(account, 0);
 
-                    if (account.RoleId != 1 && account.RoleId != 2)
+                    if (account.RoleId != (int) RoleStatus.Admin && account.RoleId != (int) RoleStatus.Support)
                     {
                         var channel = FindChannelByAccountId(accountId);
                         userViewModel.CurrentChannelId = channel.ChannelId;
                         Groups.Add(connection, channel.ChannelId.ToString());
                         Clients.Client(connection).historyMessages(GetMessageHistory(channel.ChannelId));
+                        Clients.Client(connection).historyNotifications(GetNotificationsHistory());
                     }
 
                     var tempAccount = Connections.FirstOrDefault(u => u.AccountId == accountId);
@@ -248,7 +244,6 @@ namespace Backend.Hubs
 
         public override Task OnDisconnected(bool stopCalled)
         {
-            var connection = Context.ConnectionId;
             var accountId = GetIntegerAccountId();
 
             try
@@ -260,7 +255,7 @@ namespace Backend.Hubs
                 Clients.All.UpdateUser(tempAccount);
 
                 // Remove mapping
-                if (tempAccount != null) ConnectionsMap.Remove(tempAccount.AccountId.ToString(), connection);
+                if (tempAccount != null) ConnectionsMap.Remove(tempAccount.AccountId.ToString(), GetConnectionId());
             }
             catch (Exception ex)
             {
@@ -276,12 +271,12 @@ namespace Backend.Hubs
         {
             try
             {
-                var connection = Context.ConnectionId;
+                var connection = GetConnectionId();
                 var account = Connections.FirstOrDefault(u => u.AccountId == GetIntegerAccountId());
 
                 if (Utils.NotNullOrEmpty(account))
                 {
-                    if (account != null && account.CurrentChannelId != channelId)
+                    if (account.CurrentChannelId != channelId)
                     {
                         // Join to new chat room
                         Leave(account.CurrentChannelId);
@@ -309,7 +304,7 @@ namespace Backend.Hubs
 
         private Task Leave(int channelId)
         {
-            return Groups.Remove(Context.ConnectionId, channelId.ToString());
+            return Groups.Remove(GetConnectionId(), channelId.ToString());
         }
 
         private Channels FindChannelByChannelId(int channelId)
@@ -341,6 +336,11 @@ namespace Backend.Hubs
         private string GetAccountId()
         {
             return Context.QueryString["userId"];
+        }
+
+        private string GetConnectionId()
+        {
+            return Context.ConnectionId;
         }
     }
 }

@@ -26,6 +26,13 @@ namespace OnlineBanking.DAL
         Deleted = 1
     }
 
+    public enum RoleStatus
+    {
+        Admin = 1,
+        Support = 2,
+        User = 3,
+    }
+
     public enum BankingActivity
     {
         Processing = 0,

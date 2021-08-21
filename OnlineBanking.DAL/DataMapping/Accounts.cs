@@ -28,7 +28,7 @@ namespace OnlineBanking.DAL
 
         public int? Status { get; set; }
 
-        [DefaultValue(3)] public int RoleId { get; set; }
+        [DefaultValue(RoleStatus.User)] public int RoleId { get; set; }
 
         [Required] public string NumberId { get; set; }
 
