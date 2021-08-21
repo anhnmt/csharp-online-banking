@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class ChequeBooksController : Controller
+    public class ChequeBooksController : BaseController
     {
         private readonly ApplicationDbContext db = new ApplicationDbContext();
         private readonly IRepository<ChequeBooks> chequebooks;
@@ -22,7 +23,6 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/ChequeBooks
         public ActionResult Index()
         {
-            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             return View();
 
         }
@@ -36,7 +36,9 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus) x.Status).ToString()
+                StatusName = ((ChequeBookStatus) x.Status).ToString(),
+                Status = x.Status,
+                AccountId = x.AccountId,
             });
 
             return Json(new

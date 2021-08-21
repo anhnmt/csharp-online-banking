@@ -2,16 +2,17 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class ChequesController : Controller
+    public class ChequesController : BaseController
     {
         private readonly IRepository<Cheques> cheques;
-        private IRepository<ChequeBooks> chequebooks;
-        private IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<ChequeBooks> chequebooks;
+        private readonly IRepository<BankAccounts> bankAccounts;
 
         public ChequesController()
         {
@@ -46,9 +47,11 @@ namespace Backend.Areas.Admin.Controllers
                     NumberId = x.NumberId,
                     ChequeId = x.ChequeId,
                     StatusName = ((ChequeStatus) x.Status).ToString(),
-                    Amount = x.Amount + " " + x.FromBankAccount.Currency.Name,
+                    Status = x.Status,
+                    CurrencyName = x.FromBankAccount.Currency.Name,
+                    AmountNumber = x.Amount,
                     FromBankAccountName = x.FromBankAccount.Name,
-                    ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
+                    ToBankAccountName = x.ToBankAccountId == null  ? "None" : x.ToBankAccount.Name
                 });
             return Json(new
             {
@@ -205,6 +208,16 @@ namespace Backend.Areas.Admin.Controllers
             var cheque = cheques.Get(chequeInformation.ChequeId);
             if (cheque == null)
             {
+                return Json(new
+                {
+                    message = "Error",
+                    statusCode = 400
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
+            {
+                errors.Add("Status", "This cheque was been used or deleted!");
                 return Json(new
                 {
                     message = "Error",
@@ -371,21 +384,34 @@ namespace Backend.Areas.Admin.Controllers
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
 
+            var data = new ChequesViewModel
+            {
+                ChequeBookId = cheque.ChequeBookId,
+                Code = cheque.Code,
+                NumberId = cheque.NumberId,
+                ChequeId = cheque.ChequeId,
+                StatusName = ((ChequeStatus) cheque.Status).ToString(),
+                Status = cheque.Status,
+                AmountNumber = cheque.Amount,
+                FromBankAccountName = cheque.FromBankAccount.Name,
+                FromBankAccountId = cheque.FromBankAccountId,
+                ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
+            };
             if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
                 return Json(new
                 {
                     message = "Success",
-                    data = "Using cheque successfully!",
+                    data = data,
                     statusCode = 200,
                 }, JsonRequestBehavior.AllowGet);
-
+            
             toBankAccounts.Balance += cheque.Amount;
             bankAccounts.Edit(toBankAccounts);
 
             return Json(new
             {
                 message = "Success",
-                data = "Using cheque successfully!",
+                data = data,
                 statusCode = 200,
             }, JsonRequestBehavior.AllowGet);
         }

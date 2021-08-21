@@ -3,14 +3,14 @@ using OnlineBanking.DAL;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
+using Backend.Areas.Admin.Data;
 using static System.String;
 
 namespace Backend.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly IRepository<Accounts> accounts;
         private readonly IRepository<BankAccounts> bankAccounts;
@@ -45,7 +45,7 @@ namespace Backend.Controllers
 
             return Json(new
             {
-                data = data,
+                data,
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
@@ -274,6 +274,30 @@ namespace Backend.Controllers
                 obj.AttemptLogin++;
                 accounts.Update(obj);
                 errors.Add("Password", "Your password is wrong!" + obj.AttemptLogin);
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (obj.Status == 1)
+            {
+                errors.Add("Email", "Your Account is Locked!");
+
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (obj.Status == 2)
+            {
+                errors.Add("Email", "Your Account is Deleted!");
 
                 return Json(new
                 {

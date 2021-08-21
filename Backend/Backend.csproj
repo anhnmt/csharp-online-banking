@@ -18,10 +18,11 @@
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
     <Use64BitIISExpress />
-    <IISExpressSSLPort>44340</IISExpressSSLPort>
-    <IISExpressAnonymousAuthentication />
+    <IISExpressSSLPort>1054</IISExpressSSLPort>
+    <IISExpressAnonymousAuthentication>
+    </IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode />
+    <IISExpressUseClassicPipelineMode>true</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -149,9 +150,11 @@
     <Compile Include="Areas\Admin\Controllers\HomeController.cs" />
     <Compile Include="Areas\Admin\Controllers\RolesController.cs" />
     <Compile Include="Areas\Admin\Controllers\TransactionsController.cs" />
+    <Compile Include="Areas\Admin\Data\BaseController.cs" />
     <Compile Include="Controllers\BankAccountsController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\TransactionsController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -370,10 +373,14 @@
     <Content Include="Content\images\users\8.png" />
     <Content Include="Content\images\users\9.jpg" />
     <Content Include="Content\images\users\9.png" />
+    <Content Include="Content\js\buttons.html5.min.js" />
     <Content Include="Content\js\custom.js" />
     <Content Include="Content\js\dashboard\dashboard-1.js" />
+    <Content Include="Content\js\dataTables.buttons.min.js" />
     <Content Include="Content\js\dlabnav-userInit.js" />
     <Content Include="Content\js\dlabnav-init.js" />
+    <Content Include="Content\js\jszip.min.js" />
+    <Content Include="Content\js\pdfmake.min.js" />
     <Content Include="Content\js\plugins-init\bs-daterange-picker-init.js" />
     <Content Include="Content\js\plugins-init\chartist-init.js" />
     <Content Include="Content\js\plugins-init\chartjs-init.js" />
@@ -619,6 +626,7 @@
     <Content Include="Scripts\jquery.validate.unobtrusive.js" />
     <Content Include="Scripts\jquery.validate.unobtrusive.min.js" />
     <Content Include="Scripts\modernizr-2.8.3.js" />
+    <Content Include="Views\Notifications\Index.cshtml" />
     <Content Include="Web.config" />
     <Content Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
@@ -643,8 +651,8 @@
     <Content Include="Views\Home\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="App_Data\" />
     <Folder Include="Areas\Admin\Content\js\" />
+    <Folder Include="Data" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineBanking.BLL\OnlineBanking.BLL.csproj">

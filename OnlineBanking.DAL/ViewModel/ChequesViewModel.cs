@@ -14,6 +14,7 @@ namespace OnlineBanking.DAL
         public string NumberId { get; set; }
         public string Amount { get; set; }
         public float AmountNumber { get; set; }
+        public string CurrencyName { get; set; }
         public int Status { get; set; }
         public string StatusName { get; set; }
         public string FromBankAccountName { get; set; }

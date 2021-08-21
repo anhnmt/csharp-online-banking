@@ -14,7 +14,10 @@ namespace Backend.Hubs
         {
             get
             {
-                return _connections.Count;
+                lock (_connections)
+                {
+                    return _connections.Count;
+                }
             }
         }
 
@@ -39,12 +42,7 @@ namespace Backend.Hubs
         public IEnumerable<string> GetConnections(T key)
         {
             HashSet<string> connections;
-            if (_connections.TryGetValue(key, out connections))
-            {
-                return connections;
-            }
-
-            return Enumerable.Empty<string>();
+            return _connections.TryGetValue(key, out connections) ? connections : Enumerable.Empty<string>();
         }
 
         public void Remove(T key, string connectionId)

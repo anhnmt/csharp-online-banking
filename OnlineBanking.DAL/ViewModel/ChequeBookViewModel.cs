@@ -11,7 +11,9 @@ namespace OnlineBanking.DAL
         public int ChequeBookId { get; set; }
         public string Code { get; set; }
         public string StatusName { get; set; }
+        public int Status { get; set; }
         public string AccountName { get; set; }
         public int ChequesUsed { get; set; }
+        public int AccountId { get; set; }
     }
 }

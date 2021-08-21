@@ -273,7 +273,6 @@
         
                     submitHandler: function () {
                        var trans = {
-                           FromId: "@user.AccountId",
                            Amount: $("#Amount").val(),
                            ToId: $("#Id").val(),
                        };
@@ -496,8 +495,16 @@
                 },
 
                 {
-                    data: 'StatusName',
+                    data: {Status: 'Status', StatusName:'StatusName'},
+                    render: function (data) {
+                        if (data.Status === 0){
+                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                        }else {
+                            return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
+                        }
+                    },
                     className: 'align-middle text-center',
+                    "searchable": false,
                     "orderable": false,
                 },
                 {
@@ -573,9 +580,9 @@
             })
 
             $(document).on("click", "#btnAddChequeBook", function () {
-                var chequebook = {
+                let chequebook = {
                     AccountId: @Model.AccountId,
-                }
+                };
                 managerChequeBook.post(chequebook);
             })
             //Account Number

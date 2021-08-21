@@ -6,10 +6,11 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Backend.Areas.Admin.Data;
 
 namespace Backend.Areas.Admin.Controllers
 {
-    public class BankAccountsController : Controller
+    public class BankAccountsController : BaseController
     {
         private readonly IRepository<BankAccounts> bankAccounts;
 
@@ -26,7 +27,6 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileBankAccount(int id)
         {
-            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
             var data = bankAccounts.Get(x => x.BankAccountId == id).Select(x => new ProfileBankAccountViewModels(x))
                 .FirstOrDefault();
             return data == null ? View() : View(data);
