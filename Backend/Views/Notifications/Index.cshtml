@@ -1,0 +1,98 @@
+﻿@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+    <link href="~/Content/vendor/datatables/css/jquery.dataTables.min.css" rel="stylesheet"/>
+}
+
+<div class="page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "Home")">Home</a>
+        </li>
+        <li class="breadcrumb-item active">
+            <a href="@Url.Action("Index", "Notifications")">Notifications</a>
+        </li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card card-info">
+            <div class="card-header">
+                <h3 class="card-title">Notifications</h3>
+            </div>
+            <div class="card-body">
+                <div class="form-horizontal">
+                    <table class="table table-hover" id="datatables">
+                        <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Messages</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>CreatedAt</th>
+                            @* <th>Action</th> *@
+                        </tr>
+                        </thead>
+                        <tbody id="tbl_trans"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
+    <script>
+        $(function () {
+            $('#datatables').DataTable({
+                "paging": true,
+                "ordering": true,
+                "autoWidth": false,
+                "responsive": true,
+                "processing": true,
+                "filter": true,
+                "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+                "ajax": {
+                    "url": "/Notifications/GetData",
+                },
+                "order": [
+                    [1, 'desc']
+                ],
+                "columns": [
+                    {
+                        data: 'NotificationId',
+                        className: 'align-middle text-center'
+                    },
+                    {
+                        data: 'Content',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: 'StatusName',
+                        className: 'align-middle text-center',
+                        "searchable": false
+                    },
+                    {
+                        data: 'PkTypeName',
+                        className: 'align-middle text-center',
+                        "searchable": false
+                    },
+                    {
+                        data: 'CreatedAt',
+                        className: 'align-middle',
+                    },
+                    // {
+                    //     data: 'NotificationId',
+                    //     className: 'align-middle',
+                    //     "orderable": false
+                    // },
+                ]
+            })
+        })
+    </script>
+}

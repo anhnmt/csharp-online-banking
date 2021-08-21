@@ -26,6 +26,13 @@ namespace OnlineBanking.DAL
         Deleted = 1
     }
 
+    public enum RoleStatus
+    {
+        Admin = 1,
+        Support = 2,
+        User = 3,
+    }
+
     public enum BankingActivity
     {
         Processing = 0,
@@ -46,5 +53,17 @@ namespace OnlineBanking.DAL
     {
         Opened = 0,
         Closed = 1,
+    }
+
+    public enum NotificationStatus
+    {
+        Read = 0,
+        Unread = 1,
+    }
+
+    public enum NotificationType
+    {
+        Transaction = 0,
+        Message = 1,
     }
 }
