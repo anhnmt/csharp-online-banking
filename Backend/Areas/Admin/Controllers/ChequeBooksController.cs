@@ -36,7 +36,9 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus) x.Status).ToString()
+                StatusName = ((ChequeBookStatus) x.Status).ToString(),
+                Status = x.Status,
+                AccountId = x.AccountId,
             });
 
             return Json(new

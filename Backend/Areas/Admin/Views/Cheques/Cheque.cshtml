@@ -60,6 +60,75 @@
             </div>
         </form>
     </div>
+    <div class="modal fade" id="successModal" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="form-validation">
+                    <form id="formData" action="#" method="POST" novalidate="novalidate">
+                        <div class="modal-header">
+                            <h4 class="modal-title">Cheque Information</h4>
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p>Code: </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p id="modal-code"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p>Amount: </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p id="modal-amount"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p>Source: </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p id="modal-from"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p>Destination: </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p id="modal-to"></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <p>Status: </p>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <p id="modal-status"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>
 
 @section scripts{
@@ -106,13 +175,23 @@
                 success: function (res){
                     if (res.statusCode === 400){
                         validator.showErrors(res.data);
+                        toastr.error("Using cheque failed");
                     }else{
-                        toastr.success(res.data);
+                        chequeManager.showModal(res.data);
+                        toastr.success("Using cheque successfully");
                         $("#formData").trigger("reset");
                     }
                 }
             })
         },
+        showModal: function(data) {
+            $("#modal-code").html(data.Code);
+            $("#modal-amount").html(data.AmountNumber);
+            $("#modal-from").html(data.FromBankAccountName);
+            $("#modal-to").html(data.ToBankAccountName);
+            $("#modal-status").html(data.StatusName);
+            $("#successModal").modal("show");
+        }
     }
     
     $(function(){
@@ -124,6 +203,9 @@
               $("#ToBankAccountId").val("");
           }
         })
+        $('#successModal').on('shown.bs.modal', function () {
+            validator.resetForm();
+        });
     })
     </script>
 }

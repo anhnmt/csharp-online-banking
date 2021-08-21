@@ -47,6 +47,7 @@ namespace Backend.Areas.Admin.Controllers
                     NumberId = x.NumberId,
                     ChequeId = x.ChequeId,
                     StatusName = ((ChequeStatus) x.Status).ToString(),
+                    Status = x.Status,
                     CurrencyName = x.FromBankAccount.Currency.Name,
                     AmountNumber = x.Amount,
                     FromBankAccountName = x.FromBankAccount.Name,
@@ -214,6 +215,16 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
+            {
+                errors.Add("Status", "This cheque was been used or deleted!");
+                return Json(new
+                {
+                    message = "Error",
+                    statusCode = 400
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             var oldAmount = cheque.Amount;
             var fromBankAccount = bankAccounts.Get(chequeInformation.FromBankAccountId);
             if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
@@ -373,11 +384,24 @@ namespace Backend.Areas.Admin.Controllers
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
 
+            var data = new ChequesViewModel
+            {
+                ChequeBookId = cheque.ChequeBookId,
+                Code = cheque.Code,
+                NumberId = cheque.NumberId,
+                ChequeId = cheque.ChequeId,
+                StatusName = ((ChequeStatus) cheque.Status).ToString(),
+                Status = cheque.Status,
+                AmountNumber = cheque.Amount,
+                FromBankAccountName = cheque.FromBankAccount.Name,
+                FromBankAccountId = cheque.FromBankAccountId,
+                ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
+            };
             if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
                 return Json(new
                 {
                     message = "Success",
-                    data = "Using cheque successfully!",
+                    data = data,
                     statusCode = 200,
                 }, JsonRequestBehavior.AllowGet);
             
@@ -387,7 +411,7 @@ namespace Backend.Areas.Admin.Controllers
             return Json(new
             {
                 message = "Success",
-                data = "Using cheque successfully!",
+                data = data,
                 statusCode = 200,
             }, JsonRequestBehavior.AllowGet);
         }
