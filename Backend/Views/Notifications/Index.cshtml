@@ -34,7 +34,7 @@
                             <th>Status</th>
                             <th>Type</th>
                             <th>CreatedAt</th>
-                            <th>Action</th>
+                            @* <th>Action</th> *@
                         </tr>
                         </thead>
                         <tbody id="tbl_trans"></tbody>
@@ -86,11 +86,11 @@
                         data: 'CreatedAt',
                         className: 'align-middle',
                     },
-                    {
-                        data: '',
-                        className: 'align-middle',
-                        "orderable": false
-                    },
+                    // {
+                    //     data: 'NotificationId',
+                    //     className: 'align-middle',
+                    //     "orderable": false
+                    // },
                 ]
             })
         })

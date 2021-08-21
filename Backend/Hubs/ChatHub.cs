@@ -15,18 +15,15 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
+        public static ChatHub Instance { get; private set; }
+        private static object Lock = new object();
+
         #region Properties
 
         /// <summary>
         /// List of online users
         /// </summary>
         private static readonly List<UserViewModel> Connections = new List<UserViewModel>();
-
-        /// <summary>
-        /// Mapping SignalR connections to application users.
-        /// (We don't want to share connectionId)
-        /// </summary>
-        private static readonly ConnectionMapping<string> ConnectionsMap = new ConnectionMapping<string>();
 
         #endregion
 
@@ -38,6 +35,7 @@ namespace Backend.Hubs
 
         public ChatHub()
         {
+            Instance = this;
             accountRepo = new Repository<Accounts>();
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
@@ -45,7 +43,7 @@ namespace Backend.Hubs
             transactionRepo = new Repository<Transactions>();
         }
 
-        public int SendPrivate(string message)
+        public async Task SendPrivate(string message)
         {
             try
             {
@@ -63,20 +61,16 @@ namespace Backend.Hubs
 
                 // Broadcast the message
                 var messageViewModel = new MessageViewModel(msg, account.Name);
-                Clients.Group(channel.ChannelId.ToString()).newMessage(messageViewModel);
-                Clients.All.reloadChatData();
-
-                return msg.MessageId;
+                await Clients.Group("channel-" + channel.ChannelId).newMessage(messageViewModel);
+                await Clients.All.reloadChatData();
             }
             catch (Exception)
             {
                 Clients.Caller.onError("Message can't not send!");
             }
-
-            return 0;
         }
 
-        public int SendToChannel(int channelId, string message)
+        public async Task SendToChannel(int channelId, string message)
         {
             try
             {
@@ -94,17 +88,13 @@ namespace Backend.Hubs
 
                 // Broadcast the message
                 var messageViewModel = new MessageViewModel(msg, account.Name);
-                Clients.Group(channelId.ToString()).newMessage(messageViewModel);
-                Clients.All.reloadChatData();
-
-                return msg.MessageId;
+                await Clients.Group("channel-" + channelId).newMessage(messageViewModel);
+                await Clients.All.reloadChatData();
             }
             catch (Exception)
             {
                 Clients.Caller.onError("Message can't not send!");
             }
-
-            return 0;
         }
 
         public IEnumerable<MessageViewModel> GetMessageHistory(int channelId, int messageId = 0)
@@ -137,16 +127,15 @@ namespace Backend.Hubs
                 });
         }
 
-        public IEnumerable<NotificationViewModel> GetNotificationsHistory()
+        public IEnumerable<NotificationViewModel> GetNotificationsHistory(int accountId)
         {
             var notifications = notificationRepo.Get()
-                .Where(m => m.AccountId == GetIntegerAccountId())
-                .OrderByDescending(m => m.CreatedAt);
+                .Where(m => m.AccountId == accountId);
 
             return notifications
-                .Take(10)
+                .OrderByDescending(m => m.CreatedAt)
+                .Take(5)
                 .AsEnumerable()
-                .Reverse()
                 .Select(x =>
                 {
                     var pkObject = transactionRepo
@@ -156,32 +145,27 @@ namespace Backend.Hubs
                 });
         }
 
-        protected int SendNotification(Notifications notification)
+        public void SendNotifications(List<Notifications> notifications)
         {
             try
             {
-                // Create and save notification in database
-                notificationRepo.Add(notification);
+                if (!notificationRepo.AddRange(notifications)) return;
 
-                var pkObject = transactionRepo
-                    .Get().FirstOrDefault(y => y.TransactionId == notification.PkId);
-
-                // Broadcast the message
-                var notificationViewModel = new NotificationViewModel(notification, pkObject);
-
-                ConnectionsMap.GetConnections(notification.AccountId.ToString()).ForEach(connectionId =>
+                notifications.ForEach(x =>
                 {
-                    Clients.Client(connectionId).historyNotifications(GetNotificationsHistory());
-                });
+                    Console.WriteLine("user-" + x.AccountId);
 
-                return notification.NotificationId;
+                    var pkObject = transactionRepo
+                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+
+                    Clients.Group("user-" + x.AccountId)
+                        .newNotification(new NotificationViewModel(x, pkObject));
+                });
             }
             catch (Exception)
             {
                 Clients.Caller.onError("Notification can't not send!");
             }
-
-            return 0;
         }
 
         //private void sendListOnline()
@@ -198,7 +182,7 @@ namespace Backend.Hubs
 
         public override Task OnConnected()
         {
-            var connection = GetConnectionId();
+            var connectionId = GetConnectionId();
             var accountId = GetIntegerAccountId();
 
             try
@@ -213,18 +197,19 @@ namespace Backend.Hubs
                     {
                         var channel = FindChannelByAccountId(accountId);
                         userViewModel.CurrentChannelId = channel.ChannelId;
-                        Groups.Add(connection, channel.ChannelId.ToString());
-                        Clients.Client(connection).historyMessages(GetMessageHistory(channel.ChannelId));
-                        Clients.Client(connection).historyNotifications(GetNotificationsHistory());
+                        Groups.Add(connectionId, "channel-" + channel.ChannelId);
+                        Clients.Client(connectionId).historyMessages(GetMessageHistory(channel.ChannelId));
+                        Clients.Client(connectionId)
+                            .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                     }
 
                     var tempAccount = Connections.FirstOrDefault(u => u.AccountId == accountId);
                     Connections.Remove(tempAccount);
 
                     Connections.Add(userViewModel);
-                    Clients.All.UpdateUser(userViewModel);
+                    Clients.Client(connectionId).UpdateUser(userViewModel);
 
-                    ConnectionsMap.Add(accountId.ToString(), connection);
+                    Groups.Add(connectionId, "user-" + accountId);
                 }
             }
             catch (Exception ex)
@@ -244,6 +229,7 @@ namespace Backend.Hubs
 
         public override Task OnDisconnected(bool stopCalled)
         {
+            var connectionId = GetConnectionId();
             var accountId = GetIntegerAccountId();
 
             try
@@ -252,10 +238,10 @@ namespace Backend.Hubs
                 Connections.Remove(tempAccount);
 
                 Connections.Add(tempAccount);
-                Clients.All.UpdateUser(tempAccount);
+                Clients.Client(connectionId).UpdateUser(tempAccount);
 
                 // Remove mapping
-                if (tempAccount != null) ConnectionsMap.Remove(tempAccount.AccountId.ToString(), GetConnectionId());
+                if (tempAccount != null) Groups.Remove(connectionId, "user-" + accountId);
             }
             catch (Exception ex)
             {
@@ -271,7 +257,7 @@ namespace Backend.Hubs
         {
             try
             {
-                var connection = GetConnectionId();
+                var connectionId = GetConnectionId();
                 var account = Connections.FirstOrDefault(u => u.AccountId == GetIntegerAccountId());
 
                 if (Utils.NotNullOrEmpty(account))
@@ -280,17 +266,17 @@ namespace Backend.Hubs
                     {
                         // Join to new chat room
                         Leave(account.CurrentChannelId);
-                        Groups.Add(connection, channelId.ToString());
+                        Groups.Add(connectionId, "channel-" + channelId);
                         Connections.Remove(account);
 
                         account.CurrentChannelId = channelId;
 
                         Connections.Add(account);
-                        Clients.All.UpdateUser(account);
+                        Clients.Client(connectionId).UpdateUser(account);
 
-                        Clients.Client(connection).historyMessages(GetMessageHistory(channelId));
+                        Clients.Client(connectionId).historyMessages(GetMessageHistory(channelId));
 
-                        return Groups.Add(connection, channelId.ToString());
+                        return Groups.Add(connectionId, channelId.ToString());
                     }
                 }
             }
@@ -304,7 +290,7 @@ namespace Backend.Hubs
 
         private Task Leave(int channelId)
         {
-            return Groups.Remove(GetConnectionId(), channelId.ToString());
+            return Groups.Remove(GetConnectionId(), "channel-" + channelId);
         }
 
         private Channels FindChannelByChannelId(int channelId)

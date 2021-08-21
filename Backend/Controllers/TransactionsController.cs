@@ -8,6 +8,7 @@ using System.Threading;
 using System.Web;
 using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
+using Backend.Hubs;
 
 namespace Backend.Controllers
 {
@@ -42,7 +43,6 @@ namespace Backend.Controllers
                 var bankDequeue = bankQueue.Dequeue();
                 do
                 {
-                    
                     var receiverAccount = bankAccounts.Get(bankDequeue.ToId);
                     if (receiverAccount == null)
                     {
@@ -65,6 +65,7 @@ namespace Backend.Controllers
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
                     }
+
                     var receiverStatus = receiverAccount.Status;
                     var sessionUsers = (Accounts) Session["user"];
                     if (sessionUsers.RoleId == 1)
@@ -137,6 +138,7 @@ namespace Backend.Controllers
                             statusCode = 404
                         }, JsonRequestBehavior.AllowGet);
                     }
+
                     var sourceCurrency = sourceAccount.Currency.Name;
                     var receiverCurrency = receiverAccount.Currency.Name;
                     var sourceStatus = sourceAccount.Status;
@@ -240,6 +242,31 @@ namespace Backend.Controllers
 
                     if (transactions.Add(bankDequeue))
                     {
+                        var notifications = new List<Notifications>()
+                        {
+                            new Notifications
+                            {
+                                AccountId = sourceAccount.AccountId,
+                                Content = "Your account balance -" + bankDequeue.Amount +
+                                          ", available balance: " + sourceAccount.Balance,
+                                Status = (int) NotificationStatus.Unread,
+                                PkType = (int) NotificationType.Transaction,
+                                PkId = bankDequeue.TransactionId,
+                            },
+
+                            new Notifications
+                            {
+                                AccountId = receiverAccount.AccountId,
+                                Content = "Your account balance +" + bankDequeue.Amount +
+                                          ", available balance: " + receiverAccount.Balance,
+                                Status = (int) NotificationStatus.Unread,
+                                PkType = (int) NotificationType.Transaction,
+                                PkId = bankDequeue.TransactionId,
+                            }
+                        };
+
+                        ChatHub.Instance.SendNotifications(notifications);
+
                         return Json(new
                         {
                             data = "Successful transfer",

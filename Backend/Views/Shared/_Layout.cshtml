@@ -50,223 +50,156 @@
     </div>
 </div>
 <div id="main-wrapper">
-<div class="nav-header">
-    <a href="@Url.Action("Index", "Home")" class="brand-logo">
-        <img class="logo-abbr" src="~/Content/images/logo.png" alt="">
-        <img class="logo-compact" src="~/Content/images/logo-text.png" alt="">
-        <img class="brand-title" src="~/Content/images/logo-text.png" alt="">
+    <div class="nav-header">
+        <a href="@Url.Action("Index", "Home")" class="brand-logo">
+            <img class="logo-abbr" src="~/Content/images/logo.png" alt="">
+            <img class="logo-compact" src="~/Content/images/logo-text.png" alt="">
+            <img class="brand-title" src="~/Content/images/logo-text.png" alt="">
 
-    </a>
+        </a>
 
-    <div class="nav-control">
-        <div class="hamburger">
-            <span class="line"></span><span class="line"></span><span class="line"></span>
+        <div class="nav-control">
+            <div class="hamburger">
+                <span class="line"></span><span class="line"></span><span class="line"></span>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="header">
-    <div class="header-content">
-        <nav class="navbar navbar-expand">
-            <div class="collapse navbar-collapse justify-content-between">
-                <div class="header-left">
-                    <div class="dashboard_bar"></div>
-                </div>
-                <ul class="navbar-nav header-right">
-                    <li class="nav-item">
-                        <div class="input-group search-area d-lg-inline-flex d-none">
-                            <div class="input-group-append">
-                                <span class="input-group-text">
-                                    <a href="javascript:void(0)">
-                                        <i class="flaticon-381-search-2"></i>
-                                    </a>
-                                </span>
-                            </div>
-                            <input type="text" class="form-control" placeholder="Search here...">
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown notification_dropdown">
-                        <a class="nav-link  ai-icon" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M23.3333 19.8333H23.1187C23.2568 19.4597 23.3295 19.065 23.3333 18.6666V12.8333C23.3294 10.7663 22.6402 8.75902 21.3735 7.12565C20.1068 5.49228 18.3343 4.32508 16.3333 3.80679V3.49996C16.3333 2.88112 16.0875 2.28763 15.6499 1.85004C15.2123 1.41246 14.6188 1.16663 14 1.16663C13.3812 1.16663 12.7877 1.41246 12.3501 1.85004C11.9125 2.28763 11.6667 2.88112 11.6667 3.49996V3.80679C9.66574 4.32508 7.89317 5.49228 6.6265 7.12565C5.35983 8.75902 4.67058 10.7663 4.66667 12.8333V18.6666C4.67053 19.065 4.74316 19.4597 4.88133 19.8333H4.66667C4.35725 19.8333 4.0605 19.9562 3.84171 20.175C3.62292 20.3938 3.5 20.6905 3.5 21C3.5 21.3094 3.62292 21.6061 3.84171 21.8249C4.0605 22.0437 4.35725 22.1666 4.66667 22.1666H23.3333C23.6428 22.1666 23.9395 22.0437 24.1583 21.8249C24.3771 21.6061 24.5 21.3094 24.5 21C24.5 20.6905 24.3771 20.3938 24.1583 20.175C23.9395 19.9562 23.6428 19.8333 23.3333 19.8333Z" fill="#67636D"/>
-                                <path d="M9.98193 24.5C10.3863 25.2088 10.971 25.7981 11.6767 26.2079C12.3823 26.6178 13.1839 26.8337 13.9999 26.8337C14.816 26.8337 15.6175 26.6178 16.3232 26.2079C17.0289 25.7981 17.6136 25.2088 18.0179 24.5H9.98193Z" fill="#67636D"/>
-                            </svg>
-                            <span class="badge light text-white bg-primary rounded-circle">4</span>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <div id="dlab_W_Notification1" class="widget-media dlab-scroll p-3 height380">
-                                <ul class="timeline">
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2">
-                                                <img alt="image" width="50" src="~/Content/images/avatar/1.jpg">
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Dr sultads Send you Photo</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2 media-info">
-                                                KG
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Resport created successfully</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2 media-success">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Reminder : Treatment Time!</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2">
-                                                <img alt="image" width="50" src="~/Content/images/avatar/1.jpg">
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Dr sultads Send you Photo</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2 media-danger">
-                                                KG
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Resport created successfully</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="timeline-panel">
-                                            <div class="media mr-2 media-primary">
-                                                <i class="fa fa-home"></i>
-                                            </div>
-                                            <div class="media-body">
-                                                <h6 class="mb-1">Reminder : Treatment Time!</h6>
-                                                <small class="d-block">29 July 2020 - 02:26 PM</small>
-                                            </div>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                            <a class="all-notification" href="@Url.Action("Index", "Notifications")">See all notifications <i class="ti-arrow-right"></i></a>
-                        </div>
-                    </li>
-                    <li class="nav-item dropdown header-profile">
-                        <a class="nav-link" href="javascript:void(0)" role="button" data-toggle="dropdown">
-                            <img src="~/Content/images/profile/17.jpg" width="20" alt=""/>
-                            <div class="header-info">
-                                <span class="text-black">@user.Name</span>
-                                <p class="fs-12 mb-0 ">@user.Email</p>
-                            </div>
-                        </a>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a href="@Url.Action("InfoAccount", "Home")" class="dropdown-item ai-icon">
-                                <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
-                                </svg>
-                                <span class="ml-2">Profile </span>
-                            </a>
-                            <a href="@Url.Action("Logout", "Home", new {Area = ""})" class="dropdown-item ai-icon">
-                                <svg id="icon-logout" xmlns="http://www.w3.org/2000/svg" class="text-danger" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
-                                </svg>
-                                <span class="ml-2">Logout </span>
-                            </a>
-                        </div>
-                    </li>
-
-                </ul>
-
-            </div>
-        </nav>
-    </div>
-</div>
-<div class="dlabnav pt-xl-0">
-    <div class="dlabnav-scroll">
-        <ul class="metismenu" id="menu">
-            <li>
-                <a href="@Url.Action("Index", "Home")" class="ai-icon" aria-expanded="false">
-                    <i class="flaticon-381-home"></i>
-                    <span class="nav-text">Dashboard</span>
-                </a>
-            </li>
-            <li>
-                <a href="#/" class="ai-icon" aria-expanded="false">
-                    <i class="flaticon-381-book"></i>
-                    <span class="nav-text">Cheque Book</span>
-                </a>
-            </li>
-            <li>
-                <a href="@Url.Action("Index", "Transactions")" class="ai-icon" aria-expanded="false">
-                    <i class="flaticon-381-transfer"></i>
-                    <span class="nav-text">Transfer</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
-<div class="content-body">
-    <!-- row -->
-
-    <div class="container-fluid">
-        @RenderBody()
-    </div>
-</div>
-<div class="footer">
-    <div class="copyright">
-        <p>Made with <span class="heart"></span> by C1905M BKAP - Group 1</p>
-    </div>
-</div>
-
-<div class="chat-popup">
-    <div class="chat-icon" style="display: none;">
-        <i class="fas fa-comment-smile"></i>
-    </div>
-</div>
-
-<div id="chat-list" class="chat-popup col-md-6 col-lg-5 col-xl-5" style="display: none;">
-    <div class="row">
-        <div class="col-xl-12">
-            <div class="card message-bx chat-box">
-                <div class="card-header d-sm-flex d-block shadow-sm">
-                    <div>
-                        <h4 class="fs-20 mb-0 font-w600 text-black mb-sm-0 mb-2">Chat Support</h4>
+    <div class="header">
+        <div class="header-content">
+            <nav class="navbar navbar-expand">
+                <div class="collapse navbar-collapse justify-content-between">
+                    <div class="header-left">
+                        <div class="dashboard_bar"></div>
                     </div>
+                    <ul class="navbar-nav header-right">
+                        <li class="nav-item">
+                            <div class="input-group search-area d-lg-inline-flex d-none">
+                                <div class="input-group-append">
+                                    <span class="input-group-text">
+                                        <a href="javascript:void(0)">
+                                            <i class="flaticon-381-search-2"></i>
+                                        </a>
+                                    </span>
+                                </div>
+                                <input type="text" class="form-control" placeholder="Search here...">
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown notification_dropdown">
+                            <a class="nav-link  ai-icon" href="javascript:void(0)" role="button" data-toggle="dropdown">
+                                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M23.3333 19.8333H23.1187C23.2568 19.4597 23.3295 19.065 23.3333 18.6666V12.8333C23.3294 10.7663 22.6402 8.75902 21.3735 7.12565C20.1068 5.49228 18.3343 4.32508 16.3333 3.80679V3.49996C16.3333 2.88112 16.0875 2.28763 15.6499 1.85004C15.2123 1.41246 14.6188 1.16663 14 1.16663C13.3812 1.16663 12.7877 1.41246 12.3501 1.85004C11.9125 2.28763 11.6667 2.88112 11.6667 3.49996V3.80679C9.66574 4.32508 7.89317 5.49228 6.6265 7.12565C5.35983 8.75902 4.67058 10.7663 4.66667 12.8333V18.6666C4.67053 19.065 4.74316 19.4597 4.88133 19.8333H4.66667C4.35725 19.8333 4.0605 19.9562 3.84171 20.175C3.62292 20.3938 3.5 20.6905 3.5 21C3.5 21.3094 3.62292 21.6061 3.84171 21.8249C4.0605 22.0437 4.35725 22.1666 4.66667 22.1666H23.3333C23.6428 22.1666 23.9395 22.0437 24.1583 21.8249C24.3771 21.6061 24.5 21.3094 24.5 21C24.5 20.6905 24.3771 20.3938 24.1583 20.175C23.9395 19.9562 23.6428 19.8333 23.3333 19.8333Z" fill="#67636D"/>
+                                    <path d="M9.98193 24.5C10.3863 25.2088 10.971 25.7981 11.6767 26.2079C12.3823 26.6178 13.1839 26.8337 13.9999 26.8337C14.816 26.8337 15.6175 26.6178 16.3232 26.2079C17.0289 25.7981 17.6136 25.2088 18.0179 24.5H9.98193Z" fill="#67636D"/>
+                                </svg>
+                                <span class="badge light text-white bg-primary rounded-circle" id="countNotifications">0</span>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <div id="dlab_W_Notification1" class="widget-media dlab-scroll p-3">
+                                    <ul class="timeline" id="notifications"></ul>
+                                </div>
+                                <a class="all-notification" href="@Url.Action("Index", "Notifications")">See all notifications <i class="ti-arrow-right"></i></a>
+                            </div>
+                        </li>
+                        <li class="nav-item dropdown header-profile">
+                            <a class="nav-link" href="javascript:void(0)" role="button" data-toggle="dropdown">
+                                <img src="~/Content/images/profile/17.jpg" width="20" alt=""/>
+                                <div class="header-info">
+                                    <span class="text-black">@user.Name</span>
+                                    <p class="fs-12 mb-0 ">@user.Email</p>
+                                </div>
+                            </a>
+                            <div class="dropdown-menu dropdown-menu-right">
+                                <a href="@Url.Action("InfoAccount", "Home")" class="dropdown-item ai-icon">
+                                    <svg id="icon-user1" xmlns="http://www.w3.org/2000/svg" class="text-primary" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>
+                                    </svg>
+                                    <span class="ml-2">Profile </span>
+                                </a>
+                                <a href="@Url.Action("Logout", "Home", new {Area = ""})" class="dropdown-item ai-icon">
+                                    <svg id="icon-logout" xmlns="http://www.w3.org/2000/svg" class="text-danger" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+                                    </svg>
+                                    <span class="ml-2">Logout </span>
+                                </a>
+                            </div>
+                        </li>
 
-                    <button type="button" class="close btn-close" data-dismiss="modal">
-                        <span>×</span>
-                    </button>
+                    </ul>
+
                 </div>
-                <div class="card-body dlab-scroll height520 ps ps--active-y ps-trap" id="discussion">
-                </div>
-                <div class="card-footer border-0 type-massage">
-                    <form id="chat" onsubmit="return false;">
-                        <div class="input-group">
-                            <textarea id="message" name="message" class="form-control" placeholder="Type message..."></textarea>
-                            <input type="hidden" id="channel" name="channel" value="0">
+            </nav>
+        </div>
+    </div>
+    <div class="dlabnav pt-xl-0">
+        <div class="dlabnav-scroll">
+            <ul class="metismenu" id="menu">
+                <li>
+                    <a href="@Url.Action("Index", "Home")" class="ai-icon" aria-expanded="false">
+                        <i class="flaticon-381-home"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#/" class="ai-icon" aria-expanded="false">
+                        <i class="flaticon-381-book"></i>
+                        <span class="nav-text">Cheque Book</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="@Url.Action("Index", "Transactions")" class="ai-icon" aria-expanded="false">
+                        <i class="flaticon-381-transfer"></i>
+                        <span class="nav-text">Transfer</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="content-body">
+        <!-- row -->
+
+        <div class="container-fluid">
+            @RenderBody()
+        </div>
+    </div>
+    <div class="footer">
+        <div class="copyright">
+            <p>Made with <span class="heart"></span> by C1905M BKAP - Group 1</p>
+        </div>
+    </div>
+
+    <div class="chat-popup">
+        <div class="chat-icon" style="display: none;">
+            <i class="fas fa-comment-smile"></i>
+        </div>
+    </div>
+
+    <div id="chat-list" class="chat-popup col-md-6 col-lg-5 col-xl-5" style="display: none;">
+        <div class="row">
+            <div class="col-xl-12">
+                <div class="card message-bx chat-box">
+                    <div class="card-header d-sm-flex d-block shadow-sm">
+                        <div>
+                            <h4 class="fs-20 mb-0 font-w600 text-black mb-sm-0 mb-2">Chat Support</h4>
                         </div>
-                    </form>
+
+                        <button type="button" class="close btn-close" data-dismiss="modal">
+                            <span>×</span>
+                        </button>
+                    </div>
+                    <div class="card-body dlab-scroll height520 ps ps--active-y ps-trap" id="discussion">
+                    </div>
+                    <div class="card-footer border-0 type-massage">
+                        <form id="chat" onsubmit="return false;">
+                            <div class="input-group">
+                                <textarea id="message" name="message" class="form-control" placeholder="Type message..."></textarea>
+                                <input type="hidden" id="channel" name="channel" value="0">
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 </div>
 <script src="~/Content/vendor/global/global.min.js" type="text/javascript"></script>
@@ -330,6 +263,51 @@
 
                 $('#discussion').append(msg);
             };
+            
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.newMessage = function (messageView) {
+                let msg = connvertMessage(accountId, messageView);
+
+                $('#discussion')
+                    .append(msg)
+                    .ready(function () {
+                        $('#discussion').animate({ scrollTop: $('#discussion').prop("scrollHeight") }, 150);
+                    });
+            };
+
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.newNotification = function (notificationView) {
+                console.log(notificationView);
+                let count = $("#countNotifications").html()*1 ?? 0;
+                
+                count += notificationView.Status ?? 0;
+                let msg = connvertNotification(notificationView);
+
+                $('#countNotifications').html(count);
+                $('#notifications').prepend(msg);
+            };
+            
+            // Create a function that the hub can call back to display messages.
+            chatHub.client.historyNotifications = function (historyNotifications) {
+                console.log(historyNotifications);
+                let count = 0;
+                let msg = "";
+                $('#notifications').html("");
+                
+                if (historyNotifications.length > 0) {
+                    for (let notificationView of historyNotifications) {
+                        count += notificationView.Status ?? 0;
+                        msg += connvertNotification(notificationView);
+                    }
+                } else {
+                    msg += `<li class="text-center">
+                                Nothing here...
+                            </li>`;
+                }
+
+                $('#countNotifications').html(count);
+                $('#notifications').append(msg);
+            };
 
             connection.hub.start().done(function () {
                 $('#chat').submit(function (event) {
@@ -382,6 +360,20 @@
                 });
             });
 
+            function connvertNotification(notificationView) {
+                return `<li>
+                           <div class="timeline-panel">
+                               <div class="media mr-2 media-info">
+                                   TS
+                               </div>
+                               <div class="media-body">
+                                   <h6 class="mb-1">${notificationView.Content}</h6>
+                                   <small class="d-block">${notificationView.CreatedAt}</small>
+                               </div>
+                           </div>
+                       </li>`;
+            }
+            
             function connvertMessage(accountId, messageView) {
                 var image = `<div class="image-bx ${accountId == messageView.AccountId ? 'ml-sm-4 ml-2 mb-4' : 'mr-sm-4 mr-2'}">
                                 <img src="https://vora.dexignlab.com/laravel/demo/images/users/9.png" alt="" class="rounded-circle img-1">

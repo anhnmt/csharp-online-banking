@@ -32,6 +32,19 @@ namespace OnlineBanking.BLL.Repositories
                 return false;
             }
         }
+        public bool AddRange(List<T> e)
+        {
+            try
+            {
+                tbl.AddRange(e);
+                cnn.SaveChanges();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
 
         public bool CheckDuplicate(Expression<Func<T, bool>> predicate)
         {

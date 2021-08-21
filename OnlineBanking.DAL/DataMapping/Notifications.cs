@@ -12,7 +12,7 @@ namespace OnlineBanking.DAL
 
         [Required(AllowEmptyStrings = false)] public string Content { get; set; }
 
-        [DefaultValue(NotificationStatus.Read)]
+        [DefaultValue(NotificationStatus.Unread)]
         public int Status { get; set; }
 
         [DefaultValue(NotificationType.Transaction)]

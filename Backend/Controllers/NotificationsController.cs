@@ -10,11 +10,9 @@ namespace Backend.Controllers
     {
         private readonly IRepository<Notifications> notifications;
         private readonly IRepository<Transactions> transactions;
-        private readonly Accounts currentUser;
 
         public NotificationsController()
         {
-            currentUser = (Accounts) Session["user"];
             notifications = new Repository<Notifications>();
             transactions = new Repository<Transactions>();
         }
@@ -22,12 +20,13 @@ namespace Backend.Controllers
         // GET
         public ActionResult Index()
         {
-            if (currentUser == null) return RedirectToAction("Login", "Home");
+            if ((Accounts) Session["user"] == null) return RedirectToAction("Login", "Home");
             return View();
         }
 
         public ActionResult GetData()
         {
+            var currentUser = (Accounts) Session["user"];
             if (Utils.IsNullOrEmpty(currentUser))
                 return Json(new
                 {
