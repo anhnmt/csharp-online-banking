@@ -217,7 +217,6 @@ namespace Backend.Areas.Admin.Controllers
 
             if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
             {
-                errors.Add("Status", "This cheque was been used or deleted!");
                 return Json(new
                 {
                     message = "Error",
@@ -397,6 +396,7 @@ namespace Backend.Areas.Admin.Controllers
                 FromBankAccountId = cheque.FromBankAccountId,
                 ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
             };
+            
             if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
                 return Json(new
                 {
@@ -435,7 +435,7 @@ namespace Backend.Areas.Admin.Controllers
                 return Json(new
                 {
                     message = "Error",
-                    data = "This cheque is not active",
+                    data = "This cheque was used or deleted",
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
             }

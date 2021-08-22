@@ -434,16 +434,17 @@
                     }
                 })
             },
-            put: function (chequeBook) {
+            put: function (id) {
                 $.ajax({
                     type: "POST",
-                    url: "/Admin/ChequeBooks/Edit",
-                    data: chequeBook,
+                    url: "@Url.Action("PutData", "ChequeBooks")",
+                    data: {id : id},
                     success: function (res) {
-                        if (res.statusCode == 200) {
-                            $('#datatables').DataTable().ajax.reload();
-                            $("#myModal").modal("hide");
-                            toastr.success('Updated Successfully')
+                        if (res.statusCode === 200) {
+                            $('#datatablesChequeBook').DataTable().ajax.reload();
+                            toastr.success(res.data);
+                        }else{
+                            toastr.error(res.data);
                         }
                     }
 
@@ -452,10 +453,10 @@
             post: function (chequeBook) {
                 $.ajax({
                     type: "POST",
-                    url: "/Admin/ChequeBooks/Create",
+                    url: "@Url.Action("PostData", "ChequeBooks")",
                     data: chequeBook,
                     success: function (res) {
-                        if (res.statusCode == 200) {
+                        if (res.statusCode === 200) {
                             $('#datatablesChequeBook').DataTable().ajax.reload();
                             toastr.success('Created Successfully')
                         }
@@ -474,7 +475,7 @@
             "filter": true,
             "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
             "ajax": {
-                'url': '/Admin/ChequeBooks/GetAccountData',
+                'url': '@Url.Action("GetAccountData", "ChequeBooks")',
                 'data': { AccountId: @Model.AccountId},
             },
             "order": [
@@ -493,14 +494,12 @@
                     data: 'AccountName',
                     className: 'align-middle',
                 },
-
                 {
-                    data: {Status: 'Status', StatusName:'StatusName'},
-                    render: function (data) {
-                        if (data.Status === 0){
-                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                    render: function (data, type, row) {
+                        if (row.Status === 0){
+                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+row.StatusName+'</span>';
                         }else {
-                            return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
+                            return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+row.StatusName+'</span>';
                         }
                     },
                     className: 'align-middle text-center',
@@ -515,7 +514,9 @@
                 {
                     data: 'ChequeBookId',
                     "render": function (data, type, row) {
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a></div></div>'
+                    let toggle = row.Status === 0 ? "Close book" : "Open book";
+                    return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-toggle" href="javascript:void(0);">' + toggle +  '</a><a data-id="' + row.ChequeBookId + '" data-chequeUsed="' + row.ChequesUsed + '"  class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+
                     }
                 },
             ]
@@ -585,6 +586,11 @@
                 };
                 managerChequeBook.post(chequebook);
             })
+            
+            $(document).on("click", ".btn-toggle", function () {
+                let bookId = $(this).data("id");
+                managerChequeBook.put(bookId);
+            })
             //Account Number
             
             $(document).on("click", ".btn-add", function () {
@@ -596,17 +602,17 @@
                 $("#myModal").modal("show");
                 $(".modal-title").html("Create Account Number");
             })
+            
             $(document).on("click", ".btn-edit", function () {
                 $("#type").val("EDIT");
                 let bankId = $(this).data("id");
                 let a = managerBank.get(bankId);
             })
+            
             $(document).on("click", ".btn-manager", function () {
                 $("#type").val("TRANSFER");
                 let bankId = $(this).data("id");
                 let a = managerBank.get2(bankId);
-               
-
             })
 
             $(document).on("click", ".btn-delete", function () {
