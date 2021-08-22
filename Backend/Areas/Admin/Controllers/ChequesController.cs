@@ -322,6 +322,16 @@ namespace Backend.Areas.Admin.Controllers
                     data = errors,
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
+            if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
+            {
+                errors.Add("Code", "This cheque is belong to a cheque book which is not open!");
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet); 
+            }
 
             if (cheque.Status != (int) ChequeStatus.Actived)
             {
