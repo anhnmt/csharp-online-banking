@@ -9,6 +9,7 @@ namespace OnlineBanking.DAL
 {
     public class ApplicationDbContext : DbContext
     {
+
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());

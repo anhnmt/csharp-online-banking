@@ -1,24 +1,24 @@
 ﻿namespace OnlineBanking.DAL
 {
-    public class TransactionsDetail
+    public class TransactionsDetailViewModels
     {
-        public TransactionsDetail()
+        public TransactionsDetailViewModels()
         {
             
         }
 
-        public TransactionsDetail(Transactions trans)
+        public TransactionsDetailViewModels(Transactions trans)
         {
             TransactionId = trans.TransactionId;
-            FromId = trans.FromAccount.Name;
+            FromId = trans.TransactionDetails.W;
             ToId = trans.ToAccount.Name;
             Status = trans.Status;
             Amount = trans.Amount;
             Messages = trans.Messages;
             CreatedAt = trans.CreatedAt?.ToString("dd-MM-yyyy");
-            FromName = trans.FromAccount.Account.Name;
-            ToName = trans.ToAccount.Account.Name;
-            Currency = trans.FromAccount.Currency.Name;
+            //FromName = trans.FromAccount.Account.Name;
+            //ToName = trans.ToAccount.Account.Name;
+            Currency = trans.Currency.Name;
         }
         public int TransactionId { get; set; }
         public string FromId { get; set; }
