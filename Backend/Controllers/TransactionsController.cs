@@ -14,6 +14,7 @@ namespace Backend.Controllers
 {
     public class TransactionsController : BaseController
     {
+        public static TransactionsController Instance { get; private set; }
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Accounts> accounts;
@@ -22,6 +23,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
+            Instance = this;
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
