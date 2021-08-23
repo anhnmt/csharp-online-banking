@@ -14,12 +14,14 @@ namespace Backend.Areas.Admin.Controllers
         private readonly IRepository<Cheques> cheques;
         private readonly IRepository<ChequeBooks> chequebooks;
         private readonly IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<Transactions> transactions;
 
         public ChequesController()
         {
             cheques = new Repository<Cheques>();
             chequebooks = new Repository<ChequeBooks>();
             bankAccounts = new Repository<BankAccounts>();
+            transactions = new Repository<Transactions>();
         }
 
         // GET: Admin/Cheques
@@ -409,36 +411,62 @@ namespace Backend.Areas.Admin.Controllers
                 ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
             };
 
-            if (chequeExec.PaymentMethod == "bank-account" && toBankAccounts != null)
-            {
-                toBankAccounts.Balance += cheque.Amount;
-                bankAccounts.Edit(toBankAccounts);
-
-                var notifications = new List<Notifications>()
+            if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
+                return Json(new
                 {
-                    new Notifications
-                    {
-                        AccountId = cheque.FromBankAccount.Account.AccountId,
-                        Content = "Your account balance -" + cheque.Amount +
-                                  ", available balance: " + cheque.FromBankAccount.Balance,
-                        Status = (int) NotificationStatus.Unread,
-                        PkType = (int) NotificationType.Transaction,
-                        PkId = 1,
-                    },
+                    message = "Success",
+                    data = data,
+                    statusCode = 200,
+                }, JsonRequestBehavior.AllowGet);
 
-                    new Notifications
-                    {
-                        AccountId = cheque.ToBankAccount.AccountId,
-                        Content = "Your account balance +" + cheque.Amount +
-                                  ", available balance: " + toBankAccounts.Balance,
-                        Status = (int) NotificationStatus.Unread,
-                        PkType = (int) NotificationType.Transaction,
-                        PkId = 1,
-                    }
-                };
+            toBankAccounts.Balance += cheque.Amount;
+            bankAccounts.Edit(toBankAccounts);
 
-                // ChatHub.Instance.SendNotifications(notifications);
+            var transaction = new Transactions
+            {
+                FromId = cheque.FromBankAccount.BankAccountId,
+                ToId = toBankAccounts.BankAccountId,
+                Status = (int) DefaultStatus.Actived,
+                Amount = cheque.Amount,
+                BalancedTo = cheque.FromBankAccount.Balance,
+                BalancedFrom = toBankAccounts.Balance,
+                Messages = "Transfer from " + cheque.FromBankAccount.Name + " to " + toBankAccounts.Name,
+            };
+
+            if (!transactions.Add(transaction))
+            {
+                errors.Add("Transaction", "Can't create new transactions!");
+                return Json(new
+                {
+                    message = "Error",
+                    data = errors,
+                    statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
             }
+
+            var notifications = new List<Notifications>()
+            {
+                new Notifications
+                {
+                    AccountId = cheque.FromBankAccount.AccountId,
+                    Content = "Your account balance -" + cheque.Amount +
+                              ", available balance: " + cheque.FromBankAccount.Balance,
+                    Status = (int) NotificationStatus.Unread,
+                    PkType = (int) NotificationType.Transaction,
+                    PkId = transaction.TransactionId,
+                },
+                new Notifications
+                {
+                    AccountId = toBankAccounts.AccountId,
+                    Content = "Your account balance +" + cheque.Amount +
+                              ", available balance: " + toBankAccounts.Balance,
+                    Status = (int) NotificationStatus.Unread,
+                    PkType = (int) NotificationType.Transaction,
+                    PkId = transaction.TransactionId,
+                }
+            };
+
+            ChatHub.Instance.SendNotifications(notifications);
 
             return Json(new
             {
