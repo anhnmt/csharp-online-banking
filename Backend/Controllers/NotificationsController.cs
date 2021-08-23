@@ -36,6 +36,7 @@ namespace Backend.Controllers
 
             var data = notifications.Get()
                 .Where(x => x.AccountId == currentUser.AccountId)
+                .OrderByDescending(x => x.CreatedAt)
                 .Select(x =>
                 {
                     var pkObject = transactions

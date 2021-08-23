@@ -20,7 +20,7 @@ namespace OnlineBanking.DAL
         public int FromBankAccountId { get; set; }
         [Required]
         public int ChequeBookId { get; set; }
-        public Nullable<int> ToBankAccountId { get; set; }
+        public int? ToBankAccountId { get; set; }
 
         [ForeignKey("ChequeBookId")] public virtual ChequeBooks ChequeBook { get; set; }
         [ForeignKey("FromBankAccountId")] public virtual BankAccounts FromBankAccount { get; set; }
