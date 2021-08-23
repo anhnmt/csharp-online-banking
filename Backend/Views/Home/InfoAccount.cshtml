@@ -172,8 +172,16 @@
                     required: true,
                     email: true,
                 },
+                NumberID: {
+                    required: true,
+                    minlength: 10,
+                },
+                Address: {
+                    required: true,
+                },
                 Birthday: {
                     minAge: 18,
+                    required: true,
                 }
             },
             messages: {
@@ -254,7 +262,7 @@
                         $("#Email").val(response.data.Email);
                         $("#Phone").val(response.data.Phone);
                         $("#Birthday").val(response.data.Birthday);
-                        $("#NumberID").val(response.data.NumberID);
+                        $("#NumberID").val(response.data.NumberId);
                         $("#Address").val(response.data.Address);
                         $("#TextName").html(response.data.Name);
                         $("#TextEmail").html(response.data.Email);
@@ -270,12 +278,11 @@
                     url: "/Home/UpdateInfo",
                     data: user,
                     success: function (res) {
-                        console.log(res);
                         if (res.statusCode === 400) {
                             validator.showErrors(res.data);
-                            toastr.error("Update failed!");
+                            notifyError("Error", "Update failed!");
                         } else if (res.statusCode === 200) {
-                            toastr.success("Update successfully!");
+                            notifySuccess("Success", "Update succesfully!");
                             accounts.load();
                         }
                     }
@@ -287,12 +294,11 @@
                     url: "@Url.Action("ChangePassword","Home")",
                     data: obj,
                     success: function (res) {
-                        console.log(res);
                         if (res.statusCode === 400) {
                             validator2.showErrors(res.data);
-                            toastr.error("Update failed!");
+                            notifyError("Error", "Update failed!");
                         } else if (res.statusCode === 200) {
-                            toastr.success("Change password successfully!");
+                            notifySuccess("Success", "Change password successfully!");
                             $("#formData2").trigger("reset");
                         }
                     }

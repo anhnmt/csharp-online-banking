@@ -121,8 +121,6 @@ namespace Backend.Controllers
 
         public ActionResult InfoAccount()
         {
-            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
-
             return View();
         }
 
@@ -181,9 +179,14 @@ namespace Backend.Controllers
                 acc1.Birthday = IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberId = acc.NumberId;
-                acc1.UpdatedAt = DateTime.Now;
-                accounts.Edit(acc1);
-
+                if (!accounts.Edit(acc1))
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
                 return Json(new
                 {
                     statusCode = 200,
