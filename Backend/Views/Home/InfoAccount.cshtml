@@ -164,6 +164,10 @@
                 Name: {
                     required: true,
                 },
+                Phone: {
+                    minlength: 10,
+                    required: true,
+                },
                 Email: {
                     required: true,
                     email: true,
@@ -176,6 +180,18 @@
                 Birthday: {
                     minAge: "Your age must be greater than 18"
                 }
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
             },
             submitHandler: function (form) {
                 const user = {
@@ -206,6 +222,18 @@
                   equalTo: "#NewPassword",
                }
            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
            submitHandler: function (form) {
                const obj = {
                    OldPassword: $("#OldPassword").val(),
