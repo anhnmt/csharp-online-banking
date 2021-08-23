@@ -27,7 +27,6 @@ namespace Backend.Controllers
         
         public ActionResult GetAccountData(int accountId)
         {
-            ViewBag.ChequeBooks = "active";
             var data = chequebooks.Get(x => x.AccountId == accountId).Select(x => new ChequeBookViewModel
             {
                 ChequeBookId = x.ChequeBookId,
