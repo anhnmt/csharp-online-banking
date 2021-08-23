@@ -14,6 +14,7 @@ namespace Backend.Controllers
 {
     public class TransactionsController : BaseController
     {
+        public static TransactionsController Instance { get; private set; }
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Accounts> accounts;
@@ -22,6 +23,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
+            Instance = this;
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
@@ -328,15 +330,16 @@ namespace Backend.Controllers
             return data == null ? View() : View(data);
         }
 
-        public ActionResult TransactionsDetails(string fromBank, int transId)
+        public ActionResult TransactionsDetails(int id,string fromBank)
         {
             ViewBag.fromBank = fromBank;
-            var data = transactions
-                .Get(x => x.TransactionId == transId)
-                .Select(x => new TransactionsDetail(x))
-                .FirstOrDefault();
-
-            return View(data);
+            var user = (Accounts)Session["user"];
+            if (bankAccounts.CheckDuplicate(x => x.AccountId == user.AccountId && x.Name == fromBank))
+            {
+                var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x)).FirstOrDefault();
+                return data == null ? View() : View(data);
+            }
+            return RedirectToAction("NotFound", "Error");
         }
     }
 }
