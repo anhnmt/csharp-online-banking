@@ -19,12 +19,12 @@ namespace OnlineBanking.DAL
             modelBuilder.Entity<TransactionDetails>()
                 .HasRequired(t => t.Transaction)
                 .WithMany(a => a.TransactionDetails)
-                .HasForeignKey(m => m.BankAccountId)
+                .HasForeignKey(m => m.TransactionId)
                 .WillCascadeOnDelete(false);   
             
             modelBuilder.Entity<TransactionDetails>()
                 .HasRequired(t => t.BankAccount)
-                .WithMany(a => a.Transactions)
+                .WithMany(a => a.TransactionDetails)
                 .HasForeignKey(m => m.BankAccountId)
                 .WillCascadeOnDelete(false);
 
