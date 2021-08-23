@@ -333,8 +333,13 @@ namespace Backend.Controllers
         public ActionResult TransactionsDetails(int id,string fromBank)
         {
             ViewBag.fromBank = fromBank;
-            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x)).FirstOrDefault();
-            return data == null ? View() : View(data);
+            var user = (Accounts)Session["user"];
+            if (bankAccounts.CheckDuplicate(x => x.AccountId == user.AccountId && x.Name == fromBank))
+            {
+                var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x)).FirstOrDefault();
+                return data == null ? View() : View(data);
+            }
+            return RedirectToAction("NotFound", "Error");
         }
     }
 }
