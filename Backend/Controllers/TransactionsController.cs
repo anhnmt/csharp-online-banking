@@ -328,11 +328,15 @@ namespace Backend.Controllers
             return data == null ? View() : View(data);
         }
 
-        public ActionResult TransactionsDetails(int id,string fromBank)
+        public ActionResult TransactionsDetails(string fromBank, int transId)
         {
             ViewBag.fromBank = fromBank;
-            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x)).FirstOrDefault();
-            return data == null ? View() : View(data);
+            var data = transactions
+                .Get(x => x.TransactionId == transId)
+                .Select(x => new TransactionsDetail(x))
+                .FirstOrDefault();
+
+            return View(data);
         }
     }
 }

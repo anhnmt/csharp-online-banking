@@ -3,6 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
+using Backend.Hubs;
 using OnlineBanking.BLL.Repositories;
 using OnlineBanking.DAL;
 
@@ -51,7 +52,7 @@ namespace Backend.Areas.Admin.Controllers
                     CurrencyName = x.FromBankAccount.Currency.Name,
                     AmountNumber = x.Amount,
                     FromBankAccountName = x.FromBankAccount.Name,
-                    ToBankAccountName = x.ToBankAccountId == null  ? "None" : x.ToBankAccount.Name
+                    ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
                 });
             return Json(new
             {
@@ -215,7 +216,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
+            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
             {
                 return Json(new
                 {
@@ -322,7 +323,7 @@ namespace Backend.Areas.Admin.Controllers
                     data = errors,
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
-            
+
             if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
             {
                 errors.Add("Code", "This cheque is belong to a cheque book which is not open!");
@@ -331,7 +332,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                     data = errors,
                     statusCode = 400,
-                }, JsonRequestBehavior.AllowGet); 
+                }, JsonRequestBehavior.AllowGet);
             }
 
             if (cheque.Status != (int) ChequeStatus.Actived)
@@ -407,17 +408,37 @@ namespace Backend.Areas.Admin.Controllers
                 FromBankAccountId = cheque.FromBankAccountId,
                 ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
             };
-            
-            if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
-                return Json(new
+
+            if (chequeExec.PaymentMethod == "bank-account" && toBankAccounts != null)
+            {
+                toBankAccounts.Balance += cheque.Amount;
+                bankAccounts.Edit(toBankAccounts);
+
+                var notifications = new List<Notifications>()
                 {
-                    message = "Success",
-                    data = data,
-                    statusCode = 200,
-                }, JsonRequestBehavior.AllowGet);
-            
-            toBankAccounts.Balance += cheque.Amount;
-            bankAccounts.Edit(toBankAccounts);
+                    new Notifications
+                    {
+                        AccountId = cheque.FromBankAccount.Account.AccountId,
+                        Content = "Your account balance -" + cheque.Amount +
+                                  ", available balance: " + cheque.FromBankAccount.Balance,
+                        Status = (int) NotificationStatus.Unread,
+                        PkType = (int) NotificationType.Transaction,
+                        PkId = 1,
+                    },
+
+                    new Notifications
+                    {
+                        AccountId = cheque.ToBankAccount.AccountId,
+                        Content = "Your account balance +" + cheque.Amount +
+                                  ", available balance: " + toBankAccounts.Balance,
+                        Status = (int) NotificationStatus.Unread,
+                        PkType = (int) NotificationType.Transaction,
+                        PkId = 1,
+                    }
+                };
+
+                // ChatHub.Instance.SendNotifications(notifications);
+            }
 
             return Json(new
             {
@@ -450,7 +471,7 @@ namespace Backend.Areas.Admin.Controllers
                     statusCode = 400,
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             cheque.Status = (int) ChequeStatus.Deleted;
             cheques.Edit(cheque);
             return Json(new

@@ -175,7 +175,7 @@
                     {
                         data: {TransactionId:'TransactionId'},
                         "render": function (data) {
-                            let detail = "@Url.Action("TransactionsDetails", "Transactions")?id="+data.TransactionId+"&fromBank="+@Model.Name;
+                            let detail = "@Url.Action("TransactionsDetails", "Transactions")/"+@Model.Name+"?transId="+data.TransactionId;
                             return '<a href="'+detail+'" class="btn btn-rounded btn-info" >Details</a>'}
                     },
                 ],
