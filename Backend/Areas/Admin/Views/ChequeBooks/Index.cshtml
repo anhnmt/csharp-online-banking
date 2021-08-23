@@ -181,14 +181,7 @@
                 let chequeBookId = $(this).data("id");
                 window.location.assign("/Admin/ChequeBooks/Cheques/" + chequeBookId)
             })
-
-            $(document).on("click", "#btnSave", function () {
-                var chequeBook = {
-                    AccountId: $("#AccountId").val(),
-                }
-                chequeBook.AccountId = $("#Id").val();
-                managerChequeBook.put(chequeBook);
-            })
+            
             $(document).on("click", ".btn-detail", function () {
                 let bookId = $(this).data("id");
                 let accountId = $(this).data("account");
