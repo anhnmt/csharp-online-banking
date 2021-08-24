@@ -20,7 +20,7 @@ namespace Backend.Controllers
         private readonly IRepository<TransactionDetails> transactionDetails;
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Accounts> accounts;
-        private readonly Queue<Transactions> bankQueue;
+        private readonly Queue<TransactionRequestModels> bankQueue;
         private static readonly object Lock = new object();
         private static ApplicationDbContext _context;
 
@@ -32,7 +32,7 @@ namespace Backend.Controllers
             transactionDetails = new Repository<TransactionDetails>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
-            bankQueue = new Queue<Transactions>();
+            bankQueue = new Queue<TransactionRequestModels>();
         }
 
         // GET: Admin/Transactions
@@ -329,63 +329,64 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult Transfers(TransactionRequestModels tran)
         {
-            return HandlerTransfer(tran);
+            bankQueue.Enqueue(tran);
+
+            return HandlerTransfer();
         }
 
-        private JsonResult HandlerTransfer(TransactionRequestModels tran)
+        private JsonResult HandlerTransfer()
         {
             lock (Lock)
             {
-                using (var transaction = _context.Database.BeginTransaction())
+                var errors = new Dictionary<string, string>();
+                var tran = bankQueue.Dequeue();
+                do
                 {
-                    try
+                    using (var transaction = _context.Database.BeginTransaction())
                     {
-                        var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
-                        var minusError = MinusMoney(tran, sourceBankAccount);
-                        if (minusError != null)
+                        try
                         {
-                            return minusError;
+                            var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
+                            var minusError = MinusMoney(tran, sourceBankAccount);
+                            if (minusError != null)
+                            {
+                                return minusError;
+                            }
+
+                            var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
+                            var plusError = PlusMoney(tran, receiverBankAccount);
+                            if (plusError != null)
+                            {
+                                return plusError;
+                            }
+
+                            CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+
+                            transaction.Commit();
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            return Json(new
+                            {
+                                data = ex,
+                                message = "error",
+                                statuscode = 404
+                            }, JsonRequestBehavior.AllowGet);
+                            throw;
                         }
 
-                        var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
-                        var plusError = PlusMoney(tran, receiverBankAccount);
-                        if (plusError != null)
-                        {
-                            return plusError;
-                        }
 
-                        CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
-
-                        transaction.Commit();
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        //Console.WriteLine(ex);
                         return Json(new
                         {
-                            data = ex,
-                            message = "error",
-                            statuscode = 404
-                        }, JsonRequestBehavior.AllowGet);
-                        throw;
+                            data = "Successful transfer",
+                            message = "Success",
+                            statusCode = 200
+                        });
                     }
-
-
-                    return Json(new
-                    {
-                        data = "Successful transfer",
-                        message = "Success",
-                        statusCode = 200
-                    });
-                }
+                } while (bankQueue.Count != 0);
+                
             }
-            // xử lý công, trừ tiền BankAccount
-
-            // trừ tiền FromBank lấy ra đc đối tượng FromBankAcount
-            // cộng tiền ToBank lấy ra đc đối tượng ToBankAcount
-
-            // => thành công thì sẽ gọi hàm CreateTransactions(tran, FromBankAcount, ToBankAcount)
         }
         private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount)
         {
@@ -445,12 +446,15 @@ namespace Backend.Controllers
                     Status =1
                 },
             };
-
+            if (string.IsNullOrEmpty(tran.Messages))
+            {
+                tran.Messages = "Transfer from " + fromBankAccount.Name + " to " + toBankAccount.Name;
+            }
             var trannsaction = new Transactions()
             {
                 Status = 1,
                 Amount = tran.Amount,
-                Messages = "zxczxc",
+                Messages = tran.Messages,
                 TransactionDetails = transactionDetails,
             };
 

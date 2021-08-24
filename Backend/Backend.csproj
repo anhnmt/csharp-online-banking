@@ -22,7 +22,7 @@
     <IISExpressAnonymousAuthentication>
     </IISExpressAnonymousAuthentication>
     <IISExpressWindowsAuthentication />
-    <IISExpressUseClassicPipelineMode>true</IISExpressUseClassicPipelineMode>
+    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
@@ -658,7 +658,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Content\js\" />
-    <Folder Include="Data" />
+    <Folder Include="Data\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\OnlineBanking.BLL\OnlineBanking.BLL.csproj">
