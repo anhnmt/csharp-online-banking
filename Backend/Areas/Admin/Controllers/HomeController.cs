@@ -15,6 +15,7 @@ namespace Backend.Areas.Admin.Controllers
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Channels> channels;
         private readonly IRepository<Transactions> transactions;
+        private readonly IRepository<Cheques> cheques;
 
         public HomeController()
         {
@@ -22,6 +23,7 @@ namespace Backend.Areas.Admin.Controllers
             bankAccounts = new Repository<BankAccounts>();
             channels = new Repository<Channels>();
             transactions = new Repository<Transactions>();
+            cheques = new Repository<Cheques>();
         }
 
         // GET: Admin/Home
@@ -60,6 +62,24 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             var result = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            return Json(new
+            {
+                data = result.ToList(),
+                message = "Success",
+                statusCode = 200
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult GetCheques(DateTime? startDate, DateTime? endDate)
+        {
+            var data = cheques.Get(x => x.Status == (int) ChequeStatus.Received);
+            if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
+            {
+                endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
+                data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
+            }
+
+            var result = data.OrderByDescending(x => x.UpdatedAt).Select(x => new ChequesViewModel(x));
             return Json(new
             {
                 data = result.ToList(),
