@@ -36,18 +36,6 @@ namespace OnlineBanking.DAL
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<TransactionDetails>()
-                .HasRequired(t => t.Transaction)
-                .WithMany(a => a.TransactionDetails)
-                .HasForeignKey(m => m.TransactionId)
-                .WillCascadeOnDelete(false);
-
-            modelBuilder.Entity<TransactionDetails>()
-                .HasRequired(t => t.BankAccount)
-                .WithMany(a => a.TransactionDetails)
-                .HasForeignKey(m => m.BankAccountId)
-                .WillCascadeOnDelete(false);
-
             modelBuilder.Entity<Cheques>()
                 .HasRequired(t => t.FromBankAccount)
                 .WithMany(a => a.FromCheques)
@@ -64,6 +52,18 @@ namespace OnlineBanking.DAL
                 .HasRequired(m => m.Account)
                 .WithMany()
                 .HasForeignKey(m => m.AccountId)
+                .WillCascadeOnDelete(false);
+            
+            modelBuilder.Entity<TransactionDetails>()
+                .HasRequired(t => t.Transaction)
+                .WithMany(a => a.TransactionDetails)
+                .HasForeignKey(m => m.TransactionId)
+                .WillCascadeOnDelete(false);
+
+            modelBuilder.Entity<TransactionDetails>()
+                .HasRequired(t => t.BankAccount)
+                .WithMany(a => a.TransactionDetails)
+                .HasForeignKey(m => m.BankAccountId)
                 .WillCascadeOnDelete(false);
         }
 
@@ -98,8 +98,8 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Messages> Messages { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
 
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
+        public virtual DbSet<ChequeBooks> ChequeBooks { get; set; }
 
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.Cheques> Cheques { get; set; }
+        public virtual DbSet<Cheques> Cheques { get; set; }
     }
 }
