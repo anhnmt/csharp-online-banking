@@ -17,6 +17,7 @@ namespace Backend.Controllers
     {
         public static TransactionsController Instance { get; private set; }
         private readonly IRepository<Transactions> transactions;
+        private readonly IRepository<TransactionDetails> transactionDetails;
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Accounts> accounts;
         private readonly Queue<Transactions> bankQueue;
@@ -25,10 +26,10 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
-
             _context = ApplicationDbContext.Instance();
             Instance = this;
             transactions = new Repository<Transactions>();
+            transactionDetails = new Repository<TransactionDetails>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
             bankQueue = new Queue<Transactions>();
@@ -309,14 +310,14 @@ namespace Backend.Controllers
 
         public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
-            var data = transactions.Get(x => x.TransactionDetails.Any(y => y.BankAccountId == fromId) );
+            var data = transactionDetails.Get(x => x.BankAccountId == fromId);
             if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
             {
                 endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
                 data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             }
 
-            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x, x.Transaction));
             return Json(new
             {
                 data = data2.ToList(),
@@ -466,17 +467,17 @@ namespace Backend.Controllers
             return data == null ? View() : View(data);
         }
 
-        public ActionResult TransactionsDetails(int id, string fromBank)
+        public ActionResult TransactionsDetails(int id)
         {
-            ViewBag.fromBank = fromBank;
             var user = (Accounts)Session["user"];
 
-            if (!bankAccounts.CheckDuplicate(x => x.AccountId == user.AccountId && x.Name == fromBank))
+            var data = transactionDetails.Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId).Select(x => new TransactionsDetailViewModels(x, x.Transaction))
+                .FirstOrDefault();
+
+            if (data == null)
                 return RedirectToAction("NotFound", "Error");
 
-            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetailViewModels(x))
-                .FirstOrDefault();
-            return data == null ? View() : View(data);
+            return View(data);
         }
     }
 }

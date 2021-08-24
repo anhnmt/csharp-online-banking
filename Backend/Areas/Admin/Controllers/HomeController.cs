@@ -15,6 +15,7 @@ namespace Backend.Areas.Admin.Controllers
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Channels> channels;
         private readonly IRepository<Transactions> transactions;
+        private readonly IRepository<TransactionDetails> transactionDetails;
 
         public HomeController()
         {
@@ -22,6 +23,7 @@ namespace Backend.Areas.Admin.Controllers
             bankAccounts = new Repository<BankAccounts>();
             channels = new Repository<Channels>();
             transactions = new Repository<Transactions>();
+            transactionDetails = new Repository<TransactionDetails>();
         }
 
         // GET: Admin/Home
@@ -52,14 +54,14 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetTransactions(DateTime? startDate, DateTime? endDate)
         {
-            var data = transactions.Get();
+            var data = transactionDetails.Get();
             if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
             {
                 endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
                 data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             }
 
-            var result = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            var result = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x, x.Transaction));
             return Json(new
             {
                 data = result.ToList(),
