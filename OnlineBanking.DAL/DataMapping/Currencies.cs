@@ -13,5 +13,6 @@ namespace OnlineBanking.DAL
         [Required(AllowEmptyStrings = false)] public string Name { get; set; }
         public int Status { get; set; }
         public ICollection<BankAccounts> BankAccounts { get; set; }
+        //public ICollection<Transactions> Transactions { get; set; }
     }
 }

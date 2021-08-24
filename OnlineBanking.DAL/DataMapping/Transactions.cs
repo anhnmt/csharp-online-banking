@@ -13,8 +13,8 @@ namespace OnlineBanking.DAL
         public int Status { get; set; }
         public double Amount { get; set; }
         public string Messages { get; set; }
-        public string CurrencyId { get; set; }
+        //public int CurrencyId { get; set; }
         public virtual ICollection<TransactionDetails> TransactionDetails { get; set; }
-        [ForeignKey("CurrencyId")] public virtual Currencies Currency { get; set; }
+        //[ForeignKey("CurrencyId")] public virtual Currencies Currency { get; set; }
     }
 }

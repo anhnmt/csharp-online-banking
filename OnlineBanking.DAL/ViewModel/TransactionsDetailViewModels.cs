@@ -10,15 +10,15 @@
         public TransactionsDetailViewModels(Transactions trans)
         {
             TransactionId = trans.TransactionId;
-            FromId = trans.TransactionDetails.W;
-            ToId = trans.ToAccount.Name;
+            //FromId = trans.TransactionDetails.W;
+            //ToId = trans.ToAccount.Name;
             Status = trans.Status;
             Amount = trans.Amount;
             Messages = trans.Messages;
             CreatedAt = trans.CreatedAt?.ToString("dd-MM-yyyy");
             //FromName = trans.FromAccount.Account.Name;
             //ToName = trans.ToAccount.Account.Name;
-            Currency = trans.Currency.Name;
+            //Currency = trans.Currency.Name;
         }
         public int TransactionId { get; set; }
         public string FromId { get; set; }

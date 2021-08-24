@@ -10,9 +10,12 @@ namespace OnlineBanking.DAL
     public class ApplicationDbContext : DbContext
     {
 
+        public static ApplicationDbContext Instance;
+
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
+            Instance = this;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

@@ -9,6 +9,7 @@ using System.Web;
 using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
 using Backend.Hubs;
+using System.Data.Entity;
 
 namespace Backend.Controllers
 {
@@ -329,36 +330,52 @@ namespace Backend.Controllers
 
         private JsonResult HandlerTransfer(TransactionRequestModels tran)
         {
-            lock (Lock) {
-                var minusMoney = MinusMoney(tran);
-                if (minusMoney == null)
+            lock (Lock)
+            {
+                using (var context = ApplicationDbContext.Instance)
                 {
-                    return Json(new
+                    using (var transaction = context.Database.BeginTransaction())
                     {
-                        data = "Successful transfer",
-                        message = "Success",
-                        statusCode = 400
-                    });
-                }
+                        try
+                        {
+                            var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
+                            var minusError = MinusMoney(tran, sourceBankAccount,context);
+                            if (minusError != null)
+                            {
+                                return minusError;
+                            }
 
-                var plusMoney = PlusMoney(tran);
-                if (plusMoney == null)
-                {
-                    return Json(new
-                    {
-                        data = "Successful transfer",
-                        message = "Success",
-                        statusCode = 400
-                    });
-                }
+                            var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
+                            var plusError = PlusMoney(tran, receiverBankAccount,context);
+                            if (plusError != null)
+                            {
+                                return plusError;
+                            }
 
-                
-                return Json(new
-                {
-                    data = "Successful transfer",
-                    message = "Success",
-                    statusCode = 200
-                });
+                            transaction.Commit();
+
+
+                            return Json(new
+                            {
+                                data = "Successful transfer",
+                                message = "Success",
+                                statusCode = 200
+                            });
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+
+                            return Json(new
+                            {
+                                data = ex,
+                                message = "Error",
+                                statusCode = 400
+                            });
+                        }
+
+                    }
+                }
             };
             // xử lý công, trừ tiền BankAccount
 
@@ -367,40 +384,95 @@ namespace Backend.Controllers
 
             // => thành công thì sẽ gọi hàm CreateTransactions(tran, FromBankAcount, ToBankAcount)
         }
-        private BankAccounts MinusMoney(TransactionRequestModels tran)
+        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount, ApplicationDbContext context)
         {
-            using (SqlTransaction transaction = con.BeginTransaction())
+            var errors = new Dictionary<string, string>();
+            if (sourceBankAccount == null)
             {
-                try
+                errors.Add("FromId", "Account number doesn't exist");
+                return Json(new
                 {
-                   
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-
-                    Console.WriteLine(ex.InnerException);
-                }
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
             }
+
+            
+            sourceBankAccount.Balance -= tran.Amount;
+            try
+            {
+                context.Entry(sourceBankAccount).State = EntityState.Modified;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                throw;
+            }
+            
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    data = ex,
+                    message = "error",
+                    statuscode = 404
+                }, JsonRequestBehavior.AllowGet);
+                throw;
+            }
+           
+
+
             return null; //BankAccount
         }
 
-        private BankAccounts PlusMoney(TransactionRequestModels tran)
+        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount, ApplicationDbContext context)
         {
+            var errors = new Dictionary<string, string>();
+            if (receiverBankAccount == null)
+            {
+                errors.Add("FromId", "Account number doesn't exist");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            receiverBankAccount.AccountId = 0;
+            receiverBankAccount.Balance += tran.Amount;
+            try
+            {
+                context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    data = ex,
+                    message = "error",
+                    statuscode = 404
+                }, JsonRequestBehavior.AllowGet);
+                throw;
+            }
 
             return null; //BankAccount
         }
-        public void CreateTransactions (TransactionRequestModels tran, BankAccounts fromBankAccount, BankAccounts toBankAccount)
+        public void CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount, BankAccounts toBankAccount)
         {
-            var transactionDetails = new List<TransactionDetails>() { 
-                new TransactionDetails { 
+            var transactionDetails = new List<TransactionDetails>() {
+                new TransactionDetails {
                     BankAccountId = 1,
                     Balance = 1111,
                     Type = (int)TransactionType.Minus,
                     Status =1
-                }, 
-                new TransactionDetails { 
+                },
+                new TransactionDetails {
                     BankAccountId = 2,
                     Balance = 1311,
                     Type = (int)TransactionType.Plus,
@@ -420,8 +492,8 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts) Session["user"]) == null)
-                RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts)Session["user"]) == null)
+                RedirectToAction("Login", "Home", new { area = "" });
 
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
@@ -430,12 +502,12 @@ namespace Backend.Controllers
         public ActionResult TransactionsDetails(int id, string fromBank)
         {
             ViewBag.fromBank = fromBank;
-            var user = (Accounts) Session["user"];
+            var user = (Accounts)Session["user"];
 
             if (!bankAccounts.CheckDuplicate(x => x.AccountId == user.AccountId && x.Name == fromBank))
                 return RedirectToAction("NotFound", "Error");
 
-            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x))
+            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetailViewModels(x))
                 .FirstOrDefault();
             return data == null ? View() : View(data);
         }
