@@ -126,7 +126,8 @@
     <script src="~/Content/vendor/moment/moment.min.js" type="text/javascript"></script>
     <script src="~/Content/vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script src="~/Content/js/plugins-init/bs-daterange-picker-init.js"></script>
-    <script>  
+    <script>
+
         $(function () {
             let buttonCommon = {
                     exportOptions: {
@@ -141,52 +142,52 @@
                     }};
             let startDate;
             let endDate;
-            
+
             let datatables = $('#datatables').DataTable({
-                            "paging": true,
-                            "ordering": true,
-                            "autoWidth": false,
-                            "responsive": true,
-                            "processing": true,
-                            "filter": true,
-                            "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
-                            "ajax": {
-                                url: "/Admin/Transactions/GetData",
-                                data: function(d){
-                                    d.fromId= @Model.BankAccountId;
-                                    d.startDate= startDate;
-                                    d.endDate= endDate;
-                                },
-                            },
-                            "order": [
-                                [1, 'desc']
-                            ],
-                            "columns": [
-                                {
-                                    data: 'TransactionId',
-                                    className: 'align-middle text-center'
-                                },
-                                {
-                                    data: 'CreatedAt',
-                                    className: 'align-middle',
-                                },
-                                {
-                                    data: 'Messages',
-                                    className: 'align-middle',
-                                },
-                                {
-                                    data: { Amount: 'Amount', FromId: 'FromId'},
-                                    render: function(data) {
-                                        let fromId = $("#fromId").val();
-                                        return (data.Amount) == null ? "" : ((data.FromId === @Model.BankAccountId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
-                                    },
-                                    className: 'align-middle',
-                                },
-                                {
-                                    data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo:"BalancedTo"},
-                                    render: function (data) {
-                                        let fromId = $("#fromId").val();
-                                        return ((data.FromId === @Model.BankAccountId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
+                "paging": true,
+                "ordering": true,
+                "autoWidth": false,
+                "responsive": true,
+                "processing": true,
+                "filter": true,
+                "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+                "ajax": {
+                    url: "/Admin/Transactions/GetData",
+                    data: function (d) {
+                        d.fromId = @Model.BankAccountId;
+                        d.startDate = startDate;
+                        d.endDate = endDate;
+                    },
+                },
+                "order": [
+                    [1, 'desc']
+                ],
+                "columns": [
+                    {
+                        data: 'TransactionDetailId',
+                        className: 'align-middle text-center'
+                    },
+                    {
+                        data: 'CreatedAt',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: 'Messages',
+                        className: 'align-middle',
+                    },
+                    {
+                        data: { Amount: 'Amount', Type: 'Type', Currency: "Currency" },
+                        render: function (data) {
+                            let fromId = $("#fromId").val();
+                            return (data.Amount) == null ? "" : ((data.Type ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.Currency }).format(data.Amount));
+                        },
+                        className: 'align-middle',
+                    },
+                    {
+                        data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo: "BalancedTo", Currency: "Currency" },
+                        render: function (data) {
+                            let fromId = $("#fromId").val();
+                            return data.Type ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: data.Currency }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: data.Currency }).format(data.BalancedTo);
                                     },
                                     className: 'align-middle',
                                     "searchable": false,
@@ -201,7 +202,7 @@
                                     "searchable": false,
                                     "orderable": false
                                 },
-            
+
                             ],
                              dom: 'Bfrtip',
                              dom: 'Bfrtip',
@@ -210,20 +211,20 @@
                                  { extend: 'pdf', className: 'btn btn-primary glyphicon glyphicon-list-alt' },
                              ]
                         });
-                    
+
             $('#daterange').on('apply.daterangepicker', function(ev, picker) {
                 startDate = picker.startDate.format('YYYY-MM-DD');
                 endDate = picker.endDate.format('YYYY-MM-DD');
               datatables.ajax.reload();
             });
-            
+
             let start = moment().subtract(29, 'days');
             let end = moment();
-            
+
             function cb(start, end) {
                 $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
             }
-        
+
             $('#daterange').daterangepicker({
                 startDate: start,
                 endDate: end,
@@ -237,7 +238,7 @@
                    'This Year': [moment().subtract(1, 'month').startOf('year'), moment().subtract(1, 'month').endOf('year')]
                 }
             }, cb);
-        
+
             cb(start, end);
         })
     </script>

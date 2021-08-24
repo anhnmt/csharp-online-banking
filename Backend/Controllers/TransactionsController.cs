@@ -21,7 +21,7 @@ namespace Backend.Controllers
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Notifications> notifications;
         private readonly IRepository<Accounts> accounts;
-        private readonly Queue<Transactions> bankQueue;
+        private readonly Queue<TransactionRequestModels> bankQueue;
         private static readonly object Lock = new object();
         private static ApplicationDbContext _context;
 
@@ -33,7 +33,7 @@ namespace Backend.Controllers
             transactionDetails = new Repository<TransactionDetails>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
-            bankQueue = new Queue<Transactions>();
+            bankQueue = new Queue<TransactionRequestModels>();
             notifications = new Repository<Notifications>();
         }
 
@@ -332,50 +332,58 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult Transfers(TransactionRequestModels tran)
         {
-            return HandlerTransfer(tran);
+            bankQueue.Enqueue(tran);
+
+            return HandlerTransfer();
         }
 
-        private JsonResult HandlerTransfer(TransactionRequestModels tran)
+        private JsonResult HandlerTransfer()
         {
             lock (Lock)
             {
-                using (var transaction = _context.Database.BeginTransaction())
+                var errors = new Dictionary<string, string>();
+                var tran = bankQueue.Dequeue();
+                do
                 {
-                    try
+                    using (var transaction = _context.Database.BeginTransaction())
                     {
-                        var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
-                        var minusError = MinusMoney(tran, sourceBankAccount);
-                        if (minusError != null)
+                        try
                         {
-                            return minusError;
+                            var sourceBankAccount =
+                                bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
+                            var minusError = MinusMoney(tran, sourceBankAccount);
+                            if (minusError != null)
+                            {
+                                return minusError;
+                            }
+
+                            var receiverBankAccount =
+                                bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
+                            var plusError = PlusMoney(tran, receiverBankAccount);
+                            if (plusError != null)
+                            {
+                                return plusError;
+                            }
+
+                            var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+
+                            var newNotifications = CreateNotifications(newTransaction);
+
+                            transaction.Commit();
+
+                            ChatHub.Instance.SendNotifications(newNotifications);
                         }
-
-                        var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
-                        var plusError = PlusMoney(tran, receiverBankAccount);
-                        if (plusError != null)
+                        catch (Exception ex)
                         {
-                            return plusError;
+                            transaction.Rollback();
+                            return Json(new
+                            {
+                                data = ex,
+                                message = "error",
+                                statuscode = 404
+                            }, JsonRequestBehavior.AllowGet);
+                            throw;
                         }
-
-                        var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
-
-                        var newNotifications = CreateNotifications(newTransaction);
-
-                        transaction.Commit();
-
-                        ChatHub.Instance.SendNotifications(newNotifications);
-                    }
-                    catch (Exception ex)
-                    {
-                        transaction.Rollback();
-                        //Console.WriteLine(ex);
-                        return Json(new
-                        {
-                            data = ex,
-                            message = "error",
-                            statuscode = 404
-                        }, JsonRequestBehavior.AllowGet);
-                        throw;
                     }
 
                     return Json(new
@@ -384,7 +392,7 @@ namespace Backend.Controllers
                         message = "Success",
                         statusCode = 200
                     });
-                }
+                } while (bankQueue.Count != 0);
             }
         }
 
@@ -405,7 +413,6 @@ namespace Backend.Controllers
             sourceBankAccount.Balance -= tran.Amount;
             _context.Entry(sourceBankAccount).State = EntityState.Modified;
             _context.SaveChanges();
-
             return null;
         }
 
@@ -426,7 +433,6 @@ namespace Backend.Controllers
             receiverBankAccount.Balance += tran.Amount;
             _context.Entry(receiverBankAccount).State = EntityState.Modified;
             _context.SaveChanges();
-
             return null; //BankAccount
         }
 
@@ -450,18 +456,21 @@ namespace Backend.Controllers
                     Status = 1
                 },
             };
+            if (string.IsNullOrEmpty(tran.Messages))
+            {
+                tran.Messages = "Transfer from " + fromBankAccount.Name + " to " + toBankAccount.Name;
+            }
 
             var trannsaction = new Transactions()
             {
                 Status = 1,
                 Amount = tran.Amount,
-                Messages = "zxczxc",
+                Messages = tran.Messages,
                 TransactionDetails = transactionDetails,
             };
 
             _context.Set<Transactions>().Add(trannsaction);
             _context.SaveChanges();
-
             return trannsaction;
         }
 
@@ -494,15 +503,16 @@ namespace Backend.Controllers
 
             _context.Set<Notifications>().AddRange(lstNotification);
             _context.SaveChanges();
-
             return lstNotification;
         }
 
         public ActionResult ProfileAccountNumber(int id)
         {
             if (((Accounts) Session["user"]) == null)
-                RedirectToAction("Login", "Home", new {area = ""});
-
+                RedirectToAction("Login", "Home", new
+                {
+                    area = ""
+                });
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
         }
