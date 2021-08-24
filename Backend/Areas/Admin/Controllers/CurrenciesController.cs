@@ -10,7 +10,6 @@ namespace Backend.Areas.Admin.Controllers
 {
     public class CurrenciesController : BaseController
     {
-        private readonly ApplicationDbContext db = new ApplicationDbContext();
         private readonly IRepository<Currencies> currencies;
 
         public CurrenciesController()
@@ -170,16 +169,6 @@ namespace Backend.Areas.Admin.Controllers
                 statusCode = 400,
                 message = "Error"
             }, JsonRequestBehavior.AllowGet);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                db.Dispose();
-            }
-
-            base.Dispose(disposing);
         }
 
         private bool ExistCurrencyId(int id)
