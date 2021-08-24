@@ -30,7 +30,7 @@ namespace Backend.Hubs
         private readonly IRepository<Channels> channelRepo;
         private readonly IRepository<Messages> messageRepo;
         private readonly IRepository<Notifications> notificationRepo;
-        private readonly IRepository<Transactions> transactionRepo;
+        private readonly IRepository<TransactionDetails> transactionDetailRepo;
 
         public ChatHub()
         {
@@ -39,7 +39,7 @@ namespace Backend.Hubs
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
             notificationRepo = new Repository<Notifications>();
-            transactionRepo = new Repository<Transactions>();
+            transactionDetailRepo = new Repository<TransactionDetails>();
         }
 
         public async Task SendPrivate(string message)
@@ -137,8 +137,8 @@ namespace Backend.Hubs
                 .AsEnumerable()
                 .Select(x =>
                 {
-                    var pkObject = transactionRepo
-                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+                    var pkObject = transactionDetailRepo
+                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
                     return new NotificationViewModel(x, pkObject);
                 });
@@ -150,10 +150,8 @@ namespace Backend.Hubs
             {
                 notifications.ForEach(x =>
                 {
-                    Console.WriteLine("user-" + x.AccountId);
-
-                    var pkObject = transactionRepo
-                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+                    var pkObject = transactionDetailRepo
+                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
                     Clients.Group("user-" + x.AccountId)
                         .newNotification(new NotificationViewModel(x, pkObject));
