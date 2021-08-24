@@ -48,12 +48,6 @@ namespace OnlineBanking.DAL
                 .HasForeignKey(m => m.BankAccountId)
                 .WillCascadeOnDelete(false);
 
-            // modelBuilder.Entity<Transactions>()
-            //     .HasRequired(m => m.TransactionDetails)
-            //     .WithMany(a => a.ToTransactions)
-            //     .HasForeignKey(m => m.ToId)
-            //     .WillCascadeOnDelete(false);
-
             modelBuilder.Entity<Cheques>()
                 .HasRequired(t => t.FromBankAccount)
                 .WithMany(a => a.FromCheques)
