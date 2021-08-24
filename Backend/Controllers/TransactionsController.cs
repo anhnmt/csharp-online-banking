@@ -19,6 +19,7 @@ namespace Backend.Controllers
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<TransactionDetails> transactionDetails;
         private readonly IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<Notifications> notifications;
         private readonly IRepository<Accounts> accounts;
         private readonly Queue<Transactions> bankQueue;
         private static readonly object Lock = new object();
@@ -33,6 +34,7 @@ namespace Backend.Controllers
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
             bankQueue = new Queue<Transactions>();
+            notifications = new Repository<Notifications>();
         }
 
         // GET: Admin/Transactions
@@ -317,7 +319,8 @@ namespace Backend.Controllers
                 data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             }
 
-            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x, x.Transaction));
+            var data2 = data.OrderByDescending(x => x.CreatedAt)
+                .Select(x => new TransactionsViewModels(x, x.Transaction));
             return Json(new
             {
                 data = data2.ToList(),
@@ -325,7 +328,7 @@ namespace Backend.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
-        
+
         [HttpPost]
         public ActionResult Transfers(TransactionRequestModels tran)
         {
@@ -354,9 +357,13 @@ namespace Backend.Controllers
                             return plusError;
                         }
 
-                        CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+                        var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+
+                        var newNotifications = CreateNotifications(newTransaction);
 
                         transaction.Commit();
+
+                        ChatHub.Instance.SendNotifications(newNotifications);
                     }
                     catch (Exception ex)
                     {
@@ -371,7 +378,6 @@ namespace Backend.Controllers
                         throw;
                     }
 
-
                     return Json(new
                     {
                         data = "Successful transfer",
@@ -380,13 +386,8 @@ namespace Backend.Controllers
                     });
                 }
             }
-            // xử lý công, trừ tiền BankAccount
-
-            // trừ tiền FromBank lấy ra đc đối tượng FromBankAcount
-            // cộng tiền ToBank lấy ra đc đối tượng ToBankAcount
-
-            // => thành công thì sẽ gọi hàm CreateTransactions(tran, FromBankAcount, ToBankAcount)
         }
+
         private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount)
         {
             var errors = new Dictionary<string, string>();
@@ -429,20 +430,24 @@ namespace Backend.Controllers
             return null; //BankAccount
         }
 
-        public void CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount, BankAccounts toBankAccount)
+        public Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
+            BankAccounts toBankAccount)
         {
-            var transactionDetails = new List<TransactionDetails>() {
-                new TransactionDetails {
+            var transactionDetails = new List<TransactionDetails>()
+            {
+                new TransactionDetails
+                {
                     BankAccountId = fromBankAccount.BankAccountId,
                     Balance = fromBankAccount.Balance,
-                    Type = (int)TransactionType.Minus,
-                    Status =1
+                    Type = (int) TransactionType.Minus,
+                    Status = 1
                 },
-                new TransactionDetails {
+                new TransactionDetails
+                {
                     BankAccountId = toBankAccount.BankAccountId,
                     Balance = toBankAccount.Balance,
-                    Type = (int)TransactionType.Plus,
-                    Status =1
+                    Type = (int) TransactionType.Plus,
+                    Status = 1
                 },
             };
 
@@ -456,6 +461,41 @@ namespace Backend.Controllers
 
             _context.Set<Transactions>().Add(trannsaction);
             _context.SaveChanges();
+
+            return trannsaction;
+        }
+
+        public List<Notifications> CreateNotifications(Transactions transaction)
+        {
+            var from = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Minus);
+            var to = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Plus);
+
+            var lstNotification = new List<Notifications>()
+            {
+                new Notifications
+                {
+                    AccountId = from.BankAccount.AccountId,
+                    Content = "Your account balance -" + transaction.Amount +
+                              ", available balance: " + from.Balance,
+                    Status = (int) NotificationStatus.Unread,
+                    PkType = (int) NotificationType.Transaction,
+                    PkId = from.TransactionDetailId,
+                },
+                new Notifications
+                {
+                    AccountId = to.BankAccount.AccountId,
+                    Content = "Your account balance +" + transaction.Amount +
+                              ", available balance: " + to.Balance,
+                    Status = (int) NotificationStatus.Unread,
+                    PkType = (int) NotificationType.Transaction,
+                    PkId = to.TransactionDetailId,
+                }
+            };
+
+            _context.Set<Notifications>().AddRange(lstNotification);
+            _context.SaveChanges();
+
+            return lstNotification;
         }
 
         public ActionResult ProfileAccountNumber(int id)
@@ -469,9 +509,11 @@ namespace Backend.Controllers
 
         public ActionResult TransactionsDetails(int id)
         {
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
 
-            var data = transactionDetails.Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId).Select(x => new TransactionsDetailViewModels(x, x.Transaction))
+            var data = transactionDetails
+                .Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId)
+                .Select(x => new TransactionsDetailViewModels(x, x.Transaction))
                 .FirstOrDefault();
 
             if (data == null)

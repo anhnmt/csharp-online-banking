@@ -34,7 +34,7 @@ namespace Backend.Areas.Admin.Controllers
                 ChequeBookId = x.ChequeBookId,
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
-                ChequesUsed = x.Cheques.Count,
+                ChequesUsed = x.Cheques?.Count ?? 0,
                 StatusName = ((ChequeBookStatus) x.Status).ToString(),
                 Status = x.Status,
                 AccountId = x.AccountId,

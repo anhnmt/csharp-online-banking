@@ -148,8 +148,6 @@ namespace Backend.Hubs
         {
             try
             {
-                if (!notificationRepo.AddRange(notifications)) return;
-
                 notifications.ForEach(x =>
                 {
                     Console.WriteLine("user-" + x.AccountId);
