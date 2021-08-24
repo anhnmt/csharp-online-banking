@@ -9,9 +9,29 @@ namespace OnlineBanking.DAL
 {
     public class ApplicationDbContext : DbContext
     {
+        private static ApplicationDbContext _dbContext;
+
+        // lock object
+        private static readonly object LockObject = new object();
+
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
+        }
+
+        // Class in Instance
+        public static ApplicationDbContext Instance()
+        {
+            if (_dbContext == null)
+            {
+                lock (LockObject)
+                {
+                    if (_dbContext == null)
+                        _dbContext = new ApplicationDbContext();
+                }
+            }
+
+            return _dbContext;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -76,9 +96,7 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
-
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
-
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.Cheques> Cheques { get; set; }
+        public virtual DbSet<ChequeBooks> ChequeBooks { get; set; }
+        public virtual DbSet<Cheques> Cheques { get; set; }
     }
 }
