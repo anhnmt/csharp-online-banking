@@ -80,7 +80,7 @@
         function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Currencies/GetData",
+                url: "/Currencies/GetData",
                 data: { page: page, key: key, pageSize: pageSize },
                 success: function (res) {
                     var html;
