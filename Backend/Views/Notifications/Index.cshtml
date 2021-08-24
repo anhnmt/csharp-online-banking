@@ -86,11 +86,16 @@
                         data: 'CreatedAt',
                         className: 'align-middle',
                     },
-                    // {
-                    //     data: 'NotificationId',
-                    //     className: 'align-middle',
-                    //     "orderable": false
-                    // },
+                    {
+                        data: {PkId:'PkId'},
+                        className: 'align-middle',
+                        "render": function (data) {
+                            let detail = "@Url.Action("TransactionsDetails", "Transactions")/"+data.PkId;
+                            
+                            return '<a href="'+detail+'" class="btn btn-rounded btn-info" >Details</a>'
+                        },
+                        "orderable": false
+                    },
                 ]
             })
         })

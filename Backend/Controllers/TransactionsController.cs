@@ -14,6 +14,7 @@ namespace Backend.Controllers
 {
     public class TransactionsController : BaseController
     {
+        public static TransactionsController Instance { get; private set; }
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;
         private readonly IRepository<Accounts> accounts;
@@ -22,6 +23,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
+            Instance = this;
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
             accounts = new Repository<Accounts>();
@@ -237,7 +239,7 @@ namespace Backend.Controllers
                     bankDequeue.BalancedTo = receiverAccount.Balance;
                     if (string.IsNullOrEmpty(bankDequeue.Messages))
                     {
-                        bankDequeue.Messages = "Transfer from " + bankDequeue.FromId + " to " + bankDequeue.ToId;
+                        bankDequeue.Messages = "Transfer from " + sourceAccount.Name + " to " + receiverAccount.Name;
                     }
 
                     if (transactions.Add(bankDequeue))
@@ -325,6 +327,19 @@ namespace Backend.Controllers
                 RedirectToAction("Login", "Home", new {area = ""});
 
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
+            return data == null ? View() : View(data);
+        }
+
+        public ActionResult TransactionsDetails(int id, string fromBank)
+        {
+            ViewBag.fromBank = fromBank;
+            var user = (Accounts) Session["user"];
+
+            if (!bankAccounts.CheckDuplicate(x => x.AccountId == user.AccountId && x.Name == fromBank))
+                return RedirectToAction("NotFound", "Error");
+
+            var data = transactions.Get(x => x.TransactionId == id).Select(x => new TransactionsDetail(x))
+                .FirstOrDefault();
             return data == null ? View() : View(data);
         }
     }
