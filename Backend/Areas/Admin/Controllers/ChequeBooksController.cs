@@ -109,8 +109,6 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
-
-
         }
         
         public ActionResult PutData(int id)
@@ -160,5 +158,45 @@ namespace Backend.Areas.Admin.Controllers
             return Json(data, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult DeleteData(int id)
+        {
+            var x = chequebooks.Get(id);
+            if (x.Status == (int)ChequeBookStatus.Deleted)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "This cheque book was deleted",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (x.Cheques.Count > 0)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "This cheque book has cheque was used, cannot delete",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (!chequebooks.Delete(x))
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "Something wrong happen",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                statusCode = 200,
+                data = "Delete Successfully",
+                message = "Success"
+            }, JsonRequestBehavior.AllowGet);
+        }
     }
 }

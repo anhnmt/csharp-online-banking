@@ -24,16 +24,17 @@ namespace Backend.Controllers
         {
             return View();
         }
-        
-        public ActionResult GetAccountData(int accountId)
+
+        public ActionResult GetAccountData()
         {
-            var data = chequebooks.Get(x => x.AccountId == accountId).Select(x => new ChequeBookViewModel
+            var user = (Accounts)Session["user"];
+            var data = chequebooks.Get(x => x.AccountId == user.AccountId).Select(x => new ChequeBookViewModel
             {
                 ChequeBookId = x.ChequeBookId,
                 Code = x.Code,
                 AccountName = "#" + x.Account.AccountId + " - " + x.Account.Name,
                 ChequesUsed = x.Cheques.Count,
-                StatusName = ((ChequeBookStatus) x.Status).ToString(),
+                StatusName = ((ChequeBookStatus)x.Status).ToString(),
                 Status = x.Status
             });
 
@@ -44,13 +45,14 @@ namespace Backend.Controllers
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
         }
-        
+
         [HttpPost]
-        public ActionResult PostData(ChequeBooks chequeBook)
+        public ActionResult PostData()
         {
+            var user = (Accounts)Session["user"];
             var errors = new Dictionary<string, string>();
             var check = true;
-            if (!accounts.CheckDuplicate(x => x.AccountId == chequeBook.AccountId))
+            if (!accounts.CheckDuplicate(x => x.AccountId == user.AccountId))
             {
                 check = false;
                 errors.Add("AccountId", "Account does not exist!");
@@ -69,8 +71,9 @@ namespace Backend.Controllers
                 {
                     random = Utils.RandomString(16);
                 } while (chequebooks.CheckDuplicate(x => x.Code == random));
-
+                var chequeBook = new ChequeBooks();
                 chequeBook.Code = random;
+                chequeBook.AccountId = user.AccountId;
                 chequebooks.Add(chequeBook);
                 return Json(new
                 {
@@ -78,10 +81,8 @@ namespace Backend.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
-
-
         }
-        
+
         public ActionResult PutData(int id)
         {
             var x = chequebooks.Get(id);
@@ -106,11 +107,52 @@ namespace Backend.Controllers
                     message = "Error"
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             return Json(new
             {
                 statusCode = 200,
                 data = data,
+                message = "Success"
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult DeleteData(int id)
+        {
+            var x = chequebooks.Get(id);
+            if (x.Status == (int)ChequeBookStatus.Deleted)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "This cheque book was deleted",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (x.Cheques.Count > 0)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "This cheque book has cheque was used, cannot delete",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (!chequebooks.Delete(x))
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "Something wrong happen",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(new
+            {
+                statusCode = 200,
+                data = "Delete Successfully",
                 message = "Success"
             }, JsonRequestBehavior.AllowGet);
         }

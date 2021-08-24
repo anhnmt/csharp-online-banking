@@ -137,7 +137,7 @@
                 }
             }
         });
-        
+
         let buttonCommon = {
                 exportOptions: {
                     format: {
@@ -151,7 +151,7 @@
                 }};
         let startDate;
         let endDate;
-        
+
         let datatables = $('#datatables').DataTable({
                         "paging": true,
                         "ordering": true,
@@ -199,7 +199,7 @@
                                 "searchable": false,
                                 "orderable": false
                             },
-        
+
                         ],
                          dom: 'Bfrtip',
                          dom: 'Bfrtip',
@@ -208,20 +208,20 @@
                              { extend: 'pdf', className: 'btn btn-primary glyphicon glyphicon-list-alt' },
                          ]
                     });
-                
+
         $('#daterange').on('apply.daterangepicker', function(ev, picker) {
             startDate = picker.startDate.format('YYYY-MM-DD');
             endDate = picker.endDate.format('YYYY-MM-DD');
           datatables.ajax.reload();
         });
-        
+
         let start = moment().subtract(29, 'days');
         let end = moment();
-        
+
         function cb(start, end) {
             $('#daterange span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
         }
-    
+
         $('#daterange').daterangepicker({
             startDate: start,
             endDate: end,
@@ -235,8 +235,111 @@
                'This Year': [moment().subtract(1, 'month').startOf('year'), moment().subtract(1, 'month').endOf('year')]
             }
         }, cb);
-    
+
         cb(start, end);
+
+
+        //Cheque
+        let startDate2;
+        let endDate2;
+
+        let datatablesCheque = $('#datatablesCheque').DataTable({
+            "paging": true,
+            "ordering": true,
+            "autoWidth": false,
+            "responsive": true,
+            "processing": true,
+            "filter": true,
+            "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+            "ajax": {
+                url: "@Url.Action("GetCheques", "Home")",
+                data: function(d){
+                    d.startDate= startDate2;
+                    d.endDate= endDate2;
+                },
+            },
+            "order": [
+                [1, 'desc']
+            ],
+            "columns": [
+                {
+                    data: 'ChequeId',
+                    className: 'align-middle',
+
+                },
+                {
+                    data: 'Code',
+                    className: 'align-middle',
+                },
+                {
+                    data: { AmountNumber: 'AmountNumber', CurrencyName: "CurrencyName" },
+                    render: function (data) {
+                        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.CurrencyName }).format(data.AmountNumber)
+                    },
+                    className: 'align-middle',
+                },
+                {
+                    data: 'FromBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'ToBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: { Status: 'Status', StatusName: 'StatusName' },
+                    render: function (data) {
+                        if (data.Status === 0) {
+                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>' + data.StatusName + '</span>';
+                        } else if (data.Status === 1) {
+                            return '<span class="badge light badge-warning"><i class="fa fa-circle text-warning mr-1"></i>' + data.StatusName + '</span>';
+                        } else {
+                            return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>' + data.StatusName + '</span>';
+                        }
+
+                    },
+                    className: 'align-middle text-center',
+                    "searchable": false,
+                    "orderable": false,
+                },
+
+            ],
+            dom: 'Bfrtip',
+            dom: 'Bfrtip',
+            buttons: [
+                { extend: 'excel', className: 'btn btn-primary glyphicon glyphicon-list-alt' },
+                { extend: 'pdf', className: 'btn btn-primary glyphicon glyphicon-list-alt' },
+            ]
+        });
+
+        $('#daterange2').on('apply.daterangepicker', function (ev, picker) {
+            startDate2 = picker.startDate.format('YYYY-MM-DD');
+            endDate2 = picker.endDate.format('YYYY-MM-DD');
+            datatablesCheque.ajax.reload();
+        });
+
+        let start2 = moment().subtract(29, 'days');
+        let end2 = moment();
+
+        function cb(start2, end2) {
+            $('#daterange2 span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+        }
+
+        $('#daterange2').daterangepicker({
+            startDate: start,
+            endDate: end,
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().subtract(1, 'month').startOf('year'), moment().subtract(1, 'month').endOf('year')]
+            }
+        }, cb);
+
+        cb(start2, end2);
     });
     </script>
 }
