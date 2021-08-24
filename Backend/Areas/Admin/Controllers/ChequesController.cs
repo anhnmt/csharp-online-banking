@@ -456,7 +456,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.Status != (int) ChequeStatus.Actived)
+            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int)ChequeStatus.Deleted)
             {
                 return Json(new
                 {

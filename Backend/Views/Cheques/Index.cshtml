@@ -19,15 +19,15 @@
                 <div class="table-responsive">
                     <table id="datatables" class="display min-w850">
                         <thead>
-                        <tr>
-                            <th>ChequeId</th>
-                            <th>Code</th>
-                            <th>Amount</th>
-                            <th>Source Bank Account</th>
-                            <th>Destination Bank Account</th>
-                            <th>Status</th>
-                            <th></th>
-                        </tr>
+                            <tr>
+                                <th>No</th>
+                                <th>Code</th>
+                                <th>Amount</th>
+                                <th>Source Bank Account</th>
+                                <th>Destination Bank Account</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
                         </thead>
                     </table>
                 </div>
@@ -104,13 +104,15 @@
             success: function (res){
                 let html = "";
                 for(let i = 0; i < res.data.length; i++) {
-                    html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + res.data[i].Balance + " " + res.data[i].CurrencyName + '">' + res.data[i].Name + '</option>';
+                    html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + (new Intl.NumberFormat('vi-VN', { style: 'currency', currency: res.data[i].CurrencyName }).format(res.data[i].Balance)) + '">' + res.data[i].Name + '</option>';
                 }
                 $("#bankAccountId").html(html);
+
                 $("#balance").html($("#bankAccountId :selected").data('balance'));
             }
         })
     }
+
     const chequesManager = {
         post: function (obj) {
             $.ajax({
@@ -122,9 +124,8 @@
                         $("#modifyModal").modal("hide");
                         $('#datatables').DataTable().ajax.reload();
                         notifySuccess("Success", 'Created Successfully');
-                        
-                    }else{
-                        if (typeof res.data == "string"){
+                    } else {
+                        if (typeof res.data == "string") {
                             notifyError("Error", res.data);
                             $("#modifyModal").modal("hide");
                         }else{
@@ -134,24 +135,24 @@
                 }
             })
         },
-        
-        put: function (obj) {
+
+        put: function (id) {
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("PutData", "Cheques")",
-                data: obj,
+                data: {id: id},
                 success: function (res) {
                     if (res.statusCode === 200) {
                         $("#modifyModal").modal("hide");
                         $('#datatables').DataTable().ajax.reload();
-                        notifySuccess("Success", "Updated successfully");
+                        notifySuccess('Success', res.data);
                     } else {
-                        validator.showErrors(res.data);
+                        notifyError('Error', res.data);
                     }
                 }
             })
         },
-        
+
         get: function (id) {
             $.ajax({
                 type: "GET",
@@ -161,11 +162,11 @@
                     $("#bankAccountId").val(res.data.FromBankAccountId);
                     $("#Amount").val(res.data.AmountNumber);
                     $("#Status").val(res.data.Status);
-                    $("#modifyModal").modal("show"); 
+                    $("#modifyModal").modal("show");
                 }
             })
         },
-        
+
         delete: function (id){
             $.ajax({
                 type: "POST",
@@ -213,15 +214,10 @@
                 ChequeBookId: @Model.ChequeBookId,
                 Status: $("#Status").val(),
             };
-            if ($("#type").val() === "EDIT") {
-                obj.ChequeId = $("#Id").val();
-                chequesManager.put(obj);
-            } else {
-                chequesManager.post(obj);
-            }
+            chequesManager.post(obj);
         }
     });
-    
+
     $(function () {
         $('#datatables').DataTable({
             "paging": true,
@@ -234,7 +230,7 @@
             "ajax":{
                 "url": "@Url.Action("GetData", "Cheques")",
                 "data": {ChequeBookId: @Model.ChequeBookId},
-            }, 
+            },
             "order": [
                 [0, 'asc']
             ],
@@ -242,7 +238,7 @@
                 {
                     data: 'ChequeId',
                     className: 'align-middle',
-                    
+
                 },
                 {
                     data: 'Code',
@@ -273,7 +269,7 @@
                         }else {
                             return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
                         }
-                       
+
                     },
                     className: 'align-middle text-center',
                     "searchable": false,
@@ -283,7 +279,8 @@
                     bSortable: false,
                     className: 'align-middle text-right',
                     "render": function (data, type, row) {
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" data-status="' + row.Status + '"class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        let toggle = row.Status === 0 ? "Stop this cheque" : "Active this cheque";
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" data-status="' + row.Status + '"class="dropdown-item btn-edit" href="javascript:void(0);">' + toggle + '</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                     }
                 },
             ]
@@ -291,25 +288,18 @@
 
         $(".btn-generate").click(function () {
             $("#formData").trigger("reset");
-            $(".modal-title").html("Create new cheque");
             $("#modifyModal").modal("show");
-            $("#type").val("CREATE");
             $("#Id").val("");
             loadBankAccount();
         });
 
         $(document).on("click", ".btn-edit", function () {
             let chequeStatus = $(this).data("status");
-            if (chequeStatus == 1 || chequeStatus == 3){
-                notifyError("Error", "You cannot edit cheque was received or used!");
-            }else{
-                $("#formData").trigger("reset");
-                $(".modal-title").html("Update Currency");
-                $("#type").val("EDIT");
-                $("#Id").val(chequeId);
+            if (chequeStatus == 1 || chequeStatus == 3) {
+                notifyError("Error", "You cannot edit cheque was deleted or used!");
+            } else {
                 let chequeId = $(this).data("id");
-                chequesManager.get(chequeId);
-                loadBankAccount();
+                chequesManager.put(chequeId);
             }
         });
 
@@ -317,11 +307,11 @@
             let chequeId = $(this).data("id");
             chequesManager.delete(chequeId);
         });
-        
+
         $(document).on("change", "#bankAccountId", function () {
             $("#balance").html($("#bankAccountId :selected").data("balance"));
         });
-        
+
         $('#modifyModal').on('shown.bs.modal', function () {
             validator.resetForm();
         });
