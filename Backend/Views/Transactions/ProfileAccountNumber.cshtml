@@ -137,7 +137,7 @@
                 ],
                 "columns": [
                     {
-                        data: 'TransactionId',
+                        data: 'TransactionDetailId',
                         className: 'align-middle text-center'
                     },
                     {
@@ -149,10 +149,10 @@
                         className: 'align-middle',
                     },
                     {
-                        data: { Amount: 'Amount', FromId: 'FromId'},
+                        data: { Amount: 'Amount', FromId: 'FromId', Currency: "Currency", Type: "Type"},
                         render: function(data) {
                             let fromId = $("#fromId").val();
-                            return (data.Amount) == null ? "" : ((data.FromId === @Model.BankAccountId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
+                            return (data.Amount) == null ? "" : (data.Type ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.Currency }).format(data.Amount)
                         },
                         className: 'align-middle',
                     },
@@ -175,11 +175,10 @@
                     {
                         data: {TransactionId:'TransactionId'},
                         "render": function (data) {
-                            let detail = "@Url.Action("TransactionsDetails", "Transactions")/"+data.TransactionId+"?fromBank="+@Model.Name;
+                            let detail = "@Url.Action("TransactionsDetails", "Transactions")/" + data.TransactionDetailId;
                             return '<a href="'+detail+'" class="btn btn-rounded btn-info" >Details</a>'}
                     },
                 ],
-                 dom: 'Bfrtip',
                  dom: 'Bfrtip',
                  buttons: [
                      { extend: 'excel', className: 'btn btn-primary glyphicon glyphicon-list-alt' },
