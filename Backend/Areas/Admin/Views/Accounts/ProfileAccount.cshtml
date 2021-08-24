@@ -235,7 +235,7 @@
                 success: function (e) {
                     jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
                 },
-    
+
                 submitHandler: function () {
                    var bank = {
                        AccountId : "@Model.AccountId",
@@ -270,7 +270,7 @@
                     success: function (e) {
                         jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
                     },
-        
+
                     submitHandler: function () {
                        var trans = {
                            Amount: $("#Amount").val(),
@@ -399,7 +399,7 @@
                             notifyError('Error',"Deleted BankAccounts Error");
                             $('#tbl_banks').DataTable().ajax.reload();
                         }
-                        
+
                     }
                 })
             },
@@ -421,7 +421,7 @@
                 })
             }
         }
-        
+
         //Cheque Book
         var managerChequeBook = {
             get: function (id) {
@@ -442,9 +442,9 @@
                     success: function (res) {
                         if (res.statusCode === 200) {
                             $('#datatablesChequeBook').DataTable().ajax.reload();
-                            toastr.success(res.data);
+                            notifySuccess("Success",res.data);
                         }else{
-                            toastr.error(res.data);
+                            notifyError("Error",res.data);
                         }
                     }
 
@@ -458,12 +458,28 @@
                     success: function (res) {
                         if (res.statusCode === 200) {
                             $('#datatablesChequeBook').DataTable().ajax.reload();
-                            toastr.success('Created Successfully')
+                            notifySuccess("Success", "Created Successfully");
                         }
                     }
 
                 })
-            }
+            },
+            delete: function (id) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("DeleteData", "ChequeBooks")",
+                    data: {id : id},
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            $('#datatablesChequeBook').DataTable().ajax.reload();
+                            notifySuccess("Success", res.data);
+                        }else{
+                            notifyError("Error", res.data);
+                        }
+                    }
+
+                })
+            },
         }
 
         $('#datatablesChequeBook').DataTable({
@@ -514,8 +530,8 @@
                 {
                     data: 'ChequeBookId',
                     "render": function (data, type, row) {
-                    let toggle = row.Status === 0 ? "Close book" : "Open book";
-                    return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-toggle" href="javascript:void(0);">' + toggle +  '</a><a data-id="' + row.ChequeBookId + '" data-chequeUsed="' + row.ChequesUsed + '"  class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        let toggle = row.Status === 0 ? "Close book" : "Open book";
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" data-account="' + row.AccountId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-toggle" href="javascript:void(0);">' + toggle + '</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item text-danger btn-delete2" href="javascript:void(0);">Delete</a></div></div>'
 
                     }
                 },
@@ -586,13 +602,13 @@
                 };
                 managerChequeBook.post(chequebook);
             })
-            
+
             $(document).on("click", ".btn-toggle", function () {
                 let bookId = $(this).data("id");
                 managerChequeBook.put(bookId);
             })
             //Account Number
-            
+
             $(document).on("click", ".btn-add", function () {
                 loadStatus();
                 loadCurrency();
@@ -602,13 +618,13 @@
                 $("#myModal").modal("show");
                 $(".modal-title").html("Create Account Number");
             })
-            
+
             $(document).on("click", ".btn-edit", function () {
                 $("#type").val("EDIT");
                 let bankId = $(this).data("id");
                 let a = managerBank.get(bankId);
             })
-            
+
             $(document).on("click", ".btn-manager", function () {
                 $("#type").val("TRANSFER");
                 let bankId = $(this).data("id");
@@ -619,7 +635,11 @@
                 let BankId = $(this).data("id");
                 managerBank.delete(BankId);
             });
-             
+
+            $(document).on("click", ".btn-delete2", function () {
+                let bookId = $(this).data("id");
+                managerChequeBook.delete(bookId);
+            })
         })
     </script>
 }
