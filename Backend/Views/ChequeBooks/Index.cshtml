@@ -164,7 +164,7 @@
             $(document).on("click", ".btn-detail-2", function () {
                 let bookId = $(this).data("id");
                 let accountId = $(this).data("account");
-                window.location.assign("/Admin/Cheques/?ChequeBookId=" + bookId + "&AccountId=" + accountId);
+                window.location.assign("Cheques/?ChequeBookId=" + bookId);
             })
 
             $(document).on("click", ".btn-toggle", function () {

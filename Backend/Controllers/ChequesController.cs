@@ -12,6 +12,7 @@ namespace Backend.Controllers
     public class ChequesController : BaseController
     {
         private readonly IRepository<Cheques> cheques;
+        private readonly IRepository<Accounts> accounts;
         private readonly IRepository<ChequeBooks> chequebooks;
         private readonly IRepository<BankAccounts> bankAccounts;
 
@@ -20,25 +21,37 @@ namespace Backend.Controllers
             cheques = new Repository<Cheques>();
             chequebooks = new Repository<ChequeBooks>();
             bankAccounts = new Repository<BankAccounts>();
+            accounts = new Repository<Accounts>();
         }
 
         // GET: Admin/Cheques
         public ActionResult Index(int chequeBookId)
         {
             var user = (Accounts)Session["user"];
-
+            var account = accounts.Get(user.AccountId);
             var chequesInformationViewModel = new ChequesInformationViewModel
             {
                 ChequeBookId = chequeBookId,
                 AccountId = user.AccountId
             };
 
-            return View(chequesInformationViewModel);
+            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeBookId && x.AccountId == account.AccountId))
+            {
+                return View(chequesInformationViewModel);
+            }
+            else
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
         }
 
         public ActionResult GetData(int chequeBookId)
         {
-            var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int)ChequeStatus.Deleted)
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeBookId && x.AccountId == account.AccountId))
+            {
+                var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int)ChequeStatus.Deleted)
                 .Select(x => new ChequesViewModel
                 {
                     ChequeBookId = x.ChequeBookId,
@@ -52,17 +65,30 @@ namespace Backend.Controllers
                     FromBankAccountName = x.FromBankAccount.Name,
                     ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
                 });
-            return Json(new
+                return Json(new
+                {
+                    data = data.ToList(),
+                    message = "Success",
+                    statusCode = 200
+                }, JsonRequestBehavior.AllowGet);
+            }
+            else
             {
-                data = data.ToList(),
-                message = "Success",
-                statusCode = 200
-            }, JsonRequestBehavior.AllowGet);
+                return Json(new
+                {
+                    message = "Not found",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
         }
 
         public ActionResult FindId(int chequeId)
         {
             var x = cheques.Get(chequeId);
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+
             var data = new ChequesViewModel
             {
                 ChequeBookId = x.ChequeBookId,
@@ -90,6 +116,8 @@ namespace Backend.Controllers
         {
             var errors = new Dictionary<string, string>();
             string code;
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
 
             if (!ModelState.IsValid)
             {
@@ -106,6 +134,15 @@ namespace Backend.Controllers
                     message = "Error",
                     data = errors,
                     statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeInformation.ChequeBookId && x.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    message = "Error",
+                    statusCode = 404,
                 }, JsonRequestBehavior.AllowGet);
             }
 
