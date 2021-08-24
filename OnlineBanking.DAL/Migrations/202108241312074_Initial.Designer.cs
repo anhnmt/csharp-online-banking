@@ -13,7 +13,7 @@ namespace OnlineBanking.DAL.Migrations
         
         string IMigrationMetadata.Id
         {
-            get { return "202108232127343_Initial"; }
+            get { return "202108241312074_Initial"; }
         }
         
         string IMigrationMetadata.Source

@@ -67,9 +67,9 @@
     <Compile Include="DataMapping\Roles.cs" />
     <Compile Include="DataMapping\TransactionDetails.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
-    <Compile Include="Migrations\202108232127343_Initial.cs" />
-    <Compile Include="Migrations\202108232127343_Initial.Designer.cs">
-      <DependentUpon>202108232127343_Initial.cs</DependentUpon>
+    <Compile Include="Migrations\202108241312074_Initial.cs" />
+    <Compile Include="Migrations\202108241312074_Initial.Designer.cs">
+      <DependentUpon>202108241312074_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,12 +100,12 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202108232127343_Initial.resx">
-      <DependentUpon>202108232127343_Initial.cs</DependentUpon>
-    </EmbeddedResource>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+    <EmbeddedResource Include="Migrations\202108241312074_Initial.resx">
+      <DependentUpon>202108241312074_Initial.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

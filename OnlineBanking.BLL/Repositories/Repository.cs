@@ -16,7 +16,7 @@ namespace OnlineBanking.BLL.Repositories
         private readonly DbSet<T> tbl;
         public Repository()
         {
-            cnn = new ApplicationDbContext();
+            cnn = ApplicationDbContext.Instance();
             tbl = cnn.Set<T>();
         }
         public bool Add(T e)
@@ -90,7 +90,6 @@ namespace OnlineBanking.BLL.Repositories
             }
             catch (Exception)
             {
-
                 return false;
             }
         }

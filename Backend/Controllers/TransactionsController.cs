@@ -21,9 +21,12 @@ namespace Backend.Controllers
         private readonly IRepository<Accounts> accounts;
         private readonly Queue<Transactions> bankQueue;
         private static object Lock = new object();
+        private static ApplicationDbContext _context;
 
         public TransactionsController()
         {
+
+            _context = ApplicationDbContext.Instance();
             Instance = this;
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
@@ -332,51 +335,50 @@ namespace Backend.Controllers
         {
             lock (Lock)
             {
-                using (var context = ApplicationDbContext.Instance)
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    using (var transaction = context.Database.BeginTransaction())
+                    try
                     {
-                        try
+                        var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
+                        var minusError = MinusMoney(tran, sourceBankAccount);
+                        if (minusError != null)
                         {
-                            var sourceBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
-                            var minusError = MinusMoney(tran, sourceBankAccount,context);
-                            if (minusError != null)
-                            {
-                                return minusError;
-                            }
-
-                            var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
-                            var plusError = PlusMoney(tran, receiverBankAccount,context);
-                            if (plusError != null)
-                            {
-                                return plusError;
-                            }
-
-                            transaction.Commit();
-
-
-                            return Json(new
-                            {
-                                data = "Successful transfer",
-                                message = "Success",
-                                statusCode = 200
-                            });
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
-
-                            return Json(new
-                            {
-                                data = ex,
-                                message = "Error",
-                                statusCode = 400
-                            });
+                            return minusError;
                         }
 
+                        var receiverBankAccount = bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
+                        var plusError = PlusMoney(tran, receiverBankAccount);
+                        if (plusError != null)
+                        {
+                            return plusError;
+                        }
+
+                        CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+
+                        transaction.Commit();
                     }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        //Console.WriteLine(ex);
+                        return Json(new
+                        {
+                            data = ex,
+                            message = "error",
+                            statuscode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                        throw;
+                    }
+
+
+                    return Json(new
+                    {
+                        data = "Successful transfer",
+                        message = "Success",
+                        statusCode = 200
+                    });
                 }
-            };
+            }
             // xử lý công, trừ tiền BankAccount
 
             // trừ tiền FromBank lấy ra đc đối tượng FromBankAcount
@@ -384,7 +386,7 @@ namespace Backend.Controllers
 
             // => thành công thì sẽ gọi hàm CreateTransactions(tran, FromBankAcount, ToBankAcount)
         }
-        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount, ApplicationDbContext context)
+        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount)
         {
             var errors = new Dictionary<string, string>();
             if (sourceBankAccount == null)
@@ -398,39 +400,14 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            
             sourceBankAccount.Balance -= tran.Amount;
-            try
-            {
-                context.Entry(sourceBankAccount).State = EntityState.Modified;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex);
-                throw;
-            }
-            
-            try
-            {
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    data = ex,
-                    message = "error",
-                    statuscode = 404
-                }, JsonRequestBehavior.AllowGet);
-                throw;
-            }
-           
+            _context.Entry(sourceBankAccount).State = EntityState.Modified;
+            _context.SaveChanges();
 
-
-            return null; //BankAccount
+            return null;
         }
 
-        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount, ApplicationDbContext context)
+        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount)
         {
             var errors = new Dictionary<string, string>();
             if (receiverBankAccount == null)
@@ -444,37 +421,25 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            receiverBankAccount.AccountId = 0;
             receiverBankAccount.Balance += tran.Amount;
-            try
-            {
-                context.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                return Json(new
-                {
-                    data = ex,
-                    message = "error",
-                    statuscode = 404
-                }, JsonRequestBehavior.AllowGet);
-                throw;
-            }
+            _context.Entry(receiverBankAccount).State = EntityState.Modified;
+            _context.SaveChanges();
 
             return null; //BankAccount
         }
+
         public void CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount, BankAccounts toBankAccount)
         {
             var transactionDetails = new List<TransactionDetails>() {
                 new TransactionDetails {
-                    BankAccountId = 1,
-                    Balance = 1111,
+                    BankAccountId = fromBankAccount.BankAccountId,
+                    Balance = fromBankAccount.Balance,
                     Type = (int)TransactionType.Minus,
                     Status =1
                 },
                 new TransactionDetails {
-                    BankAccountId = 2,
-                    Balance = 1311,
+                    BankAccountId = toBankAccount.BankAccountId,
+                    Balance = toBankAccount.Balance,
                     Type = (int)TransactionType.Plus,
                     Status =1
                 },
@@ -483,11 +448,13 @@ namespace Backend.Controllers
             var trannsaction = new Transactions()
             {
                 Status = 1,
-                Amount = 123,
+                Amount = tran.Amount,
                 Messages = "zxczxc",
                 TransactionDetails = transactionDetails,
             };
-            transactions.Add(trannsaction);
+
+            _context.Set<Transactions>().Add(trannsaction);
+            _context.SaveChanges();
         }
 
         public ActionResult ProfileAccountNumber(int id)

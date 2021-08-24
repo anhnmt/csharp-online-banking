@@ -9,13 +9,29 @@ namespace OnlineBanking.DAL
 {
     public class ApplicationDbContext : DbContext
     {
+        private static ApplicationDbContext _dbContext;
 
-        public static ApplicationDbContext Instance;
+        // lock object
+        private static readonly object lockObject = new object();
 
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
-            Instance = this;
+        }
+
+        // Class in Instance
+        public static ApplicationDbContext Instance()
+        {
+            if (_dbContext == null)
+            {
+                lock (lockObject)
+                {
+                    if (_dbContext == null)
+                        _dbContext = new ApplicationDbContext();
+                }
+            }
+
+            return _dbContext;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -24,8 +40,8 @@ namespace OnlineBanking.DAL
                 .HasRequired(t => t.Transaction)
                 .WithMany(a => a.TransactionDetails)
                 .HasForeignKey(m => m.TransactionId)
-                .WillCascadeOnDelete(false);   
-            
+                .WillCascadeOnDelete(false);
+
             modelBuilder.Entity<TransactionDetails>()
                 .HasRequired(t => t.BankAccount)
                 .WithMany(a => a.TransactionDetails)
@@ -83,10 +99,10 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Currencies> Currencies { get; set; }
         public virtual DbSet<Roles> Roles { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
+        public virtual DbSet<TransactionDetails> TransactionDetails { get; set; }
         public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
-        public virtual DbSet<TransactionDetails> TransactionDetails { get; set; }
 
         public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
 
