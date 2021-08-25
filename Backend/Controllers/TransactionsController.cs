@@ -27,7 +27,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
-            _context = ApplicationDbContext.Instance();
+            //_context = GetDbContextFromEntity();
             Instance = this;
             transactions = new Repository<Transactions>();
             transactionDetails = new Repository<TransactionDetails>();
@@ -133,70 +133,73 @@ namespace Backend.Controllers
                 var tran = bankQueue.Dequeue();
                 do
                 {
-                    using (var transaction = _context.Database.BeginTransaction())
+                    using(_context = new ApplicationDbContext())
                     {
-                        try
+                        using (var transaction = _context.Database.BeginTransaction())
                         {
-                            BankAccounts sourceBankAccount, receiverBankAccount;
-
-                            //Check TransactionRequestModels
-
-
-                            // Minus money Admin account
-                            var sessionUsers = (Accounts)Session["user"];
-                            if (sessionUsers.RoleId == 1)
+                            try
                             {
-                                var currenReceiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
-                                sourceBankAccount = bankAccounts.Get(x => x.AccountId == sessionUsers.AccountId && x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
-                                var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
-                                if (minusError1 != null)
+                                BankAccounts sourceBankAccount, receiverBankAccount;
+
+                                //Check TransactionRequestModels
+
+
+                                // Minus money Admin account
+                                var sessionUsers = (Accounts)Session["user"];
+                                if (sessionUsers.RoleId == 1)
                                 {
-                                    return minusError1;
+                                    var currenReceiverBankAccount = _context.BankAccounts.Where(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
+                                    sourceBankAccount = _context.BankAccounts.Where(x => x.AccountId == sessionUsers.AccountId && x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
+                                    var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
+                                    if (minusError1 != null)
+                                    {
+                                        return minusError1;
+                                    }
+                                    goto PlusMoney;
                                 }
-                                goto PlusMoney;
+
+                                if (CheckTransactionRequestModels(tran, errors) != null)
+                                {
+                                    return CheckTransactionRequestModels(tran, errors);
+                                }
+                                // Minus money
+                                sourceBankAccount = _context.BankAccounts.Where(x => x.Name == tran.FromId).FirstOrDefault();
+                                var minusError = MinusMoney(tran, sourceBankAccount, errors);
+                                if (minusError != null)
+                                {
+                                    return minusError;
+                                }
+
+                            // Plus money
+                            PlusMoney:
+                                receiverBankAccount = _context.BankAccounts.Where(x => x.Name == tran.ToId).FirstOrDefault();
+                                var plusError = PlusMoney(tran, receiverBankAccount, errors);
+                                if (plusError != null)
+                                {
+                                    return plusError;
+                                }
+
+                                //Create Transaction
+                                var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
+
+                                //Create Notification
+                                //var newNotifications = CreateNotifications(newTransaction);
+
+                                transaction.Commit();
+
+                                //ChatHub.Instance.SendNotifications(newNotifications);
+
+                                return Json(new
+                                {
+                                    data = "Successful transfer",
+                                    message = "Success",
+                                    statusCode = 200
+                                });
                             }
-
-                            if (CheckTransactionRequestModels(tran, errors) != null)
+                            catch (Exception)
                             {
-                                return CheckTransactionRequestModels(tran, errors);
+                                transaction.Rollback();
                             }
-                            // Minus money
-                            sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
-                            var minusError = MinusMoney(tran, sourceBankAccount, errors);
-                            if (minusError != null)
-                            {
-                                return minusError;
-                            }
-
-                        // Plus money
-                        PlusMoney:
-                            receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
-                            var plusError = PlusMoney(tran, receiverBankAccount, errors);
-                            if (plusError != null)
-                            {
-                                return plusError;
-                            }
-
-                            //Create Transaction
-                            var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
-
-                            //Create Notification
-                            var newNotifications = CreateNotifications(newTransaction);
-
-                            transaction.Commit();
-
-                            ChatHub.Instance.SendNotifications(newNotifications);
-
-                            return Json(new
-                            {
-                                data = "Successful transfer",
-                                message = "Success",
-                                statusCode = 200
-                            });
-                        }
-                        catch (Exception)
-                        {
-                            transaction.Rollback();
                             foreach (var k in ModelState.Keys)
                             {
                                 foreach (var err in ModelState[k].Errors)
@@ -212,9 +215,9 @@ namespace Backend.Controllers
                                 message = "Error",
                                 data = errors
                             }, JsonRequestBehavior.AllowGet);
-                            throw;
                         }
                     }
+                    
 
                 } while (bankQueue.Count != 0);
             }
@@ -311,9 +314,11 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+
             sourceBankAccount.Balance -= tran.Amount;
-            _context.Entry(sourceBankAccount).State = EntityState.Modified;
+            
             _context.SaveChanges();
+            
             return null;
         }
 
@@ -341,12 +346,11 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
             receiverBankAccount.Balance += tran.Amount;
-            _context.Entry(receiverBankAccount).State = EntityState.Modified;
             _context.SaveChanges();
             return null; //BankAccount
         }
 
-        public Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
+        private Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
             BankAccounts toBankAccount)
         {
             var transactionDetails = new List<TransactionDetails>()
@@ -389,7 +393,7 @@ namespace Backend.Controllers
             return trannsaction;
         }
 
-        public List<Notifications> CreateNotifications(Transactions transaction)
+        private List<Notifications> CreateNotifications(Transactions transaction)
         {
             var from = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
             var to = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
