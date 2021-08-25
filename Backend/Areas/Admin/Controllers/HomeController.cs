@@ -17,11 +17,9 @@ namespace Backend.Areas.Admin.Controllers
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<TransactionDetails> transactionDetail;
         private readonly IRepository<Cheques> cheques;
-        private static ApplicationDbContext _context;
 
         public HomeController()
         {
-            _context = ApplicationDbContext.Instance;
             accounts = new Repository<Accounts>();
             bankAccounts = new Repository<BankAccounts>();
             channels = new Repository<Channels>();
@@ -33,10 +31,8 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Home
         public ActionResult Index()
         {
-            var data = (Accounts)Session["user"];
-            var data2 = accounts.Get(x => x.AccountId == data.AccountId);
             ViewBag.HomeIndex = "active";
-            return View(data2);
+            return View();
         }
 
         public ActionResult GetData()
