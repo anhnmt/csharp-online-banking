@@ -21,7 +21,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ChequesController()
         {
-            _context = ApplicationDbContext.Instance;
+            _context = new  ApplicationDbContext();
             cheques = new Repository<Cheques>();
             chequebooks = new Repository<ChequeBooks>();
             bankAccounts = new Repository<BankAccounts>();
