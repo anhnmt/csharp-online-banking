@@ -13,26 +13,6 @@ namespace OnlineBanking.DAL
             
         }
 
-        public TransactionsViewModels(Transactions transactions)
-        {
-            var from = transactions.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
-            var to = transactions.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
-
-            TransactionId = transactions.TransactionId;
-            Amount = transactions.Amount;
-            Messages = transactions.Messages;
-            FromId = from.BankAccountId;
-            ToId = to.BankAccountId;
-            BalancedFrom = from.Balance;
-            BalancedTo = to.Balance;
-            Status = transactions.Status;
-            Currency = from.BankAccount.Currency.Name;
-            Type = from.Type;
-            StatusName = ((BankingActivity) transactions.Status).ToString();
-            CreatedAt = transactions.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
-            UpdatedAt = transactions.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
-        }
-
         public TransactionsViewModels(TransactionDetails transactionDetails, Transactions transactions)
         {
             var From = transactions.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
@@ -54,7 +34,6 @@ namespace OnlineBanking.DAL
         }
 
         public int TransactionDetailId { get; set; }
-        public int TransactionId { get; set; }
         public int FromId { get; set; }
         public int ToId { get; set; }
         public int Status { get; set; }
