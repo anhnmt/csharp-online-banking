@@ -407,6 +407,7 @@
     <Content Include="Content\js\plugins-init\sweetalert.init.js" />
     <Content Include="Content\js\plugins-init\toastr-init.js" />
     <Content Include="Content\js\plugins-init\widgets-script-init.js" />
+    <Content Include="Content\js\vfs_fonts.js" />
     <Content Include="Content\vendor\animate\animate.min.css" />
     <Content Include="Content\vendor\aos\css\aos.min.css" />
     <Content Include="Content\vendor\apexchart\apexchart.js" />
