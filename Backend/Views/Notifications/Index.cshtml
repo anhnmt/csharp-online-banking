@@ -87,12 +87,10 @@
                         className: 'align-middle',
                     },
                     {
-                        data: {PkId:'PkId'},
+                        data: {NotificationId:'NotificationId'},
                         className: 'align-middle',
                         "render": function (data) {
-                            let detail = "@Url.Action("TransactionsDetails", "Transactions")/"+data.PkId;
-                            
-                            return '<a href="'+detail+'" class="btn btn-rounded btn-info" >Details</a>'
+                            return '<a class="read-notification btn btn-rounded btn-info" data-notification="'+data.NotificationId+'">Details</a>'
                         },
                         "orderable": false
                     },
