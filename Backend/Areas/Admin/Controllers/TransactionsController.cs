@@ -14,11 +14,13 @@ namespace Backend.Areas.Admin.Controllers
     {
         private readonly IRepository<Transactions> transactions;
         private readonly IRepository<BankAccounts> bankAccounts;
+        private readonly IRepository<TransactionDetails> transactiondetail;
 
         public TransactionsController()
         {
             transactions = new Repository<Transactions>();
             bankAccounts = new Repository<BankAccounts>();
+            transactiondetail = new Repository<TransactionDetails>();
         }
 
         // GET: Admin/Transactions
@@ -29,20 +31,21 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
-            var data = transactions.Get(x => x.FromId == fromId || x.ToId == fromId);
+            var data = transactiondetail.Get(x => x.BankAccountId == fromId);
             if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
             {
                 endDate = endDate.Value.Date.AddHours(23).AddMinutes(59).AddSeconds(59);
                 data = data.Where(x => x.CreatedAt >= startDate && x.CreatedAt <= endDate);
             }
 
-            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x));
+            var data2 = data.OrderByDescending(x => x.CreatedAt).Select(x => new TransactionsViewModels(x,x.Transaction));
             return Json(new
             {
                 data = data2.ToList(),
                 message = "Success",
                 statusCode = 200
             }, JsonRequestBehavior.AllowGet);
+
         }
 
         public ActionResult ProfileAccountNumber(int id)
