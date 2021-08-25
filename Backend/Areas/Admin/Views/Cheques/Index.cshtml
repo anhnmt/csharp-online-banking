@@ -48,11 +48,11 @@
                     </div>
                     <div class="modal-body">
                         <div class="form-group">
-                            <label class="col-form-label" for="bankAccountId">
+                            <label class="col-form-label" for="FromBankAccountId">
                                 Bank Account <span class="text-danger">*</span>
                             </label>
                             <div>
-                                <select class="form-control" name="bankAccountId" id="bankAccountId">
+                                <select class="form-control" name="FromBankAccountId" id="FromBankAccountId">
                                 </select>
                             </div>
                             <div>
@@ -103,9 +103,9 @@
                 for(let i = 0; i < res.data.length; i++) {
                     html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + (new Intl.NumberFormat('vi-VN', { style: 'currency', currency: res.data[i].CurrencyName }).format(res.data[i].Balance)) + '">' + res.data[i].Name + '</option>';
                 }
-                $("#bankAccountId").html(html);
+                $("#FromBankAccountId").html(html);
                 
-                $("#balance").html($("#bankAccountId :selected").data('balance'));
+                $("#balance").html($("#FromBankAccountId :selected").data('balance'));
             }
         })
     }
@@ -155,7 +155,7 @@
                 url: "@Url.Action("FindId", "Cheques")",
                 data: { chequeId: id },
                 success: function (res) {
-                    $("#bankAccountId").val(res.data.FromBankAccountId);
+                    $("#FromBankAccountId").val(res.data.FromBankAccountId);
                     $("#Amount").val(res.data.AmountNumber);
                     $("#Status").val(res.data.Status);
                     $("#modifyModal").modal("show"); 
@@ -205,7 +205,7 @@
         },
         submitHandler: function (form) {
             let obj = {
-                FromBankAccountId: $("#bankAccountId").val(),
+                FromBankAccountId: $("#FromBankAccountId").val(),
                 Amount: $("#Amount").val(),
                 ChequeBookId: @Model.ChequeBookId,
                 Status: $("#Status").val(),
@@ -228,7 +228,7 @@
                 "data": {ChequeBookId: @Model.ChequeBookId},
             }, 
             "order": [
-                [0, 'asc']
+                [0, 'desc']
             ],
             "columns": [
                 {
@@ -304,8 +304,8 @@
             chequesManager.delete(chequeId);
         });
         
-        $(document).on("change", "#bankAccountId", function () {
-            $("#balance").html($("#bankAccountId :selected").data("balance"));
+        $(document).on("change", "#FromBankAccountId", function () {
+            $("#balance").html($("#FromBankAccountId :selected").data("balance"));
         });
         
         $('#modifyModal').on('shown.bs.modal', function () {
