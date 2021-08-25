@@ -10,7 +10,7 @@ namespace OnlineBanking.DAL
     {
         public double Amount { get; set; }
         public string Messages { get; set; }
-        public int FromId { get; set; }
-        public int ToId { get; set; }
+        public string FromId { get; set; }
+        public string ToId { get; set; }
     }
 }
