@@ -142,7 +142,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Id" id="Id" value=""/>
-                    <input type="hidden" name="type" id="type" value="CREATE"/>
+                    <input type="hidden" name="type2" id="type2" value="CREATE"/>
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
@@ -193,7 +193,7 @@
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
-                            <input type="text" class="form-control" id="Name" name="Name" placeholder="Balance..." disabled>
+                            <input type="text" class="form-control" id="Name" name="Name" disabled>
                         </div>
                     </div>
                     <div class="form-group">
@@ -274,7 +274,7 @@
                     submitHandler: function () {
                        var trans = {
                            Amount: $("#Amount").val(),
-                           ToId: $("#Id").val(),
+                           ToId: $("#Name").val(),
                        };
                        managerBank.receiveMoney(trans);
                     }
@@ -414,7 +414,7 @@
                             $('#tbl_banks').DataTable().ajax.reload();
                             notifySuccess("Transfers Successfully", res.data);
                         }else {
-                            notifyError("Transfers Error", res.data);
+                            notifyError("Transfers Error", res.data.FromId);
                         }
                     }
 

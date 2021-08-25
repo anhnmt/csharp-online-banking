@@ -43,272 +43,60 @@ namespace Backend.Controllers
             return View();
         }
 
-        // private JsonResult TransfersQueue()
-        // {
-        //     lock (Lock)
-        //     {
-        //         var errors = new Dictionary<string, string>();
-        //
-        //         var bankDequeue = bankQueue.Dequeue();
-        //         do
-        //         {
-        //             var receiverAccount = bankAccounts.Get(bankDequeue.ToId);
-        //             if (receiverAccount == null)
-        //             {
-        //                 errors.Add("ToId", "Account doesn't exist");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             if (bankDequeue.FromId == bankDequeue.ToId)
-        //             {
-        //                 errors.Add("ToId", "The number of the receiving account and the sending account is the same");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             var receiverStatus = receiverAccount.Status;
-        //             var sessionUsers = (Accounts) Session["user"];
-        //             if (sessionUsers.RoleId == 1)
-        //             {
-        //                 if (bankDequeue.Amount <= 0)
-        //                 {
-        //                     errors.Add("Amount", "Your Amount must be number");
-        //                     return Json(new
-        //                     {
-        //                         data = errors,
-        //                         message = "Error",
-        //                         statusCode = 404
-        //                     }, JsonRequestBehavior.AllowGet);
-        //                 }
-        //
-        //                 if (receiverStatus != 0)
-        //                 {
-        //                     errors.Add("ToId", "Receipt download has not been activated");
-        //                     return Json(new
-        //                     {
-        //                         data = errors,
-        //                         message = "Error",
-        //                         statusCode = 404
-        //                     }, JsonRequestBehavior.AllowGet);
-        //                 }
-        //
-        //                 receiverAccount.Balance += bankDequeue.Amount;
-        //                 if (bankAccounts.Edit(receiverAccount) != true)
-        //                     return Json(new
-        //                     {
-        //                         data = "Error adding target account money",
-        //                         message = "Error",
-        //                         statusCode = 404
-        //                     }, JsonRequestBehavior.AllowGet);
-        //                 bankDequeue.Status = 1;
-        //                 bankDequeue.CreatedAt = DateTime.Now;
-        //                 bankDequeue.UpdatedAt = DateTime.Now;
-        //                 bankDequeue.BalancedTo = receiverAccount.Balance;
-        //                 if (string.IsNullOrEmpty(bankDequeue.Messages))
-        //                 {
-        //                     bankDequeue.Messages = "Transfer from Admin to " + bankDequeue.ToId;
-        //                 }
-        //
-        //                 if (transactions.Add(bankDequeue))
-        //                 {
-        //                     return Json(new
-        //                     {
-        //                         data = "Successful transfer",
-        //                         message = "Success",
-        //                         statusCode = 200
-        //                     });
-        //                 }
-        //
-        //                 return Json(new
-        //                 {
-        //                     data = "Transfer failed",
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 });
-        //             }
-        //
-        //             var sourceAccount = bankAccounts.Get(bankDequeue.FromId);
-        //             if (sourceAccount == null)
-        //             {
-        //                 errors.Add("FromId", "Account doesn't exist");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             var sourceCurrency = sourceAccount.Currency.Name;
-        //             var receiverCurrency = receiverAccount.Currency.Name;
-        //             var sourceStatus = sourceAccount.Status;
-        //
-        //
-        //             if (bankDequeue.Amount <= 0)
-        //             {
-        //                 errors.Add("Amount", "Your Amount must be number");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             if (sourceStatus != 0)
-        //             {
-        //                 errors.Add("FormId", "Source account is not activated");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             if (receiverStatus != 0)
-        //             {
-        //                 errors.Add("ToId", "Receiver account is not activated");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             if (sourceCurrency != receiverCurrency)
-        //             {
-        //                 errors.Add("ToId", "Recipient currency does not match");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             if (Utils.IsNullOrEmpty(receiverAccount))
-        //             {
-        //                 errors.Add("ToId", "Account number doesn't exist");
-        //                 return Json(new
-        //                 {
-        //                     data = errors,
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             var balanceSource = sourceAccount.Balance;
-        //             if (balanceSource < bankDequeue.Amount)
-        //             {
-        //                 return Json(new
-        //                 {
-        //                     data = "Amount isn't enough",
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             sourceAccount.Balance = balanceSource - bankDequeue.Amount;
-        //             if (bankAccounts.Edit(sourceAccount) != true)
-        //             {
-        //                 return Json(new
-        //                 {
-        //                     data = "Error deducting money from source account",
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //             }
-        //
-        //             receiverAccount.Balance += bankDequeue.Amount;
-        //             if (bankAccounts.Edit(receiverAccount) != true)
-        //                 return Json(new
-        //                 {
-        //                     data = "Error adding target account money",
-        //                     message = "Error",
-        //                     statusCode = 404
-        //                 }, JsonRequestBehavior.AllowGet);
-        //
-        //             bankDequeue.Status = 1;
-        //             bankDequeue.CreatedAt = DateTime.Now;
-        //             bankDequeue.UpdatedAt = DateTime.Now;
-        //             bankDequeue.BalancedFrom = sourceAccount.Balance;
-        //             bankDequeue.BalancedTo = receiverAccount.Balance;
-        //             if (string.IsNullOrEmpty(bankDequeue.Messages))
-        //             {
-        //                 bankDequeue.Messages = "Transfer from " + sourceAccount.Name + " to " + receiverAccount.Name;
-        //             }
-        //
-        //             if (transactions.Add(bankDequeue))
-        //             {
-        //                 var notifications = new List<Notifications>()
-        //                 {
-        //                     new Notifications
-        //                     {
-        //                         AccountId = sourceAccount.AccountId,
-        //                         Content = "Your account balance -" + bankDequeue.Amount +
-        //                                   ", available balance: " + sourceAccount.Balance,
-        //                         Status = (int) NotificationStatus.Unread,
-        //                         PkType = (int) NotificationType.Transaction,
-        //                         PkId = bankDequeue.TransactionId,
-        //                     },
-        //
-        //                     new Notifications
-        //                     {
-        //                         AccountId = receiverAccount.AccountId,
-        //                         Content = "Your account balance +" + bankDequeue.Amount +
-        //                                   ", available balance: " + receiverAccount.Balance,
-        //                         Status = (int) NotificationStatus.Unread,
-        //                         PkType = (int) NotificationType.Transaction,
-        //                         PkId = bankDequeue.TransactionId,
-        //                     }
-        //                 };
-        //
-        //                 ChatHub.Instance.SendNotifications(notifications);
-        //
-        //                 return Json(new
-        //                 {
-        //                     data = "Successful transfer",
-        //                     message = "Success",
-        //                     statusCode = 200
-        //                 });
-        //             }
-        //         } while (bankQueue.Count != 0);
-        //
-        //         foreach (var k in ModelState.Keys)
-        //         foreach (var err in ModelState[k].Errors)
-        //         {
-        //             var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-        //             if (!errors.ContainsKey(key))
-        //                 errors.Add(key, err.ErrorMessage);
-        //         }
-        //
-        //         return Json(new
-        //         {
-        //             statusCode = 400,
-        //             message = "Error",
-        //             data = errors
-        //         }, JsonRequestBehavior.AllowGet);
-        //     }
-        // }
+        //private JsonResult TransfersQueue()
+        //{
+        //    lock (Lock)
+        //    {
+        //        var errors = new Dictionary<string, string>();
 
-        // [HttpPost]
-        // public ActionResult Transfers(Transactions tran)
-        // {
-        //     bankQueue.Enqueue(tran);
-        //     var data = TransfersQueue();
-        //     return data;
-        // }
+        //        var bankDequeue = bankQueue.Dequeue();
+        //        do
+        //        {
+        //            var receiverStatus = receiverAccount.Status;
+        //            var sessionUsers = (Accounts)Session["user"];
+        //            if (sessionUsers.RoleId == 1)
+        //            {
+
+
+        //                if (receiverStatus != 0)
+        //                {
+        //                    errors.Add("ToId", "Receipt download has not been activated");
+        //                    return Json(new
+        //                    {
+        //                        data = errors,
+        //                        message = "Error",
+        //                        statusCode = 404
+        //                    }, JsonRequestBehavior.AllowGet);
+        //                }
+
+        //                receiverAccount.Balance += bankDequeue.Amount;
+        //                if (bankAccounts.Edit(receiverAccount) != true)
+        //                    return Json(new
+        //                    {
+        //                        data = "Error adding target account money",
+        //                        message = "Error",
+        //                        statusCode = 404
+        //                    }, JsonRequestBehavior.AllowGet);
+        //                bankDequeue.Status = 1;
+        //                bankDequeue.CreatedAt = DateTime.Now;
+        //                bankDequeue.UpdatedAt = DateTime.Now;
+        //                bankDequeue.BalancedTo = receiverAccount.Balance;
+
+
+        //                return Json(new
+        //                {
+        //                    data = "Transfer failed",
+        //                    message = "Error",
+        //                    statusCode = 404
+        //                });
+        //            }
+
+
+        //        } while (bankQueue.Count != 0);
+
+
+        //    }
+        //}
 
         public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
@@ -349,62 +137,175 @@ namespace Backend.Controllers
                     {
                         try
                         {
-                            var sourceBankAccount =
-                                bankAccounts.Get(x => x.BankAccountId == tran.FromId).FirstOrDefault();
-                            var minusError = MinusMoney(tran, sourceBankAccount);
+                            BankAccounts sourceBankAccount, receiverBankAccount;
+
+                            //Check TransactionRequestModels
+
+
+                            // Minus money Admin account
+                            var sessionUsers = (Accounts)Session["user"];
+                            if (sessionUsers.RoleId == 1)
+                            {
+                                var currenReceiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
+                                sourceBankAccount = bankAccounts.Get(x => x.AccountId == sessionUsers.AccountId && x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
+                                var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
+                                if (minusError1 != null)
+                                {
+                                    return minusError1;
+                                }
+                                goto PlusMoney;
+                            }
+
+                            if (CheckTransactionRequestModels(tran, errors) != null)
+                            {
+                                return CheckTransactionRequestModels(tran, errors);
+                            }
+                            // Minus money
+                            sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
+                            var minusError = MinusMoney(tran, sourceBankAccount, errors);
                             if (minusError != null)
                             {
                                 return minusError;
                             }
 
-                            var receiverBankAccount =
-                                bankAccounts.Get(x => x.BankAccountId == tran.ToId).FirstOrDefault();
-                            var plusError = PlusMoney(tran, receiverBankAccount);
+                        // Plus money
+                        PlusMoney:
+                            receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
+                            var plusError = PlusMoney(tran, receiverBankAccount, errors);
                             if (plusError != null)
                             {
                                 return plusError;
                             }
 
+                            //Create Transaction
                             var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
 
+                            //Create Notification
                             var newNotifications = CreateNotifications(newTransaction);
 
                             transaction.Commit();
 
                             ChatHub.Instance.SendNotifications(newNotifications);
-                        }
-                        catch (Exception ex)
-                        {
-                            transaction.Rollback();
+
                             return Json(new
                             {
-                                data = ex,
-                                message = "error",
-                                statuscode = 404
+                                data = "Successful transfer",
+                                message = "Success",
+                                statusCode = 200
+                            });
+                        }
+                        catch (Exception)
+                        {
+                            transaction.Rollback();
+                            foreach (var k in ModelState.Keys)
+                            {
+                                foreach (var err in ModelState[k].Errors)
+                                {
+                                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                                    if (!errors.ContainsKey(key))
+                                        errors.Add(key, err.ErrorMessage);
+                                }
+                            }
+                            return Json(new
+                            {
+                                statusCode = 400,
+                                message = "Error",
+                                data = errors
                             }, JsonRequestBehavior.AllowGet);
                             throw;
                         }
                     }
 
-                    return Json(new
-                    {
-                        data = "Successful transfer",
-                        message = "Success",
-                        statusCode = 200
-                    });
                 } while (bankQueue.Count != 0);
             }
         }
 
-        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount)
+        private JsonResult CheckTransactionRequestModels(TransactionRequestModels tran, Dictionary<string, string> errors)
         {
-            var errors = new Dictionary<string, string>();
+            var sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
+            var receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
+            if (tran.FromId.Contains(tran.ToId))
+            {
+                errors.Add("ToId", "The number of the receiving account and the sending account is the same");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (tran.Amount <= 0)
+            {
+                errors.Add("Amount", "Your Amount must be number");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             if (sourceBankAccount == null)
             {
                 errors.Add("FromId", "Account number doesn't exist");
                 return Json(new
                 {
                     data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            //Check Currency two bank account
+            if (sourceBankAccount.Currency.CurrencyId != receiverBankAccount.Currency.CurrencyId)
+            {
+                errors.Add("ToId", "Recipient currency does not match");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (receiverBankAccount == null)
+            {
+                errors.Add("FromId", "Account number doesn't exist");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return null;
+        }
+        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount, Dictionary<string, string> errors)
+        {
+
+            if (sourceBankAccount == null)
+            {
+                errors.Add("FromId", "Account number doesn't exist");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (sourceBankAccount.Status != 0)
+            {
+                errors.Add("FormId", "Source account is not activated");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (sourceBankAccount.Balance < tran.Amount)
+            {
+                return Json(new
+                {
+                    data = "Amount isn't enough",
                     message = "Error",
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
@@ -416,9 +317,9 @@ namespace Backend.Controllers
             return null;
         }
 
-        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount)
+        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount, Dictionary<string, string> errors)
         {
-            var errors = new Dictionary<string, string>();
+
             if (receiverBankAccount == null)
             {
                 errors.Add("FromId", "Account number doesn't exist");
@@ -429,7 +330,16 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
-
+            if (receiverBankAccount.Status != 0)
+            {
+                errors.Add("FormId", "Source account is not activated");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
             receiverBankAccount.Balance += tran.Amount;
             _context.Entry(receiverBankAccount).State = EntityState.Modified;
             _context.SaveChanges();
@@ -456,11 +366,16 @@ namespace Backend.Controllers
                     Status = 1
                 },
             };
+
             if (string.IsNullOrEmpty(tran.Messages))
             {
                 tran.Messages = "Transfer from " + fromBankAccount.Name + " to " + toBankAccount.Name;
             }
-
+            var sessionUsers = (Accounts)Session["user"];
+            if (sessionUsers.RoleId == 1)
+            {
+                tran.Messages = "Transfer from Admin to " + toBankAccount.Name;
+            }
             var trannsaction = new Transactions()
             {
                 Status = 1,
@@ -476,8 +391,8 @@ namespace Backend.Controllers
 
         private List<Notifications> CreateNotifications(Transactions transaction)
         {
-            var from = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Minus);
-            var to = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Plus);
+            var from = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
+            var to = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
 
             var lstNotification = new List<Notifications>()
             {
@@ -508,7 +423,7 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts) Session["user"]) == null)
+            if (((Accounts)Session["user"]) == null)
                 RedirectToAction("Login", "Home", new
                 {
                     area = ""
@@ -519,7 +434,7 @@ namespace Backend.Controllers
 
         public ActionResult TransactionsDetails(int id)
         {
-            var user = (Accounts) Session["user"];
+            var user = (Accounts)Session["user"];
 
             var data = transactionDetails
                 .Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId)
