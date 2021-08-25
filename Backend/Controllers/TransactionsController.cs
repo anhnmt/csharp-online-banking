@@ -183,11 +183,11 @@ namespace Backend.Controllers
                                 var newTransaction = CreateTransactions(tran, sourceBankAccount, receiverBankAccount);
 
                                 //Create Notification
-                                //var newNotifications = CreateNotifications(newTransaction);
+                                var newNotifications = CreateNotifications(newTransaction);
 
                                 transaction.Commit();
 
-                                //ChatHub.Instance.SendNotifications(newNotifications);
+                                ChatHub.Instance.SendNotifications(newNotifications);
 
                                 return Json(new
                                 {
