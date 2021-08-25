@@ -15,10 +15,8 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
+        private static ApplicationDbContext _context;
         public static ChatHub Instance;
-
-        // lock object
-        private static readonly object LockObject = new object();
 
         #region Properties
 
@@ -145,6 +143,38 @@ namespace Backend.Hubs
 
                     return new NotificationViewModel(x, pkObject);
                 });
+        }
+
+        public string ReadNotification(int notificationId)
+        {
+            using (_context = new ApplicationDbContext())
+            {
+                try
+                {
+                    var accountId = GetIntegerAccountId();
+                    var notification = _context.Notifications
+                        .FirstOrDefault(x => x.AccountId == accountId && x.NotificationId == notificationId);
+
+                    if (notification == null) return null;
+
+                    if (notification.Status != (int) NotificationStatus.Read)
+                    {
+                        notification.Status = (int) NotificationStatus.Read;
+                        _context.SaveChanges();
+                    }
+
+                    if (notification.PkType == (int) NotificationType.Transaction)
+                    {
+                        return "/Transactions/TransactionsDetails/" + notification.PkId;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                
+                return null;
+            }
         }
 
         public void SendNotifications(List<Notifications> notifications)
