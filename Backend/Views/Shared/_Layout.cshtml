@@ -336,6 +336,20 @@
                     connection.hub.start();
                 }, 3000); // Restart connection
             });
+            
+            $(document).on("click", ".read-notification", function () {
+                let notificationId = $(this).data("notification")*1;
+                
+                console.log(notificationId);
+
+                chatHub.server.readNotification(notificationId ?? 0).done(function (redirectUrl) {
+                    console.log(redirectUrl);
+                    
+                    if (redirectUrl) {
+                        window.location.href = redirectUrl;
+                    }
+                });
+            });
 
             $(document).on("click", "#discussion .btn-loadmore", function () {
                 $(this).hide().remove();
@@ -358,11 +372,8 @@
             });
 
             function connvertNotification(notificationView) {
-                return `<li>
+                return `<li class="read-notification" data-notification="${notificationView.NotificationId}">
                            <div class="timeline-panel">
-                               <div class="media mr-2 media-info">
-                                   TS
-                               </div>
                                <div class="media-body">
                                    <h6 class="mb-1">${notificationView.Content}</h6>
                                    <small class="d-block">${notificationView.CreatedAt}</small>
