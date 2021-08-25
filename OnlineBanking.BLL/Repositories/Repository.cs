@@ -17,7 +17,7 @@ namespace OnlineBanking.BLL.Repositories
 
         public Repository()
         {
-            cnn = ApplicationDbContext.Instance();
+            cnn = ApplicationDbContext.Instance;
             tbl = cnn.Set<T>();
         }
 

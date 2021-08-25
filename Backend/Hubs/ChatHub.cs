@@ -15,7 +15,10 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-        public static ChatHub Instance { get; private set; }
+        public static ChatHub Instance;
+
+        // lock object
+        private static readonly object LockObject = new object();
 
         #region Properties
 

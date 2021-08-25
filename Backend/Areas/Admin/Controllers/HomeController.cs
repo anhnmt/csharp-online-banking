@@ -21,7 +21,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public HomeController()
         {
-            _context = ApplicationDbContext.Instance();
+            _context = ApplicationDbContext.Instance;
             accounts = new Repository<Accounts>();
             bankAccounts = new Repository<BankAccounts>();
             channels = new Repository<Channels>();

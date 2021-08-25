@@ -27,7 +27,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
-            _context = ApplicationDbContext.Instance();
+            _context = ApplicationDbContext.Instance;
             Instance = this;
             transactions = new Repository<Transactions>();
             transactionDetails = new Repository<TransactionDetails>();
@@ -346,7 +346,7 @@ namespace Backend.Controllers
             return null; //BankAccount
         }
 
-        public Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
+        private Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
             BankAccounts toBankAccount)
         {
             var transactionDetails = new List<TransactionDetails>()
@@ -389,7 +389,7 @@ namespace Backend.Controllers
             return trannsaction;
         }
 
-        public List<Notifications> CreateNotifications(Transactions transaction)
+        private List<Notifications> CreateNotifications(Transactions transaction)
         {
             var from = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
             var to = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
