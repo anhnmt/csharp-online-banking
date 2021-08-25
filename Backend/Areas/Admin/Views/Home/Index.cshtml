@@ -9,6 +9,7 @@
         .dt-buttons {
             float: right;
         }
+
         .dataTables_wrapper .dataTables_filter {
             float: left;
         }
@@ -90,7 +91,6 @@
                                 <i class="fa fa-calendar"></i>&nbsp;
                                 <span></span> <i class="fa fa-caret-down"></i>
                             </div>
-                            @* <button class="dt-button buttons-excel buttons-html5" tabindex="0" aria-controls="example" type="button"><span>Excel</span></button> *@
                         </div>
                     </div>
                     <div class="card-body">
@@ -151,6 +151,7 @@
     <script src="~/Content/vendor/moment/moment.min.js" type="text/javascript"></script>
     <script src="~/Content/vendor/bootstrap-daterangepicker/daterangepicker.js"></script>
     <script src="~/Content/js/plugins-init/bs-daterange-picker-init.js"></script>
+   
 
     <script>
     $(function () {
@@ -349,13 +350,13 @@
         let start2 = moment().subtract(29, 'days');
         let end2 = moment();
 
-        function cb(start2, end2) {
-            $('#daterange2 span').html(start.format('DD/MM/YYYY') + ' - ' + end.format('DD/MM/YYYY'));
+        function cb2(start2, end2) {
+            $('#daterange2 span').html(start2.format('DD/MM/YYYY') + ' - ' + end2.format('DD/MM/YYYY'));
         }
 
         $('#daterange2').daterangepicker({
-            startDate: start,
-            endDate: end,
+            startDate: start2,
+            endDate: end2,
             ranges: {
                 'Today': [moment(), moment()],
                 'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
@@ -365,9 +366,9 @@
                 'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
                 'This Year': [moment().subtract(1, 'month').startOf('year'), moment().subtract(1, 'month').endOf('year')]
             }
-        }, cb);
+        }, cb2);
 
-        cb(start2, end2);
+        cb2(start2, end2);
     });
     </script>
 }
