@@ -47,19 +47,7 @@ namespace Backend.Areas.Admin.Controllers
         public ActionResult GetData(int chequeBookId)
         {
             var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int) ChequeStatus.Deleted)
-                .Select(x => new ChequesViewModel
-                {
-                    ChequeBookId = x.ChequeBookId,
-                    Code = x.Code,
-                    NumberId = x.NumberId,
-                    ChequeId = x.ChequeId,
-                    StatusName = ((ChequeStatus) x.Status).ToString(),
-                    Status = x.Status,
-                    CurrencyName = x.FromBankAccount.Currency.Name,
-                    AmountNumber = x.Amount,
-                    FromBankAccountName = x.FromBankAccount.Name,
-                    ToBankAccountName = x.ToBankAccountId == null ? "None" : x.ToBankAccount.Name
-                });
+                .Select(x => new ChequesViewModel(x));
             return Json(new
             {
                 data = data.ToList(),
