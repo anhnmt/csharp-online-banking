@@ -72,7 +72,6 @@
                                         <th>CreatedAt</th>
                                         <th>Messages</th>
                                         <th>Amount </th>
-                                        <th>Banlanced </th>
                                         <th>Status </th>
                                     </tr>
                                 </thead>
@@ -110,7 +109,7 @@
                 ],
                 "columns": [
                     {
-                        data: 'TransactionId',
+                        data: 'TransactionDetailId',
                         className: 'align-middle text-center'
                     },
                     {
@@ -122,22 +121,12 @@
                         className: 'align-middle',
                     },
                     {
-                        data: { Amount: 'Amount', FromId: 'FromId' },
+                        data: { Amount: 'Amount', FromId: 'FromId', Currency: "Currency", Type: "Type" },
                         render: function (data) {
                             let fromId = $("#fromId").val();
-                            return (data.Amount) == null ? "" : ((data.FromId == fromId) ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: "VND" }).format(data.Amount)
+                            return (data.Amount) == null ? "" : (data.Type ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.Currency }).format(data.Amount)
                         },
                         className: 'align-middle',
-                    },
-                    {
-                        data: { FromId: 'FromId', BalancedFrom: "BalancedFrom", BalancedTo: "BalancedTo" },
-                        render: function (data) {
-                            let fromId = $("#fromId").val();
-                            return ((data.FromId == fromId) ? new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedFrom) : new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(data.BalancedTo))
-                        },
-                        className: 'align-middle',
-                        "searchable": false,
-                        "orderable": false
                     },
                     {
                         data: 'StatusName',
