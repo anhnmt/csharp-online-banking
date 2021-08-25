@@ -15,8 +15,8 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-        public static ChatHub Instance { get; private set; }
-        private static object Lock = new object();
+        private static ApplicationDbContext _context;
+        public static ChatHub Instance;
 
         #region Properties
 
@@ -31,7 +31,7 @@ namespace Backend.Hubs
         private readonly IRepository<Channels> channelRepo;
         private readonly IRepository<Messages> messageRepo;
         private readonly IRepository<Notifications> notificationRepo;
-        private readonly IRepository<Transactions> transactionRepo;
+        private readonly IRepository<TransactionDetails> transactionDetailRepo;
 
         public ChatHub()
         {
@@ -40,7 +40,7 @@ namespace Backend.Hubs
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
             notificationRepo = new Repository<Notifications>();
-            transactionRepo = new Repository<Transactions>();
+            transactionDetailRepo = new Repository<TransactionDetails>();
         }
 
         public async Task SendPrivate(string message)
@@ -138,25 +138,53 @@ namespace Backend.Hubs
                 .AsEnumerable()
                 .Select(x =>
                 {
-                    var pkObject = transactionRepo
-                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+                    var pkObject = transactionDetailRepo
+                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
                     return new NotificationViewModel(x, pkObject);
                 });
+        }
+
+        public string ReadNotification(int notificationId)
+        {
+            using (_context = new ApplicationDbContext())
+            {
+                try
+                {
+                    var accountId = GetIntegerAccountId();
+                    var notification = _context.Notifications
+                        .FirstOrDefault(x => x.AccountId == accountId && x.NotificationId == notificationId);
+
+                    if (notification == null) return null;
+
+                    if (notification.Status != (int) NotificationStatus.Read)
+                    {
+                        notification.Status = (int) NotificationStatus.Read;
+                        _context.SaveChanges();
+                    }
+
+                    if (notification.PkType == (int) NotificationType.Transaction)
+                    {
+                        return "/Transactions/TransactionsDetails/" + notification.PkId;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+                
+                return null;
+            }
         }
 
         public void SendNotifications(List<Notifications> notifications)
         {
             try
             {
-                if (!notificationRepo.AddRange(notifications)) return;
-
                 notifications.ForEach(x =>
                 {
-                    Console.WriteLine("user-" + x.AccountId);
-
-                    var pkObject = transactionRepo
-                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+                    var pkObject = transactionDetailRepo
+                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
                     Clients.Group("user-" + x.AccountId)
                         .newNotification(new NotificationViewModel(x, pkObject));

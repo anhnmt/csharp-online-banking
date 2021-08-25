@@ -2,7 +2,9 @@
 using OnlineBanking.DAL;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
+using System.Security.Cryptography.Pkcs;
 using System.Web.Mvc;
 using System.Text.RegularExpressions;
 using Backend.Areas.Admin.Data;
@@ -119,8 +121,6 @@ namespace Backend.Controllers
 
         public ActionResult InfoAccount()
         {
-            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
-
             return View();
         }
 
@@ -179,9 +179,14 @@ namespace Backend.Controllers
                 acc1.Birthday = IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberId = acc.NumberId;
-                acc1.UpdatedAt = DateTime.Now;
-                accounts.Edit(acc1);
-
+                if (!accounts.Edit(acc1))
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
                 return Json(new
                 {
                     statusCode = 200,
@@ -393,6 +398,67 @@ namespace Backend.Controllers
                 statusCode = 200,
                 message = "Successfully",
                 url = "Home/Login",
+            }, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ChangePassword(ChangePasswordViewModel changePasswordViewModel)
+        {
+            var errors = new Dictionary<string, string>();
+            var user = (Accounts) Session["user"];
+            var userUpdate = accounts.Get(user.AccountId);
+            foreach (var k in ModelState.Keys)
+            foreach (var err in ModelState[k].Errors)
+            {
+                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                if (!errors.ContainsKey(key))
+                    errors.Add(key, err.ErrorMessage);
+            }
+            
+            if (!ModelState.IsValid)
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+
+            if (!changePasswordViewModel.OldPassword.Equals(userUpdate.Password))
+            {
+                errors.Add("OldPassword", "Your password is not correct!");
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
+            if (!changePasswordViewModel.NewPassword.Equals(changePasswordViewModel.ConfirmPassword))
+            {
+                errors.Add("ConfirmPassword", "Your confirm is not the same as your new password!");
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            userUpdate.Password = changePasswordViewModel.NewPassword;
+            if (!accounts.Edit(userUpdate))
+            {
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
+            return Json(new
+            {
+                statusCode = 200,
+                message = "Change Password Successfully",
             }, JsonRequestBehavior.AllowGet);
         }
     }

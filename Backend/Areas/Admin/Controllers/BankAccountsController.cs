@@ -151,7 +151,7 @@ namespace Backend.Areas.Admin.Controllers
             var check = true;
             var bank1 = bankAccounts.Get(bank.BankAccountId);
             
-            if (!int.TryParse(bank.Name, out int i))
+            if (!long.TryParse(bank.Name, out long i))
             {
                 check = false;
                 errors.Add("NameBank", "Your name must be number");

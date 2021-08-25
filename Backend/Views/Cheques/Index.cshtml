@@ -1,0 +1,320 @@
+﻿@model OnlineBanking.DAL.ChequesInformationViewModel
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section css{
+}
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header align-middle">
+                <h4 class="card-title">Cheques Management</h4>
+                <button class="btn btn-primary btn-sm btn-generate text-right">Generate Cheque</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="datatables" class="display min-w850">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Code</th>
+                                <th>Amount</th>
+                                <th>Source Bank Account</th>
+                                <th>Destination Bank Account</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- /.content -->
+<div class="modal fade" id="modifyModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="form-validation">
+                <form id="formData" action="#" method="POST" novalidate="novalidate">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Create new Cheque</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" name="Id" id="Id" value=""/>
+                        <input type="hidden" name="type" id="type" value="CREATE"/>
+
+                        <div class="form-group">
+                            <label class="col-form-label" for="FromBankAccountId">
+                                Bank Account <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <select class="form-control" name="FromBankAccountId" id="FromBankAccountId">
+                                </select>
+                            </div>
+                            <div>
+                                <p>Balance: <span id="balance" class="text-danger"></span></p>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="Amount">
+                                Amount <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <input type="text" name="Amount" id="Amount" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-form-label" for="Status">
+                                Status <span class="text-danger">*</span>
+                            </label>
+                            <div>
+                                <select name="Status" id="Status" class="form-control">
+                                    <option value="0">Active</option>
+                                    <option value="1">Received</option>
+                                    <option value="2">Stopped</option>
+                                    <option value="3">Deleted</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-light" data-dismiss="modal">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+    const loadBankAccount = function() {
+        $.ajax({
+            type:"GET" ,
+            url: "@Url.Action("GetData", "BankAccounts")",
+            data: { account: @Model.AccountId },
+            success: function (res){
+                let html = "";
+                for(let i = 0; i < res.data.length; i++) {
+                    html += '<option value="' + res.data[i].BankAccountId + '" data-balance="' + (new Intl.NumberFormat('vi-VN', { style: 'currency', currency: res.data[i].CurrencyName }).format(res.data[i].Balance)) + '">' + res.data[i].Name + '</option>';
+                }
+                $("#FromBankAccountId").html(html);
+
+                $("#balance").html($("#FromBankAccountId :selected").data('balance'));
+            }
+        })
+    }
+
+    const chequesManager = {
+        post: function (obj) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("PostData", "Cheques")",
+                data: obj,
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $("#modifyModal").modal("hide");
+                        $('#datatables').DataTable().ajax.reload();
+                        notifySuccess("Success", 'Created Successfully');
+                    } else {
+                        if (typeof res.data == "string") {
+                            notifyError("Error", res.data);
+                            $("#modifyModal").modal("hide");
+                        }else{
+                            validator.showErrors(res.data);
+                        }
+                    }
+                }
+            })
+        },
+
+        put: function (id) {
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("PutData", "Cheques")",
+                data: {id: id},
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $("#modifyModal").modal("hide");
+                        $('#datatables').DataTable().ajax.reload();
+                        notifySuccess('Success', res.data);
+                    } else {
+                        notifyError('Error', res.data);
+                    }
+                }
+            })
+        },
+
+        get: function (id) {
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("FindId", "Cheques")",
+                data: { chequeId: id },
+                success: function (res) {
+                    $("#FromBankAccountId").val(res.data.FromBankAccountId);
+                    $("#Amount").val(res.data.AmountNumber);
+                    $("#Status").val(res.data.Status);
+                    $("#modifyModal").modal("show");
+                }
+            })
+        },
+
+        delete: function (id){
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("DeleteData", "Cheques")",
+                data: {chequeId: id},
+                success: function (res) {
+                    if (res.statusCode === 200) {
+                        $('#datatables').DataTable().ajax.reload();
+                        notifySuccess("Success", res.data);
+                    } else {
+                        notifyError("Error", res.data);
+                    }
+                }
+            })
+        }
+    };
+
+    const validator = $("#formData").validate({
+        rules: {
+            "FromBankAccountId": {
+                required: true,
+            },
+            "Amount": {
+                required: true,
+                number: true,
+                min: 1,
+            }
+        },
+        ignore: [],
+        errorClass: "invalid-feedback animated fadeInUp",
+        errorElement: "div",
+        errorPlacement: function (e, a) {
+            jQuery(a).after(e)
+        },
+        highlight: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+        },
+        success: function (e) {
+            jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+        },
+        submitHandler: function (form) {
+            let obj = {
+                FromBankAccountId: $("#FromBankAccountId").val(),
+                Amount: $("#Amount").val(),
+                ChequeBookId: @Model.ChequeBookId,
+                Status: $("#Status").val(),
+            };
+            chequesManager.post(obj);
+        }
+    });
+
+    $(function () {
+        $('#datatables').DataTable({
+            "paging": true,
+            "ordering": true,
+            "autoWidth": false,
+            "responsive": true,
+            "processing": true,
+            "filter": true,
+            "lengthMenu": [5, 10, 20, 50, 100, 200, 500],
+            "ajax":{
+                "url": "@Url.Action("GetData", "Cheques")",
+                "data": {ChequeBookId: @Model.ChequeBookId},
+            },
+            "order": [
+                [0, 'desc']
+            ],
+            "columns": [
+                {
+                    data: 'ChequeId',
+                    className: 'align-middle',
+
+                },
+                {
+                    data: 'Code',
+                    className: 'align-middle',
+                },
+                {
+                       data: { AmountNumber: 'AmountNumber', CurrencyName:"CurrencyName"},
+                        render: function (data) {
+                            return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.CurrencyName }).format(data.AmountNumber)
+                        },
+                        className: 'align-middle',
+                },
+                {
+                    data: 'FromBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: 'ToBankAccountName',
+                    className: 'align-middle',
+                },
+                {
+                    data: {Status: 'Status', StatusName:'StatusName'},
+                    render: function (data) {
+                        if (data.Status === 0){
+                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
+                        }else if(data.Status === 1){
+                            return '<span class="badge light badge-warning"><i class="fa fa-circle text-warning mr-1"></i>'+data.StatusName+'</span>';
+                        }else {
+                            return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
+                        }
+
+                    },
+                    className: 'align-middle text-center',
+                    "searchable": false,
+                    "orderable": false,
+                },
+                {
+                    bSortable: false,
+                    className: 'align-middle text-right',
+                    "render": function (data, type, row) {
+                        let toggle = row.Status === 0 ? "Stop this cheque" : "Active this cheque";
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" data-status="' + row.Status + '"class="dropdown-item btn-edit" href="javascript:void(0);">' + toggle + '</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                    }
+                },
+            ]
+        });
+
+        $(".btn-generate").click(function () {
+            $("#formData").trigger("reset");
+            $("#modifyModal").modal("show");
+            $("#Id").val("");
+            loadBankAccount();
+        });
+
+        $(document).on("click", ".btn-edit", function () {
+            let chequeStatus = $(this).data("status");
+            if (chequeStatus == 1 || chequeStatus == 3) {
+                notifyError("Error", "You cannot edit cheque was deleted or used!");
+            } else {
+                let chequeId = $(this).data("id");
+                chequesManager.put(chequeId);
+            }
+        });
+
+        $(document).on("click", ".btn-delete", function () {
+            let chequeId = $(this).data("id");
+            chequesManager.delete(chequeId);
+        });
+
+        $(document).on("change", "#FromBankAccountId", function () {
+            $("#balance").html($("#FromBankAccountId :selected").data("balance"));
+        });
+
+        $('#modifyModal').on('shown.bs.modal', function () {
+            validator.resetForm();
+        });
+    })
+    </script>
+}

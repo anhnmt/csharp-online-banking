@@ -8,6 +8,34 @@ namespace OnlineBanking.DAL
 {
     public class ChequesViewModel
     {
+        public ChequesViewModel()
+        {
+
+        }
+
+        public ChequesViewModel(Cheques x)
+        {
+            ChequeBookId = x.ChequeBookId;
+            ChequeId = x.ChequeId;
+            Code = x.Code;
+            NumberId = x.NumberId;
+            Amount = x.Amount.ToString();
+            AmountNumber = x.Amount;
+            CurrencyName = x.FromBankAccount.Currency.Name;
+            Status = x.Status;
+            StatusName = ((ChequeStatus) x.Status).ToString();
+            FromBankAccountName = x.FromBankAccount.Name;
+            FromBankAccountId = x.FromBankAccountId;
+            if (x.Status == (int) ChequeStatus.Received)
+            {
+                ToBankAccountName = x.ToBankAccountId == null ? "Using cash, his ID card: " + x.NumberId : x.ToBankAccount.Name;
+            }
+            else
+            {
+                ToBankAccountName = "Not received";
+            }
+        }
+
         public int ChequeBookId { get; set; }
         public int ChequeId { get; set; }
         public string Code { get; set; }

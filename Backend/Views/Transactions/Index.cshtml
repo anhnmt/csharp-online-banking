@@ -58,7 +58,6 @@
                         <div class="error">
                             <input type="text" class="form-control" id="ToId" name="ToId" placeholder="Receiver Account..." disabled>
                         </div>
-                        <input type="hidden" class="form-control" id="BankId">
                         <span class="text-dark font-weight-bold" id="text2" style="display: none">Name: </span>
                         <span class="text-danger font-weight-bold" id="infoReceiver" style="display: none"></span>
                     </div>
@@ -119,8 +118,8 @@
         
                     submitHandler: function () {
                        const tran = {
-                           FromId: $("#FromId").val(),
-                           ToId: $("#BankId").val(),
+                           FromId: $("#FromId option:selected").text(),
+                           ToId: $("#ToId").val(),
                            Messages: $("#Messages").val(),
                            Amount: $("#Amount").val()
                        };
@@ -181,6 +180,7 @@
                         //     window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
                         // });
                     } else {
+
                         validator.showErrors(res.data);
                     }
                 }
@@ -199,7 +199,6 @@
                     } else {
                         data = res;
                         console.log(res);
-                        toastr.error(res.message);
                     }
                 }
 

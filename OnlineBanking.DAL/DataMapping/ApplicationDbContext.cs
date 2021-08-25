@@ -9,6 +9,8 @@ namespace OnlineBanking.DAL
 {
     public class ApplicationDbContext : DbContext
     {
+
+
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
@@ -16,16 +18,16 @@ namespace OnlineBanking.DAL
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Transactions>()
-                .HasRequired(t => t.FromAccount)
-                .WithMany(a => a.FromTransactions)
-                .HasForeignKey(m => m.FromId)
+            modelBuilder.Entity<TransactionDetails>()
+                .HasRequired(t => t.Transaction)
+                .WithMany(a => a.TransactionDetails)
+                .HasForeignKey(m => m.TransactionId)
                 .WillCascadeOnDelete(false);
 
-            modelBuilder.Entity<Transactions>()
-                .HasRequired(m => m.ToAccount)
-                .WithMany(a => a.ToTransactions)
-                .HasForeignKey(m => m.ToId)
+            modelBuilder.Entity<TransactionDetails>()
+                .HasRequired(t => t.BankAccount)
+                .WithMany(a => a.TransactionDetails)
+                .HasForeignKey(m => m.BankAccountId)
                 .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Cheques>()
@@ -57,11 +59,11 @@ namespace OnlineBanking.DAL
 
             foreach (var entityEntry in entries)
             {
-                ((BaseModel) entityEntry.Entity).UpdatedAt = DateTime.Now;
+                ((BaseModel)entityEntry.Entity).UpdatedAt = DateTime.Now;
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseModel) entityEntry.Entity).CreatedAt = DateTime.Now;
+                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.Now;
                 }
             }
 
@@ -73,12 +75,11 @@ namespace OnlineBanking.DAL
         public virtual DbSet<Currencies> Currencies { get; set; }
         public virtual DbSet<Roles> Roles { get; set; }
         public virtual DbSet<Transactions> Transactions { get; set; }
+        public virtual DbSet<TransactionDetails> TransactionDetails { get; set; }
         public virtual DbSet<Channels> Channels { get; set; }
         public virtual DbSet<Messages> Messages { get; set; }
         public virtual DbSet<Notifications> Notifications { get; set; }
-
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.ChequeBooks> ChequeBooks { get; set; }
-
-        public System.Data.Entity.DbSet<OnlineBanking.DAL.Cheques> Cheques { get; set; }
+        public virtual DbSet<ChequeBooks> ChequeBooks { get; set; }
+        public virtual DbSet<Cheques> Cheques { get; set; }
     }
 }

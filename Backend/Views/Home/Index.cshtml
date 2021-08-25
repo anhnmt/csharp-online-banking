@@ -80,7 +80,7 @@
         function loadCurrency(CurrencyId = null, page = 1, key = null, pageSize = 100) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Currencies/GetData",
+                url: "/Currencies/GetData",
                 data: { page: page, key: key, pageSize: pageSize },
                 success: function (res) {
                     var html;
@@ -105,7 +105,9 @@
                                             <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: item.CurrencyName }).format(item.Balance)}</td>
                                             <td>${item.CurrencyName}</td>
                                             <td>${item.StatusName}</td>
-                                            <td><button data-id="${item.BankAccountId}" class='btn btn-detail btn-primary'>Detail</button></td>
+                                            <td>
+                                                <a href="/Transactions/ProfileAccountNumber/${item.BankAccountId}" class='btn btn-primary'>Detail</a>
+                                            </td>
                                           </tr>`
                         }
                         $('#tbl_user').html(_html);
@@ -151,10 +153,6 @@
                 } else {
                     managerAccBank.post(bank);
                 }
-            })
-            $(document).on("click", ".btn-detail", function () {
-                let bankId = $(this).data("id");
-                window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
             })
 
         })

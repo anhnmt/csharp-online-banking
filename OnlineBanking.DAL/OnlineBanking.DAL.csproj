@@ -63,13 +63,15 @@
     <Compile Include="DataMapping\Messages.cs" />
     <Compile Include="DataMapping\Notifications.cs" />
     <Compile Include="DataMapping\Roles.cs" />
+    <Compile Include="DataMapping\TransactionDetails.cs" />
     <Compile Include="DataMapping\Transactions.cs" />
-    <Compile Include="Migrations\202108111334085_test.cs" />
-    <Compile Include="Migrations\202108111334085_test.Designer.cs">
-      <DependentUpon>202108111334085_test.cs</DependentUpon>
+    <Compile Include="Migrations\202108241751463_Initial.cs" />
+    <Compile Include="Migrations\202108241751463_Initial.Designer.cs">
+      <DependentUpon>202108241751463_Initial.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModel\ChangePasswordViewModel.cs" />
     <Compile Include="ViewModel\ChannelViewModel.cs" />
     <Compile Include="ViewModel\ChequeBookViewModel.cs" />
     <Compile Include="ViewModel\ChequesExecViewModel.cs" />
@@ -86,6 +88,9 @@
     <Compile Include="ViewModel\GetInfoBankAccountViewModels.cs" />
     <Compile Include="ViewModel\RegisterViewModel.cs" />
     <Compile Include="ViewModel\RoleViewModels.cs" />
+    <Compile Include="ViewModel\TransactionRequestModels.cs" />
+    <Compile Include="ViewModel\TransactionsDetail.cs" />
+    <Compile Include="ViewModel\TransactionsDetailViewModels.cs" />
     <Compile Include="ViewModel\TransactionsViewModels.cs" />
     <Compile Include="ViewModel\UserViewModel.cs" />
   </ItemGroup>
@@ -94,8 +99,8 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Migrations\202108111334085_test.resx">
-      <DependentUpon>202108111334085_test.cs</DependentUpon>
+    <EmbeddedResource Include="Migrations\202108241751463_Initial.resx">
+      <DependentUpon>202108241751463_Initial.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

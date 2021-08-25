@@ -34,7 +34,7 @@
                 <div class="card card-primary card-outline">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            <img class="profile-user-img img-fluid img-circle" src="~/Content/images/profile/17.jpg" alt="User profile picture">
+                            <img class="profile-user-img img-fluid rounded-circle" src="~/Content/images/profile/17.jpg" alt="User profile picture">
                         </div>
 
                         <h3 class="profile-username text-center" id="TextName">Name</h3>
@@ -54,7 +54,7 @@
                         </ul>
                     </div>
                 </div>
-                
+
             </div>
             <!-- /.col -->
             <div class="col-md-9">
@@ -89,7 +89,7 @@
                                 </div>
                             </div>
                             <div class="form-group row">
-                                <label for="NumberId" class="col-sm-2 col-form-label">Number Id</label>
+                                <label for="NumberID" class="col-sm-2 col-form-label">Number Id</label>
                                 <div class="col-sm-10">
                                     <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="Number Id">
                                 </div>
@@ -102,13 +102,42 @@
                             </div>
                             <div class="form-group row">
                                 <div class="offset-sm-2 col-sm-10">
-                                    <button type="submit" id="btnUpdate" class="btn btn-warning">Update</button>
+                                    <button type="submit" id="btnUpdate" class="btn btn-warning btn-sm">Update</button>
                                 </div>
                             </div>
                         </form>
                     </div><!-- /.card-body -->
                 </div>
-                <!-- /.nav-tabs-custom -->
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Change Password</h4>
+                    </div><!-- /.card-header -->
+                    <div class="card-body">
+                        <form class="form-horizontal" id="formData2">
+                            <div class="form-group row">
+                                <label for="Name" class="col-sm-2 col-form-label">Current Password</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="OldPassword" placeholder="Current Password..." name="OldPassword">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Name" class="col-sm-2 col-form-label">New Password</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="NewPassword" placeholder="New Password ..." name="NewPassword">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="Name" class="col-sm-2 col-form-label">Confirm new Password</label>
+                                <div class="col-sm-10">
+                                    <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm New Password..." name="ConfirmPassword">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <button class="btn btn-primary offset-sm-2 btn-sm" type="submit">Save change</button>
+                            </div>
+                        </form>
+                    </div><!-- /.card-body -->
+                </div>
             </div>
             <!-- /.col -->
         </div>
@@ -129,7 +158,101 @@
             var age = today.getFullYear() - birthDate.getFullYear();
             return age >= min;
         }, "You are not old enough!");
-        var accounts = {
+        
+        const validator = $("#formData").validate({
+            rules: {
+                Name: {
+                    required: true,
+                },
+                Phone: {
+                    minlength: 10,
+                    required: true,
+                },
+                Email: {
+                    required: true,
+                    email: true,
+                },
+                NumberID: {
+                    required: true,
+                    minlength: 10,
+                },
+                Address: {
+                    required: true,
+                },
+                Birthday: {
+                    minAge: 18,
+                    required: true,
+                }
+            },
+            messages: {
+                Birthday: {
+                    minAge: "Your age must be greater than 18"
+                }
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+            submitHandler: function (form) {
+                const user = {
+                    Name: $("#Name").val(),
+                    Email: $("#Email").val(),
+                    Phone: $("#Phone").val(),
+                    Birthday: $("#Birthday").val(),
+                    NumberID: $("#NumberID").val(),
+                    Address: $("#Address").val(),
+                }
+                accounts.put(user);
+            }
+        }); 
+        
+        const validator2 = $("#formData2").validate({
+           rules: {
+               OldPassword: {
+                   required: true,
+                   minlength: 6,
+               },
+               NewPassword: {
+                   required: true,
+                   minlength: 6,
+               },
+               ConfirmPassword: {
+                  required: true,
+                  minlength: 6,
+                  equalTo: "#NewPassword",
+               }
+           },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+           submitHandler: function (form) {
+               const obj = {
+                   OldPassword: $("#OldPassword").val(),
+                   NewPassword: $("#NewPassword").val(),
+                   ConfirmPassword: $("#ConfirmPassword").val(),
+               }
+               accounts.changePassword(obj);
+           }
+       });
+        
+        const accounts = {
             load: function () {
                 $.ajax({
                     type: "GET",
@@ -139,7 +262,7 @@
                         $("#Email").val(response.data.Email);
                         $("#Phone").val(response.data.Phone);
                         $("#Birthday").val(response.data.Birthday);
-                        $("#NumberID").val(response.data.NumberID);
+                        $("#NumberID").val(response.data.NumberId);
                         $("#Address").val(response.data.Address);
                         $("#TextName").html(response.data.Name);
                         $("#TextEmail").html(response.data.Email);
@@ -155,87 +278,37 @@
                     url: "/Home/UpdateInfo",
                     data: user,
                     success: function (res) {
-                        console.log(res);
-                        if (res.statusCode == 400) {
+                        if (res.statusCode === 400) {
                             validator.showErrors(res.data);
-                            toastr.error("Update failed!", "Notification", {
-                                positionClass: "toast-top-center",
-                                timeOut: 5e3,
-                                closeButton: !0,
-                                debug: !1,
-                                newestOnTop: !0,
-                                progressBar: !0,
-                                preventDuplicates: !0,
-                                onclick: null,
-                                showDuration: "300",
-                                hideDuration: "1000",
-                                extendedTimeOut: "1000",
-                                showEasing: "swing",
-                                hideEasing: "linear",
-                                showMethod: "fadeIn",
-                                hideMethod: "fadeOut",
-                                tapToDismiss: !1
-                            })
-                        } else if (res.statusCode == 200) {
-                            toastr.success("Update sucessfully!", "Notification", {
-                                positionClass: "toast-top-center",
-                                timeOut: 5e3,
-                                closeButton: !0,
-                                debug: !1,
-                                newestOnTop: !0,
-                                progressBar: !0,
-                                preventDuplicates: !0,
-                                onclick: null,
-                                showDuration: "300",
-                                hideDuration: "1000",
-                                extendedTimeOut: "1000",
-                                showEasing: "swing",
-                                hideEasing: "linear",
-                                showMethod: "fadeIn",
-                                hideMethod: "fadeOut",
-                                tapToDismiss: !1
-                            })
+                            notifyError("Error", "Update failed!");
+                        } else if (res.statusCode === 200) {
+                            notifySuccess("Success", "Update succesfully!");
                             accounts.load();
+                        }
+                    }
+                })
+            },
+            changePassword: function (obj){
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ChangePassword","Home")",
+                    data: obj,
+                    success: function (res) {
+                        if (res.statusCode === 400) {
+                            validator2.showErrors(res.data);
+                            notifyError("Error", "Update failed!");
+                        } else if (res.statusCode === 200) {
+                            notifySuccess("Success", "Change password successfully!");
+                            $("#formData2").trigger("reset");
                         }
                     }
                 })
             }
         }
+        
         $(function () {
             accounts.load();
         })
-
-        var validator = $("#formData").validate({
-            rules: {
-                Name: {
-                    required: true,
-                },
-                Email: {
-                    required: true,
-                    email: true,
-                },
-                Birthday: {
-                    minAge: 18,
-                }
-            },
-            messages: {
-                Birthday: {
-                    minAge: "Your age must be greater than 18"
-                }
-            },
-            submitHandler: function (form) {
-                var user = {
-                    Name: $("#Name").val(),
-                    Email: $("#Email").val(),
-                    Phone: $("#Phone").val(),
-                    Birthday: $("#Birthday").val(),
-                    NumberID: $("#NumberID").val(),
-                    Address: $("#Address").val(),
-                }
-                console.log(user);
-                accounts.put(user);
-            }
-        });
 
     </script>
 }

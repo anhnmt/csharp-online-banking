@@ -86,11 +86,14 @@
                         data: 'CreatedAt',
                         className: 'align-middle',
                     },
-                    // {
-                    //     data: 'NotificationId',
-                    //     className: 'align-middle',
-                    //     "orderable": false
-                    // },
+                    {
+                        data: {NotificationId:'NotificationId'},
+                        className: 'align-middle',
+                        "render": function (data) {
+                            return '<a class="read-notification btn btn-rounded btn-info" data-notification="'+data.NotificationId+'">Details</a>'
+                        },
+                        "orderable": false
+                    },
                 ]
             })
         })

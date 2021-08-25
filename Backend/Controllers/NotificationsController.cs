@@ -9,12 +9,12 @@ namespace Backend.Controllers
     public class NotificationsController : Controller
     {
         private readonly IRepository<Notifications> notifications;
-        private readonly IRepository<Transactions> transactions;
+        private readonly IRepository<TransactionDetails> transactionDetails;
 
         public NotificationsController()
         {
             notifications = new Repository<Notifications>();
-            transactions = new Repository<Transactions>();
+            transactionDetails = new Repository<TransactionDetails>();
         }
 
         // GET
@@ -36,10 +36,11 @@ namespace Backend.Controllers
 
             var data = notifications.Get()
                 .Where(x => x.AccountId == currentUser.AccountId)
+                .OrderByDescending(x => x.CreatedAt)
                 .Select(x =>
                 {
-                    var pkObject = transactions
-                        .Get().FirstOrDefault(y => y.TransactionId == x.PkId);
+                    var pkObject = transactionDetails
+                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
                     return new NotificationViewModel(x, pkObject);
                 });

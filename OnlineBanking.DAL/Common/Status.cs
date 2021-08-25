@@ -53,6 +53,7 @@ namespace OnlineBanking.DAL
     {
         Opened = 0,
         Closed = 1,
+        Deleted = 3,
     }
 
     public enum NotificationStatus
@@ -65,5 +66,10 @@ namespace OnlineBanking.DAL
     {
         Transaction = 0,
         Message = 1,
+    }
+    public enum TransactionType
+    {
+        Plus = 0,
+        Minus = 1,
     }
 }

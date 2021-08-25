@@ -14,11 +14,13 @@ namespace OnlineBanking.BLL.Repositories
         private readonly ApplicationDbContext cnn;
 
         private readonly DbSet<T> tbl;
+
         public Repository()
         {
-            cnn = new ApplicationDbContext();
+            cnn = new ApplicationDbContext(); ;
             tbl = cnn.Set<T>();
         }
+
         public bool Add(T e)
         {
             try
@@ -32,6 +34,7 @@ namespace OnlineBanking.BLL.Repositories
                 return false;
             }
         }
+
         public bool AddRange(List<T> e)
         {
             try
@@ -90,7 +93,6 @@ namespace OnlineBanking.BLL.Repositories
             }
             catch (Exception)
             {
-
                 return false;
             }
         }
