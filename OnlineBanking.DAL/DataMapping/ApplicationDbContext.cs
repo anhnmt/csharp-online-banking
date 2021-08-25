@@ -9,7 +9,7 @@ namespace OnlineBanking.DAL
 {
     public class ApplicationDbContext : DbContext
     {
-        private static ApplicationDbContext _dbContext;
+        public static ApplicationDbContext Instance;
 
         // lock object
         private static readonly object LockObject = new object();
@@ -17,21 +17,7 @@ namespace OnlineBanking.DAL
         public ApplicationDbContext() : base("name=DBConnectionString")
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<ApplicationDbContext, Configuration>());
-        }
-
-        // Class in Instance
-        public static ApplicationDbContext Instance()
-        {
-            if (_dbContext == null)
-            {
-                lock (LockObject)
-                {
-                    if (_dbContext == null)
-                        _dbContext = new ApplicationDbContext();
-                }
-            }
-
-            return _dbContext;
+            Instance = this;
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -47,18 +33,6 @@ namespace OnlineBanking.DAL
                 .WithMany(a => a.TransactionDetails)
                 .HasForeignKey(m => m.BankAccountId)
                 .WillCascadeOnDelete(false);
-            
-            // modelBuilder.Entity<Transactions>()
-            //     .HasRequired(t => t.FromAccount)
-            //     .WithMany(a => a.FromTransactions)
-            //     .HasForeignKey(m => m.FromId)
-            //     .WillCascadeOnDelete(false);
-            //
-            // modelBuilder.Entity<Transactions>()
-            //     .HasRequired(m => m.ToAccount)
-            //     .WithMany(a => a.ToTransactions)
-            //     .HasForeignKey(m => m.ToId)
-            //     .WillCascadeOnDelete(false);
 
             modelBuilder.Entity<Cheques>()
                 .HasRequired(t => t.FromBankAccount)
@@ -89,11 +63,11 @@ namespace OnlineBanking.DAL
 
             foreach (var entityEntry in entries)
             {
-                ((BaseModel) entityEntry.Entity).UpdatedAt = DateTime.Now;
+                ((BaseModel)entityEntry.Entity).UpdatedAt = DateTime.Now;
 
                 if (entityEntry.State == EntityState.Added)
                 {
-                    ((BaseModel) entityEntry.Entity).CreatedAt = DateTime.Now;
+                    ((BaseModel)entityEntry.Entity).CreatedAt = DateTime.Now;
                 }
             }
 

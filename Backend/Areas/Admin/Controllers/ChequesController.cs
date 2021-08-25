@@ -21,7 +21,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ChequesController()
         {
-            _context = ApplicationDbContext.Instance();
+            _context = ApplicationDbContext.Instance;
             cheques = new Repository<Cheques>();
             chequebooks = new Repository<ChequeBooks>();
             bankAccounts = new Repository<BankAccounts>();
@@ -46,14 +46,14 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult GetData(int chequeBookId)
         {
-            var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int)ChequeStatus.Deleted)
+            var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int) ChequeStatus.Deleted)
                 .Select(x => new ChequesViewModel
                 {
                     ChequeBookId = x.ChequeBookId,
                     Code = x.Code,
                     NumberId = x.NumberId,
                     ChequeId = x.ChequeId,
-                    StatusName = ((ChequeStatus)x.Status).ToString(),
+                    StatusName = ((ChequeStatus) x.Status).ToString(),
                     Status = x.Status,
                     CurrencyName = x.FromBankAccount.Currency.Name,
                     AmountNumber = x.Amount,
@@ -77,7 +77,7 @@ namespace Backend.Areas.Admin.Controllers
                 Code = x.Code,
                 NumberId = x.NumberId,
                 ChequeId = x.ChequeId,
-                StatusName = ((ChequeStatus)x.Status).ToString(),
+                StatusName = ((ChequeStatus) x.Status).ToString(),
                 Status = x.Status,
                 AmountNumber = x.Amount,
                 FromBankAccountName = x.FromBankAccount.Name,
@@ -96,103 +96,117 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult PostData(Cheques chequeInformation)
         {
-            var errors = new Dictionary<string, string>();
-            string code;
-
-            if (!ModelState.IsValid)
+            using (var transaction = _context.Database.BeginTransaction())
             {
-                foreach (var k in ModelState.Keys)
-                    foreach (var err in ModelState[k].Errors)
+                try
+                {
+                    var errors = new Dictionary<string, string>();
+                    string code;
+
+                    if (!ModelState.IsValid)
                     {
-                        var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                        if (!errors.ContainsKey(key))
-                            errors.Add(key, err.ErrorMessage);
+                        foreach (var k in ModelState.Keys)
+                        foreach (var err in ModelState[k].Errors)
+                        {
+                            var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                            if (!errors.ContainsKey(key))
+                                errors.Add(key, err.ErrorMessage);
+                        }
+
+                        return Json(new
+                        {
+                            message = "Error",
+                            data = errors,
+                            statusCode = 400,
+                        }, JsonRequestBehavior.AllowGet);
                     }
 
-                return Json(new
+                    var fromBankAccount = bankAccounts.Get(chequeInformation.FromBankAccountId);
+
+                    if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
+                    {
+                        errors.Add("FromBankAccountId", "This bank account is not actived");
+                        return Json(new
+                        {
+                            message = "Error",
+                            data = errors,
+                            statusCode = 400
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    var chequeBook = chequebooks.Get(chequeInformation.ChequeBookId);
+                    if (chequeBook.Status != (int) ChequeBookStatus.Opened)
+                    {
+                        return Json(new
+                        {
+                            message = "Error",
+                            data = "This cheque book is not opened",
+                            statusCode = 400
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    do
+                    {
+                        code = Utils.RandomString(16);
+                    } while (cheques.CheckDuplicate(x => x.Code == code));
+
+                    chequeInformation.Code = code;
+                    chequeInformation.Status = (int) ChequeStatus.Actived;
+
+                    if (fromBankAccount.Balance < chequeInformation.Amount)
+                    {
+                        errors.Add("Amount", "Your balance is not enough");
+                        return Json(new
+                        {
+                            message = "Error",
+                            data = errors,
+                            statusCode = 400
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    if (0 > chequeInformation.Amount)
+                    {
+                        errors.Add("Amount", "Please enter a positive number");
+                        return Json(new
+                        {
+                            message = "Error",
+                            data = errors,
+                            statusCode = 400
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+
+                    // cheques.Add(chequeInformation);
+                    _context.Entry(chequeInformation).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    fromBankAccount.Balance -= chequeInformation.Amount;
+                    // bankAccounts.Update(fromBankAccount);
+                    _context.Entry(fromBankAccount).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    return Json(new
+                    {
+                        message = "Success",
+                        statusCode = 200,
+                    }, JsonRequestBehavior.AllowGet);
+                }
+                catch (Exception ex)
                 {
-                    message = "Error",
-                    data = errors,
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
+                    transaction.Rollback();
+                    return Json(new
+                    {
+                        data = ex,
+                        message = "error",
+                        statuscode = 404
+                    }, JsonRequestBehavior.AllowGet);
+                    throw;
+                }
             }
-
-            var fromBankAccount = bankAccounts.Get(chequeInformation.FromBankAccountId);
-
-            if (fromBankAccount.Status != (int)BankAccountStatus.Actived)
-            {
-                errors.Add("FromBankAccountId", "This bank account is not actived");
-                return Json(new
-                {
-                    message = "Error",
-                    data = errors,
-                    statusCode = 400
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            var chequeBook = chequebooks.Get(chequeInformation.ChequeBookId);
-            if (chequeBook.Status != (int)ChequeBookStatus.Opened)
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "This cheque book is not opened",
-                    statusCode = 400
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            do
-            {
-                code = Utils.RandomString(16);
-            } while (cheques.CheckDuplicate(x => x.Code == code));
-
-            chequeInformation.Code = code;
-            chequeInformation.Status = (int)ChequeStatus.Actived;
-
-            if (fromBankAccount.Balance < chequeInformation.Amount)
-            {
-                errors.Add("Amount", "Your balance is not enough");
-                return Json(new
-                {
-                    message = "Error",
-                    data = errors,
-                    statusCode = 400
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            if (0 > chequeInformation.Amount)
-            {
-                errors.Add("Amount", "Please enter a positive number");
-                return Json(new
-                {
-                    message = "Error",
-                    data = errors,
-                    statusCode = 400
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            if (!cheques.Add(chequeInformation))
-                return Json(new
-                {
-                    message = "Error",
-                    statusCode = 400,
-                    data = ModelState
-                }, JsonRequestBehavior.AllowGet);
-
-            fromBankAccount.Balance -= chequeInformation.Amount;
-            bankAccounts.Update(fromBankAccount);
-
-            return Json(new
-            {
-                message = "Success",
-                statusCode = 200,
-            }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
         public ActionResult PutData(int id)
         {
-
             var cheque = cheques.Get(id);
             if (cheque == null)
             {
@@ -205,7 +219,7 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             var chequeBook = chequebooks.Get(cheque.ChequeBookId);
-            if (chequeBook.Status != (int)ChequeBookStatus.Opened)
+            if (chequeBook.Status != (int) ChequeBookStatus.Opened)
             {
                 return Json(new
                 {
@@ -215,7 +229,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int)ChequeStatus.Deleted)
+            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
             {
                 return Json(new
                 {
@@ -226,7 +240,7 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             var fromBankAccount = bankAccounts.Get(cheque.FromBankAccountId);
-            if (fromBankAccount.Status != (int)BankAccountStatus.Actived)
+            if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
             {
                 return Json(new
                 {
@@ -236,8 +250,12 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var data = cheque.Status == (int)ChequeStatus.Actived ? "Stop this cheque successfully" : "Active this cheque successfully";
-            cheque.Status = cheque.Status == (int)ChequeStatus.Actived ? (int)ChequeStatus.Stopped : (int)ChequeStatus.Actived;
+            var data = cheque.Status == (int) ChequeStatus.Actived
+                ? "Stop this cheque successfully"
+                : "Active this cheque successfully";
+            cheque.Status = cheque.Status == (int) ChequeStatus.Actived
+                ? (int) ChequeStatus.Stopped
+                : (int) ChequeStatus.Actived;
             if (!cheques.Edit(cheque))
                 return Json(new
                 {
@@ -267,12 +285,12 @@ namespace Backend.Areas.Admin.Controllers
                     if (!ModelState.IsValid)
                     {
                         foreach (var k in ModelState.Keys)
-                            foreach (var err in ModelState[k].Errors)
-                            {
-                                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                                if (!errors.ContainsKey(key))
-                                    errors.Add(key, err.ErrorMessage);
-                            }
+                        foreach (var err in ModelState[k].Errors)
+                        {
+                            var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                            if (!errors.ContainsKey(key))
+                                errors.Add(key, err.ErrorMessage);
+                        }
 
                         return Json(new
                         {
@@ -290,7 +308,7 @@ namespace Backend.Areas.Admin.Controllers
                             statusCode = 400,
                         }, JsonRequestBehavior.AllowGet);
 
-                    if (cheque.ChequeBook.Status != (int)ChequeBookStatus.Opened)
+                    if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
                     {
                         errors.Add("Code", "This cheque is belong to a cheque book which is not open!");
                         return Json(new
@@ -301,7 +319,7 @@ namespace Backend.Areas.Admin.Controllers
                         }, JsonRequestBehavior.AllowGet);
                     }
 
-                    if (cheque.Status != (int)ChequeStatus.Actived)
+                    if (cheque.Status != (int) ChequeStatus.Actived)
                     {
                         errors.Add("Code", "Cheque is not valid or has been used!");
                         return Json(new
@@ -313,10 +331,12 @@ namespace Backend.Areas.Admin.Controllers
                     }
 
                     BankAccounts toBankAccounts;
-                    if (chequeExec.PaymentMethod == "bank-account" && !Utils.IsNullOrEmpty(chequeExec.ToBankAccountName))
+                    if (chequeExec.PaymentMethod == "bank-account" &&
+                        !Utils.IsNullOrEmpty(chequeExec.ToBankAccountName))
                     {
-                        toBankAccounts = bankAccounts.Get(x => x.Name == chequeExec.ToBankAccountName).FirstOrDefault();
-                        if (toBankAccounts != null && toBankAccounts.Status == (int)BankAccountStatus.Actived)
+                        toBankAccounts = bankAccounts.Get(x => x.Name == chequeExec.ToBankAccountName)
+                            .FirstOrDefault();
+                        if (toBankAccounts != null && toBankAccounts.Status == (int) BankAccountStatus.Actived)
                         {
                             if (toBankAccounts.Currency.CurrencyId != cheque.FromBankAccount.Currency.CurrencyId)
                             {
@@ -345,7 +365,7 @@ namespace Backend.Areas.Admin.Controllers
                     }
 
                     toBankAccounts = bankAccounts.Get(x => x.Name == chequeExec.ToBankAccountName).FirstOrDefault();
-                    cheque.Status = (int)ChequeStatus.Received;
+                    cheque.Status = (int) ChequeStatus.Received;
                     cheque.NumberId = chequeExec.NumberId;
 
                     if (toBankAccounts != null)
@@ -363,12 +383,14 @@ namespace Backend.Areas.Admin.Controllers
                         Code = cheque.Code,
                         NumberId = cheque.NumberId,
                         ChequeId = cheque.ChequeId,
-                        StatusName = ((ChequeStatus)cheque.Status).ToString(),
+                        StatusName = ((ChequeStatus) cheque.Status).ToString(),
                         Status = cheque.Status,
                         AmountNumber = cheque.Amount,
                         FromBankAccountName = cheque.FromBankAccount.Name,
                         FromBankAccountId = cheque.FromBankAccountId,
-                        ToBankAccountName = cheque.ToBankAccountId == null ? "None, using cash!" : cheque.ToBankAccount.Name
+                        ToBankAccountName = cheque.ToBankAccountId == null
+                            ? "None, using cash!"
+                            : cheque.ToBankAccount.Name
                     };
 
                     if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
@@ -386,8 +408,8 @@ namespace Backend.Areas.Admin.Controllers
 
                     var tran = new TransactionRequestModels
                     {
-                        FromId = cheque.FromBankAccount.BankAccountId,
-                        ToId = toBankAccounts.BankAccountId,
+                        FromId = cheque.FromBankAccount.BankAccountId.ToString(),
+                        ToId = toBankAccounts.BankAccountId.ToString(),
                         Amount = cheque.Amount,
                         Messages = "Transfer from " + cheque.FromBankAccount.Name + " to " + toBankAccounts.Name,
                     };
@@ -421,7 +443,7 @@ namespace Backend.Areas.Admin.Controllers
             }
         }
 
-        private Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
+        private static Transactions CreateTransactions(TransactionRequestModels tran, BankAccounts fromBankAccount,
             BankAccounts toBankAccount)
         {
             var transactionDetails = new List<TransactionDetails>()
@@ -459,10 +481,10 @@ namespace Backend.Areas.Admin.Controllers
             return trannsaction;
         }
 
-        private List<Notifications> CreateNotifications(Transactions transaction)
+        private static List<Notifications> CreateNotifications(Transactions transaction)
         {
-            var from = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
-            var to = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
+            var from = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Minus);
+            var to = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Plus);
 
             var lstNotification = new List<Notifications>()
             {
@@ -505,7 +527,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.ChequeBook.Status != (int)ChequeBookStatus.Opened)
+            if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
             {
                 return Json(new
                 {
@@ -515,7 +537,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int)ChequeStatus.Deleted)
+            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
             {
                 return Json(new
                 {

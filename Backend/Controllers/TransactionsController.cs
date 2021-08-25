@@ -27,7 +27,7 @@ namespace Backend.Controllers
 
         public TransactionsController()
         {
-            _context = ApplicationDbContext.Instance();
+            _context = ApplicationDbContext.Instance;
             Instance = this;
             transactions = new Repository<Transactions>();
             transactionDetails = new Repository<TransactionDetails>();

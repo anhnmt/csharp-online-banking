@@ -15,7 +15,7 @@ namespace Backend.Hubs
     [HubName("chatHub")]
     public class ChatHub : Hub
     {
-        private static ChatHub instance;
+        public static ChatHub Instance;
 
         // lock object
         private static readonly object LockObject = new object();
@@ -37,30 +37,12 @@ namespace Backend.Hubs
 
         public ChatHub()
         {
+            Instance = this;
             accountRepo = new Repository<Accounts>();
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
             notificationRepo = new Repository<Notifications>();
             transactionDetailRepo = new Repository<TransactionDetails>();
-        }
-
-        // Class in Instance
-        public static ChatHub Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    lock (LockObject)
-                        {
-                            if (instance == null)
-                            {
-                                instance = new ChatHub();
-                            }
-                        }
-                }
-                return instance;
-            }
         }
 
         public async Task SendPrivate(string message)
@@ -209,7 +191,7 @@ namespace Backend.Hubs
                 {
                     var userViewModel = new UserViewModel(account, 0);
 
-                    if (account.RoleId != (int)RoleStatus.Admin && account.RoleId != (int)RoleStatus.Support)
+                    if (account.RoleId != (int) RoleStatus.Admin && account.RoleId != (int) RoleStatus.Support)
                     {
                         var channel = FindChannelByAccountId(accountId);
                         userViewModel.CurrentChannelId = channel.ChannelId;
