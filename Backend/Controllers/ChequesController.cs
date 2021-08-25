@@ -116,8 +116,7 @@ namespace Backend.Controllers
         {
             var errors = new Dictionary<string, string>();
             string code;
-            var user = (Accounts)Session["user"];
-            var account = accounts.Get(user.AccountId);
+            
 
             if (!ModelState.IsValid)
             {
@@ -137,7 +136,9 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeInformation.ChequeBookId && x.AccountId == account.AccountId))
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeInformation.ChequeBookId && x.AccountId == account.AccountId))
             {
                 return Json(new
                 {
@@ -233,6 +234,17 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    message = "Error",
+                    statusCode = 404,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             var chequeBook = chequebooks.Get(cheque.ChequeBookId);
             if (chequeBook.Status != (int)ChequeBookStatus.Opened)
             {
@@ -294,6 +306,17 @@ namespace Backend.Controllers
                     message = "Error",
                     data = "This cheque is not exist",
                     statusCode = 400,
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    message = "Error",
+                    statusCode = 404,
                 }, JsonRequestBehavior.AllowGet);
             }
 
