@@ -258,6 +258,16 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+            if (receiverBankAccount == null)
+            {
+                errors.Add("ToId", "Account number doesn't exist");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
             //Check Currency two bank account
             if (sourceBankAccount.Currency.CurrencyId != receiverBankAccount.Currency.CurrencyId)
             {
@@ -269,16 +279,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
-            if (receiverBankAccount == null)
-            {
-                errors.Add("FromId", "Account number doesn't exist");
-                return Json(new
-                {
-                    data = errors,
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
+            
             return null;
         }
         private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount, Dictionary<string, string> errors)
@@ -306,9 +307,10 @@ namespace Backend.Controllers
             }
             if (sourceBankAccount.Balance < tran.Amount)
             {
+                errors.Add("Amount", "Balance isn't enough");
                 return Json(new
                 {
-                    data = "Amount isn't enough",
+                    data = errors,
                     message = "Error",
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
