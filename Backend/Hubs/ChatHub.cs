@@ -16,7 +16,8 @@ namespace Backend.Hubs
     public class ChatHub : Hub
     {
         private static ApplicationDbContext _context;
-        public static ChatHub Instance;
+        private static ChatHub _instance;
+        private static object syncLock = new object();
 
         #region Properties
 
@@ -35,12 +36,27 @@ namespace Backend.Hubs
 
         public ChatHub()
         {
-            Instance = this;
             accountRepo = new Repository<Accounts>();
             channelRepo = new Repository<Channels>();
             messageRepo = new Repository<Messages>();
             notificationRepo = new Repository<Notifications>();
             transactionDetailRepo = new Repository<TransactionDetails>();
+        }
+        
+        public static ChatHub Instance()
+        {
+            if (_instance == null)
+            {
+                lock (syncLock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new ChatHub();
+                    }
+                }
+            }
+ 
+            return _instance;
         }
 
         public async Task SendPrivate(string message)

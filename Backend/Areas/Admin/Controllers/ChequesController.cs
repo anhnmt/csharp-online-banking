@@ -436,7 +436,7 @@ namespace Backend.Areas.Admin.Controllers
 
                         transaction.Commit();
 
-                        ChatHub.Instance.SendNotifications(newNotifications);
+                        // ChatHub.Instance().SendNotifications(newNotifications);
 
                         return Json(new
                         {
