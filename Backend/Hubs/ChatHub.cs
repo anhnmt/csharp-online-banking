@@ -42,20 +42,14 @@ namespace Backend.Hubs
             notificationRepo = new Repository<Notifications>();
             transactionDetailRepo = new Repository<TransactionDetails>();
         }
-        
+
         public static ChatHub Instance()
         {
             if (_instance == null)
             {
-                lock (syncLock)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new ChatHub();
-                    }
-                }
+                _instance = new ChatHub();
             }
- 
+
             return _instance;
         }
 
@@ -188,7 +182,7 @@ namespace Backend.Hubs
                 {
                     Console.WriteLine(ex);
                 }
-                
+
                 return null;
             }
         }
