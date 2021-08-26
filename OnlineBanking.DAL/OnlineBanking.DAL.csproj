@@ -89,7 +89,6 @@
     <Compile Include="ViewModel\RegisterViewModel.cs" />
     <Compile Include="ViewModel\RoleViewModels.cs" />
     <Compile Include="ViewModel\TransactionRequestModels.cs" />
-    <Compile Include="ViewModel\TransactionsDetail.cs" />
     <Compile Include="ViewModel\TransactionsDetailViewModels.cs" />
     <Compile Include="ViewModel\TransactionsViewModels.cs" />
     <Compile Include="ViewModel\UserViewModel.cs" />

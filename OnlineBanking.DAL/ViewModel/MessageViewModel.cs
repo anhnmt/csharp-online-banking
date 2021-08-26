@@ -12,14 +12,6 @@ namespace OnlineBanking.DAL
         {
         }
 
-        public MessageViewModel(Messages message)
-        {
-            MessageId = message.MessageId;
-            AccountId = message.AccountId;
-            AccountName = message.Account?.Name;
-            Content = message.Content;
-        }
-
         public MessageViewModel(Messages message, string accountName)
         {
             MessageId = message.MessageId;
