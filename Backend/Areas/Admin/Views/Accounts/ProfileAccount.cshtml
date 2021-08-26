@@ -36,7 +36,7 @@
                     </div>
                     <div class="card-body">
                         <div class="form-horizontal">
-                            <input type="hidden" name="Id" id="AccountId" value="@Model.AccountId"/>
+                            <input type="hidden" name="Id" id="AccountId" value="@Model.AccountId" />
                             <div class="form-group">
                                 <strong>Id: </strong> @Model.AccountId
                             </div>
@@ -90,14 +90,14 @@
                             <div class="table-responsive">
                                 <table class="display table-responsive-lg min-w850 dataTable no-footer" id="tbl_banks" role="grid" aria-describedby="example4_info">
                                     <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Account Number</th>
-                                        <th>Balance</th>
-                                        <th>CurrencyName </th>
-                                        <th>Status </th>
-                                        <th>Action</th>
-                                    </tr>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Account Number</th>
+                                            <th>Balance</th>
+                                            <th>CurrencyName </th>
+                                            <th>Status </th>
+                                            <th>Action</th>
+                                        </tr>
                                     </thead>
                                 </table>
                             </div>
@@ -114,14 +114,14 @@
                             <div class="table-responsive">
                                 <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatablesChequeBook" role="grid" aria-describedby="example4_info">
                                     <thead>
-                                    <tr>
-                                        <th>No</th>
-                                        <th>Code</th>
-                                        <th>User's Name</th>
-                                        <th>Status</th>
-                                        <th>Cheques Used</th>
-                                        <th>Action</th>
-                                    </tr>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Code</th>
+                                            <th>User's Name</th>
+                                            <th>Status</th>
+                                            <th>Cheques Used</th>
+                                            <th>Action</th>
+                                        </tr>
                                     </thead>
                                 </table>
                             </div>
@@ -141,8 +141,8 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="Id" id="Id" value=""/>
-                    <input type="hidden" name="type2" id="type2" value="CREATE"/>
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <input type="hidden" name="type" id="type" value="CREATE" />
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
@@ -171,7 +171,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success" >Save</button>
+                    <button type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
                 </div>
             </form>
@@ -188,8 +188,8 @@
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" name="Id" id="Id" value=""/>
-                    <input type="hidden" name="type" id="type" value="CREATE"/>
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <input type="hidden" name="type" id="type" value="TRANSFER" />
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
@@ -207,7 +207,7 @@
                     <button type="submit" class="btn btn-success">Save</button>
                     <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
                 </div>
-             </form>
+            </form>
         </div>
     </div>
 </div>
@@ -244,7 +244,7 @@
                        Balance: $("#Balance").val(),
                        Name: $("#NameBank").val()
                    };
-                   if ($("#type").val() === "EDIT") {
+                    if ($("#type").val() === "EDIT") {
                        bank.BankAccountId = $("#Id").val();
                        managerBank.put(bank);
                    } else {
@@ -345,11 +345,13 @@
                     url: "@Url.Action("FindId", "BankAccounts")",
                     data: {id : id},
                     success: function (res) {
+                        
+                        $("#MoneyManagement").modal("show");
+                        validator2.resetForm();
+                        $("#Form2").trigger("reset");
                         $("#Id").val(res.BankAccountId);
                         $("#Name").val(res.Name);
-                        $("#MoneyManagement").modal("show");
                     }
-
                 })
             },
             post: function (bank) {
@@ -519,7 +521,6 @@
                         }
                     },
                     className: 'align-middle text-center',
-                    "searchable": false,
                     "orderable": false,
                 },
                 {
@@ -562,15 +563,29 @@
                                 className: 'align-middle text-center'
                             },
                             {
-                                data: 'Balance',
-                                className: 'align-middle',
+                                //data: 'Balance',
+                                render: function (data, type, row) {
+                                    return Intl.NumberFormat('vi-VN', { style: 'currency', currency: row.CurrencyName }).format(row.Balance);
+                                },
+                                className: 'align-middle text-center',
                             },
                             {
                                 data: 'CurrencyName',
-                                className: 'align-middle',
+                                className: 'align-middle text-center',
                             },
                             {
-                                data: 'StatusName',
+                                render: function (data, type, row) {
+                                    if (row.Status === 0) {
+                                        return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>' + row.StatusName + '</span>';
+                                    } else if (row.Status === 1) {
+                                        return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>' + row.StatusName + '</span>';
+                                    } else if (row.Status === 2) {
+                                        return '<span class="badge light badge-light"><i class="fa fa-circle text-danger mr-1"></i>' + row.StatusName + '</span>';
+                                    } else {
+                                        return '<span class="badge light badge-dark"><i class="fa fa-circle text-danger mr-1"></i>' + row.StatusName + '</span>';
+                                    }
+                                },
+                                //data: 'StatusName',
                                 className: 'align-middle text-center',
                                 "searchable": false,
                                 "orderable": false,
@@ -580,10 +595,10 @@
                                 "render": function (data) {
                                     let detail = "@Url.Action("ProfileAccountNumber", "Transactions")/"+data.BankAccountId;
                                     return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
-                                     '<a data-id="'+data.BankAccountId+'" class="dropdown-item btn-manager" href="javascript:void(0);" >Money Managment</a>' +
-                                      '<a href="'+detail+'" class="dropdown-item btn-detail" >Details</a>' +
-                                      '<a  data-id="'+data.BankAccountId+'" class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a>' +
-                                       '<a  data-id="'+data.BankAccountId+'" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                                        '<a data-id="' + data.BankAccountId +'" class="dropdown-item btn-manager text-info" href="javascript:void(0);" >Money Managment</a>' +
+                                        '<a href="' + detail +'" class="dropdown-item btn-detail text-primary" >Details</a>' +
+                                        '<a  data-id="' + data.BankAccountId +'" class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
+                                        '<a  data-id="' + data.BankAccountId +'" class="dropdown-item text-danger btn-delete btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                                      }
                             },
                         ]
@@ -626,7 +641,7 @@
             })
 
             $(document).on("click", ".btn-manager", function () {
-                $("#type").val("TRANSFER");
+                $("#type2").val("TRANSFER");
                 let bankId = $(this).data("id");
                 let a = managerBank.get2(bankId);
             })

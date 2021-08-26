@@ -237,10 +237,13 @@ namespace Backend.Controllers
             return View();
         }
 
+        [HttpPost]
         public ActionResult CheckLogin(string email, string password)
         {
             var errors = new Dictionary<string, string>();
             var obj = accounts.Get(x => x.Email == email).FirstOrDefault();
+
+            
 
             if (Utils.IsNullOrEmpty(obj))
             {
@@ -274,11 +277,11 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (!password.Equals(obj.Password))
+            if (!Utils.ValidatePassword(password,obj.Password))
             {
                 obj.AttemptLogin++;
                 accounts.Update(obj);
-                errors.Add("Password", "Your password is wrong!" + obj.AttemptLogin);
+                errors.Add("Password", "Your password is wrong!");
 
                 return Json(new
                 {
@@ -346,12 +349,14 @@ namespace Backend.Controllers
         {
             return View();
         }
-
+        [HttpPost]
         public ActionResult CheckRegister(RegisterViewModel register)
         {
             var errors = new Dictionary<string, string>();
             var additionCheck = true;
             IRepository<Accounts> users = new Repository<Accounts>();
+
+            
 
             foreach (var k in ModelState.Keys)
             foreach (var err in ModelState[k].Errors)
@@ -381,18 +386,27 @@ namespace Backend.Controllers
                     data = errors
                 }, JsonRequestBehavior.AllowGet);
 
+
             var account = new Accounts
             {
                 Name = register.Name,
                 Email = register.Email,
-                Password = register.Password,
+                Password = Utils.HashPassword(register.Password),
+                NumberId = register.NumberId,
+                Phone = register.Phone,
                 AttemptLogin = 0,
                 RoleId = 3,
                 Birthday = DateTime.Parse("1970-01-01"),
                 Status = ((int) AccountStatus.Actived)
             };
-
-            users.Add(account);
+            if (users.Add(account) == false)
+            {
+                return Json(new
+                {
+                    statusCode = 404,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
             return Json(new
             {
                 statusCode = 200,
@@ -406,6 +420,7 @@ namespace Backend.Controllers
             var errors = new Dictionary<string, string>();
             var user = (Accounts) Session["user"];
             var userUpdate = accounts.Get(user.AccountId);
+
             foreach (var k in ModelState.Keys)
             foreach (var err in ModelState[k].Errors)
             {
@@ -422,7 +437,7 @@ namespace Backend.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
 
-            if (!changePasswordViewModel.OldPassword.Equals(userUpdate.Password))
+            if (!Utils.ValidatePassword(changePasswordViewModel.OldPassword, userUpdate.Password))
             {
                 errors.Add("OldPassword", "Your password is not correct!");
                 return Json(new
@@ -443,8 +458,8 @@ namespace Backend.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
             }
-
-            userUpdate.Password = changePasswordViewModel.NewPassword;
+            
+            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.NewPassword);
             if (!accounts.Edit(userUpdate))
             {
                 return Json(new

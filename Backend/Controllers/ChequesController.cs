@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
@@ -11,6 +12,7 @@ namespace Backend.Controllers
 {
     public class ChequesController : BaseController
     {
+        private static ApplicationDbContext _context;
         private readonly IRepository<Cheques> cheques;
         private readonly IRepository<Accounts> accounts;
         private readonly IRepository<ChequeBooks> chequebooks;
@@ -27,7 +29,7 @@ namespace Backend.Controllers
         // GET: Admin/Cheques
         public ActionResult Index(int chequeBookId)
         {
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
             var account = accounts.Get(user.AccountId);
             var chequesInformationViewModel = new ChequesInformationViewModel
             {
@@ -47,12 +49,12 @@ namespace Backend.Controllers
 
         public ActionResult GetData(int chequeBookId)
         {
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
             var account = accounts.Get(user.AccountId);
             if (chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeBookId && x.AccountId == account.AccountId))
             {
-                var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int)ChequeStatus.Deleted)
-                .Select(x => new ChequesViewModel(x));
+                var data = cheques.Get(x => x.ChequeBookId == chequeBookId && x.Status != (int) ChequeStatus.Deleted)
+                    .Select(x => new ChequesViewModel(x));
                 return Json(new
                 {
                     data = data.ToList(),
@@ -68,13 +70,12 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
-            
         }
 
         public ActionResult FindId(int chequeId)
         {
             var x = cheques.Get(chequeId);
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
             var account = accounts.Get(user.AccountId);
 
             var data = new ChequesViewModel
@@ -83,7 +84,7 @@ namespace Backend.Controllers
                 Code = x.Code,
                 NumberId = x.NumberId,
                 ChequeId = x.ChequeId,
-                StatusName = ((ChequeStatus)x.Status).ToString(),
+                StatusName = ((ChequeStatus) x.Status).ToString(),
                 Status = x.Status,
                 AmountNumber = x.Amount,
                 FromBankAccountName = x.FromBankAccount.Name,
@@ -104,17 +105,17 @@ namespace Backend.Controllers
         {
             var errors = new Dictionary<string, string>();
             string code;
-            
+
 
             if (!ModelState.IsValid)
             {
                 foreach (var k in ModelState.Keys)
-                    foreach (var err in ModelState[k].Errors)
-                    {
-                        var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                        if (!errors.ContainsKey(key))
-                            errors.Add(key, err.ErrorMessage);
-                    }
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
 
                 return Json(new
                 {
@@ -124,9 +125,10 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
             var account = accounts.Get(user.AccountId);
-            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == chequeInformation.ChequeBookId && x.AccountId == account.AccountId))
+            if (!chequebooks.CheckDuplicate(x =>
+                x.ChequeBookId == chequeInformation.ChequeBookId && x.AccountId == account.AccountId))
             {
                 return Json(new
                 {
@@ -137,7 +139,7 @@ namespace Backend.Controllers
 
             var fromBankAccount = bankAccounts.Get(chequeInformation.FromBankAccountId);
 
-            if (fromBankAccount.Status != (int)BankAccountStatus.Actived)
+            if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
             {
                 errors.Add("FromBankAccountId", "This bank account is not actived");
                 return Json(new
@@ -149,7 +151,7 @@ namespace Backend.Controllers
             }
 
             var chequeBook = chequebooks.Get(chequeInformation.ChequeBookId);
-            if (chequeBook.Status != (int)ChequeBookStatus.Opened)
+            if (chequeBook.Status != (int) ChequeBookStatus.Opened)
             {
                 return Json(new
                 {
@@ -165,7 +167,7 @@ namespace Backend.Controllers
             } while (cheques.CheckDuplicate(x => x.Code == code));
 
             chequeInformation.Code = code;
-            chequeInformation.Status = (int)ChequeStatus.Actived;
+            chequeInformation.Status = (int) ChequeStatus.Actived;
 
             if (fromBankAccount.Balance < chequeInformation.Amount)
             {
@@ -210,7 +212,6 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult PutData(int id)
         {
-
             var cheque = cheques.Get(id);
             if (cheque == null)
             {
@@ -222,9 +223,10 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
             var account = accounts.Get(user.AccountId);
-            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+            if (!chequebooks.CheckDuplicate(x =>
+                x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
             {
                 return Json(new
                 {
@@ -234,7 +236,7 @@ namespace Backend.Controllers
             }
 
             var chequeBook = chequebooks.Get(cheque.ChequeBookId);
-            if (chequeBook.Status != (int)ChequeBookStatus.Opened)
+            if (chequeBook.Status != (int) ChequeBookStatus.Opened)
             {
                 return Json(new
                 {
@@ -244,7 +246,7 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int)ChequeStatus.Deleted)
+            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
             {
                 return Json(new
                 {
@@ -255,7 +257,7 @@ namespace Backend.Controllers
             }
 
             var fromBankAccount = bankAccounts.Get(cheque.FromBankAccountId);
-            if (fromBankAccount.Status != (int)BankAccountStatus.Actived)
+            if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
             {
                 return Json(new
                 {
@@ -265,8 +267,12 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            var data = cheque.Status == (int)ChequeStatus.Actived ? "Stop this cheque successfully" : "Active this cheque successfully";
-            cheque.Status = cheque.Status == (int)ChequeStatus.Actived ? (int)ChequeStatus.Stopped : (int)ChequeStatus.Actived;
+            var data = cheque.Status == (int) ChequeStatus.Actived
+                ? "Stop this cheque successfully"
+                : "Active this cheque successfully";
+            cheque.Status = cheque.Status == (int) ChequeStatus.Actived
+                ? (int) ChequeStatus.Stopped
+                : (int) ChequeStatus.Actived;
             if (!cheques.Edit(cheque))
                 return Json(new
                 {
@@ -286,64 +292,91 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult DeleteData(int chequeId)
         {
-            var cheque = cheques.Get(chequeId);
-            if (cheque == null)
+            using (_context = new ApplicationDbContext())
             {
-                return Json(new
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    message = "Error",
-                    data = "This cheque is not exist",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
+                    try
+                    {
+                        var cheque = _context.Cheques.FirstOrDefault(x => x.ChequeId == chequeId);
+                        if (cheque == null)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque is not exist",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
 
-            var user = (Accounts)Session["user"];
-            var account = accounts.Get(user.AccountId);
-            if (!chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    statusCode = 404,
-                }, JsonRequestBehavior.AllowGet);
-            }
+                        var user = (Accounts) Session["user"];
+                        var account = _context.Accounts.FirstOrDefault(x => x.AccountId == user.AccountId);
+                        if (!chequebooks.CheckDuplicate(x =>
+                            x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                statusCode = 404,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
 
-            if (cheque.ChequeBook.Status != (int)ChequeBookStatus.Opened)
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "This cheque book is closed",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
+                        if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque book is closed",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
 
-            if (cheque.Status == (int)ChequeStatus.Received || cheque.Status == (int)ChequeStatus.Deleted)
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "This cheque was used or deleted",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
+                        if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque was used or deleted",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
 
-            if (!cheques.Delete(cheque))
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "Something error happen",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
+                        var fromBankAccount =
+                            _context.BankAccounts.FirstOrDefault(x => x.BankAccountId == cheque.FromBankAccountId);
 
-            return Json(new
-            {
-                message = "Success",
-                data = "Delete Successfully",
-                statusCode = 200,
-            }, JsonRequestBehavior.AllowGet);
+                        if (fromBankAccount != null)
+                        {
+                            fromBankAccount.Balance += cheque.Amount;
+                            _context.SaveChanges();
+
+                            // cheques.Delete(cheque);
+                            // bankAccounts.Edit(fromBankAccount);
+                            _context.Cheques.Remove(cheque);
+                            _context.SaveChanges();
+                        }
+                        
+                        transaction.Commit();
+
+                        return Json(new
+                        {
+                            message = "Success",
+                            data = "Delete Successfully",
+                            statusCode = 200,
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return Json(new
+                        {
+                            data = ex,
+                            message = "error",
+                            statuscode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                        throw;
+                    }
+                }
+            }
         }
     }
 }

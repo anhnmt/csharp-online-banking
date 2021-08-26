@@ -7,7 +7,7 @@ namespace OnlineBanking.DAL
         [Required]
         public string Code { get; set; }
         [Required]
-        [MinLength(10)]
+        [MinLength(9)]
         public string NumberId { get; set; }
         public string ToBankAccountName { get; set; }
         [Required]

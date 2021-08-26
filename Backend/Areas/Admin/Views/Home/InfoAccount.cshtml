@@ -1,0 +1,296 @@
+﻿@{
+    ViewBag.Title = "InfoAccount";
+}
+
+@section css{
+    <link rel="stylesheet" href="~/Content/vendor/toastr/css/toastr.min.css">
+}
+
+<div class="page-titles">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="javascript:void(0)">Home</a></li>
+        <li class="breadcrumb-item active"><a href="@Url.Action("InfoAccount", "Home")">Profile</a></li>
+    </ol>
+</div>
+
+<div class="row">
+    <div class="col-md-3">
+
+        <!-- Profile Image -->
+        <div class="card card-primary card-outline">
+            <div class="card-body box-profile">
+                <div class="text-center">
+                    <img class="profile-user-img img-fluid rounded-circle" src="~/Content/images/profile/17.jpg" alt="User profile picture">
+                </div>
+
+                <h3 class="profile-username text-center" id="TextName">Name</h3>
+
+                <p class="text-muted text-center" id="RoleName">Role</p>
+
+                <ul class="list-group list-group-unbordered mb-3">
+                    <li class="list-group-item">
+                        <b>Email</b> <a class="float-right" id="TextEmail"></a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Phone</b> <a class="float-right" id="TextPhone"></a>
+                    </li>
+                    <li class="list-group-item">
+                        <b>Status</b> <a class="float-right" id="TextStatus"></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+    <!-- /.col -->
+    <div class="col-md-9">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Update information</h4>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+                <form class="form-horizontal" id="formData">
+                    <div class="form-group row">
+                        <label for="Name" class="col-sm-2 col-form-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="Name" placeholder="Name" name="Name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Email" class="col-sm-2 col-form-label">Email</label>
+                        <div class="col-sm-10">
+                            <input type="email" class="form-control" id="Email" placeholder="Email" name="Email">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="inputName2" class="col-sm-2 col-form-label">Phone</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="Phone" placeholder="Phone" name="Phone">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Birthday" class="col-sm-2 col-form-label">Birthday</label>
+                        <div class="col-sm-10">
+                            <input type="date" class="form-control" id="Birthday" name="Birthday" value="1970-01-01">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="NumberID" class="col-sm-2 col-form-label">Number Id</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="Number Id">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Address" class="col-sm-2 col-form-label">Address</label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control" id="Address" placeholder="Address" name="Address"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <div class="offset-sm-2 col-sm-10">
+                            <button type="submit" id="btnUpdate" class="btn btn-warning btn-sm">Update</button>
+                        </div>
+                    </div>
+                </form>
+            </div><!-- /.card-body -->
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Change Password</h4>
+            </div><!-- /.card-header -->
+            <div class="card-body">
+                <form class="form-horizontal" id="formData2">
+                    <div class="form-group row">
+                        <label for="Name" class="col-sm-2 col-form-label">Current Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="OldPassword" placeholder="Current Password..." name="OldPassword">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Name" class="col-sm-2 col-form-label">New Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="NewPassword" placeholder="New Password ..." name="NewPassword">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="Name" class="col-sm-2 col-form-label">Confirm new Password</label>
+                        <div class="col-sm-10">
+                            <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm New Password..." name="ConfirmPassword">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <button class="btn btn-primary offset-sm-2 btn-sm" type="submit">Save change</button>
+                    </div>
+                </form>
+            </div><!-- /.card-body -->
+        </div>
+    </div>
+    <!-- /.col -->
+</div>
+
+@section scripts{
+    <script src="~/Content/vendor/toastr/js/toastr.min.js"></script>
+    <script>
+        $.validator.addMethod("minAge", function (value, element, min) {
+            if (this.optional(element)) {
+                return true;
+            }
+            var today = new Date();
+            var birthDate = new Date(value);
+            var age = today.getFullYear() - birthDate.getFullYear();
+            return age >= min;
+        }, "You are not old enough!");
+        
+        const validator = $("#formData").validate({
+            rules: {
+                Name: {
+                    required: true,
+                },
+                Phone: {
+                    minlength: 10,
+                    required: true,
+                },
+                Email: {
+                    required: true,
+                    email: true,
+                },
+                NumberID: {
+                    required: true,
+                    minlength: 9,
+                },
+                Address: {
+                    required: true,
+                },
+                Birthday: {
+                    minAge: 18,
+                    required: true,
+                }
+            },
+            messages: {
+                Birthday: {
+                    minAge: "Your age must be greater than 18"
+                }
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+            submitHandler: function (form) {
+                const user = {
+                    Name: $("#Name").val(),
+                    Email: $("#Email").val(),
+                    Phone: $("#Phone").val(),
+                    Birthday: $("#Birthday").val(),
+                    NumberID: $("#NumberID").val(),
+                    Address: $("#Address").val(),
+                }
+                accounts.put(user);
+            }
+        }); 
+        
+        const validator2 = $("#formData2").validate({
+           rules: {
+               OldPassword: {
+                   required: true,
+                   minlength: 6,
+               },
+               NewPassword: {
+                   required: true,
+                   minlength: 6,
+               },
+               ConfirmPassword: {
+                  required: true,
+                  minlength: 6,
+                  equalTo: "#NewPassword",
+               }
+           },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+               jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+           submitHandler: function (form) {
+               const obj = {
+                   OldPassword: $("#OldPassword").val(),
+                   NewPassword: $("#NewPassword").val(),
+                   ConfirmPassword: $("#ConfirmPassword").val(),
+               }
+               accounts.changePassword(obj);
+           }
+       });
+        
+        const accounts = {
+            load: function () {
+                $.ajax({
+                    type: "GET",
+                    url: "@Url.Action("InfoAccountData", "Home", new{Area = "Admin"})",
+                    success: function (response) {
+                        $("#Name").val(response.data.Name);
+                        $("#Email").val(response.data.Email);
+                        $("#Phone").val(response.data.Phone);
+                        $("#Birthday").val(response.data.Birthday);
+                        $("#NumberID").val(response.data.NumberId);
+                        $("#Address").val(response.data.Address);
+                        $("#TextName").html(response.data.Name);
+                        $("#TextEmail").html(response.data.Email);
+                        $("#TextPhone").html(response.data.Phone);
+                        $("#TextStatus").html(response.data.StatusName);
+                        $("#RoleName").html(response.data.RoleName);
+                    }
+                })
+            },
+            put: function (user) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("UpdateInfo", "Home", new{Area = "Admin"})",
+                    data: user,
+                    success: function (res) {
+                        if (res.statusCode === 400) {
+                            validator.showErrors(res.data);
+                            notifyError("Error", "Update failed!");
+                        } else if (res.statusCode === 200) {
+                            notifySuccess("Success", "Update succesfully!");
+                            accounts.load();
+                        }
+                    }
+                })
+            },
+            changePassword: function (obj){
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ChangePassword", "Home", new{Area = "Admin"})",
+                    data: obj,
+                    success: function (res) {
+                        if (res.statusCode === 400) {
+                            validator2.showErrors(res.data);
+                            notifyError("Error", "Update failed!");
+                        } else if (res.statusCode === 200) {
+                            notifySuccess("Success", "Change password successfully!");
+                            $("#formData2").trigger("reset");
+                        }
+                    }
+                })
+            }
+        }
+        
+        $(function () {
+            accounts.load();
+        })
+
+    </script>
+}

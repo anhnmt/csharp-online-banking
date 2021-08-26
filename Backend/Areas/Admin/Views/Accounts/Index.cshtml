@@ -374,8 +374,8 @@
                         "render": function (data) {
                             let detail = "@Url.Action("ProfileAccount", "Accounts")/"+data.AccountId;
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
-                             '<a href="'+detail+'" class="dropdown-item btn-detail" >Details</a>' +
-                              '<a  data-id=" '+ data.AccountId +' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a>' +
+                                '<a href="' + detail +'" class="dropdown-item btn-detail text-primary" >Details</a>' +
+                                '<a  data-id=" ' + data.AccountId +' " class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
                                '<a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                              }
                     },
@@ -400,6 +400,9 @@
             $(document).on("click", ".btn-delete", function () {
                 let userId = $(this).data("id");
                 managerAcc.delete(userId);
+            });
+            $('#modifyModal').on('shown.bs.modal', function () {
+                validator.resetForm();
             });
         })
 

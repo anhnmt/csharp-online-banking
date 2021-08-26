@@ -179,8 +179,11 @@
                         //     let bankId = $("#FromId").val();
                         //     window.location.assign("/Transactions/ProfileAccountNumber/" + bankId)
                         // });
+                        $("#infoSource").val('').hide();
+                        $("#infoReceiver").val('').hide();
+                        $("#Form").trigger("reset");
+                        validator.resetForm();
                     } else {
-
                         validator.showErrors(res.data);
                     }
                 }
