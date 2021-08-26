@@ -345,9 +345,12 @@
                     url: "@Url.Action("FindId", "BankAccounts")",
                     data: {id : id},
                     success: function (res) {
+                        
+                        $("#MoneyManagement").modal("show");
+                        validator2.resetForm();
+                        $("#Form2").trigger("reset");
                         $("#Id").val(res.BankAccountId);
                         $("#Name").val(res.Name);
-                        $("#MoneyManagement").modal("show");
                     }
 
                 })
