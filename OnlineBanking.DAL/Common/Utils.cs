@@ -45,7 +45,15 @@ namespace OnlineBanking.DAL
 
         public static bool ValidatePassword(string password, string correctHash)
         {
-            return BCrypt.Net.BCrypt.Verify(password, correctHash);
+            try
+            {
+                return BCrypt.Net.BCrypt.Verify(password, correctHash);
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+            
         }
     }
 }
