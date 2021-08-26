@@ -163,7 +163,7 @@ namespace Backend.Controllers
                                     return CheckTransactionRequestModels(tran, errors);
                                 }
                                 // Minus money
-                                sourceBankAccount = _context.BankAccounts.Where(x => x.Name == tran.FromId).FirstOrDefault();
+                                sourceBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.FromId);
                                 var minusError = MinusMoney(tran, sourceBankAccount, errors);
                                 if (minusError != null)
                                 {
@@ -172,7 +172,7 @@ namespace Backend.Controllers
 
                             // Plus money
                             PlusMoney:
-                                receiverBankAccount = _context.BankAccounts.Where(x => x.Name == tran.ToId).FirstOrDefault();
+                                receiverBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.ToId);
                                 var plusError = PlusMoney(tran, receiverBankAccount, errors);
                                 if (plusError != null)
                                 {
@@ -187,7 +187,7 @@ namespace Backend.Controllers
 
                                 transaction.Commit();
 
-                                ChatHub.Instance.SendNotifications(newNotifications);
+                                // ChatHub.Instance().SendNotifications(newNotifications);
 
                                 return Json(new
                                 {
@@ -200,6 +200,7 @@ namespace Backend.Controllers
                             {
                                 transaction.Rollback();
                             }
+                            
                             foreach (var k in ModelState.Keys)
                             {
                                 foreach (var err in ModelState[k].Errors)
@@ -209,6 +210,7 @@ namespace Backend.Controllers
                                         errors.Add(key, err.ErrorMessage);
                                 }
                             }
+                            
                             return Json(new
                             {
                                 statusCode = 400,
