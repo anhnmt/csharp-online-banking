@@ -240,6 +240,7 @@
     <Content Include="Areas\Admin\Content\ckeditor5\translations\zh.js" />
     <Content Include="Areas\Admin\Content\ckeditor5\vendor.js" />
     <Content Include="Areas\Admin\Views\Cheques\Cheque.cshtml" />
+    <Content Include="Areas\Admin\Views\Home\InfoAccount.cshtml" />
     <Content Include="Content\css\style.css" />
     <Content Include="Content\custom\custom-notify.js" />
     <Content Include="Content\custom\notify\css\demo.css" />
