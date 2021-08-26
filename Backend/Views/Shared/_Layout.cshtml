@@ -416,7 +416,7 @@
                                 <p class="mb-1">
                                     ${htmlEncode(messageView.Content)}
                                 </p>
-                                <span class="fs-12">${momentFromNow(messageView.Timestamp ?? "")}</span>
+                                <span class="fs-12">${messageView.Timestamp ?? ""}</span>
                             </div>
                             ${accountId == messageView.AccountId ? image : ''}
                         </div>`;

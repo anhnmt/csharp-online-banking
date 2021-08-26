@@ -106,7 +106,7 @@
                         for (let item of res.data) {
                             if ($("#channel").val() == item.ChannelId) {
                                 $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" onclick="return false;">${item.AccountName ?? ''}</a>`);
-                                $("#user-timestamp").html(momentFromNow(item.LastUpdated ?? ""));
+                                $("#user-timestamp").html(item.LastUpdated ?? "");
                             }
 
                             _html += `
@@ -121,7 +121,7 @@
                                             <a href="/Admin/Accounts/ProfileAccount/${item.AccountId ?? '0'}" class="text-black">${item.AccountName ?? ""}</a>
                                         </h6>
                                         <p class="text-black mb-sm-3 mb-1 text-custom-wrap">${item.LastMessages ?? ""}</p>
-                                        <span class="fs-14">${momentFromNow(item.LastUpdated ?? "")}</span>
+                                        <span class="fs-14">${item.LastUpdated ?? ""}</span>
                                     </div>
                                     <button class="btn btn-sm btn-outline-primary light rounded mt-sm-0 mt-2 btn-reply" data-account="${item.AccountId ?? '0'}" data-channel="${item.ChannelId ?? ''}" data-name="${item.AccountName ?? ''}" data-timestamp="${item.LastUpdated ?? ""}">
                                         Reply</button>
@@ -162,6 +162,8 @@
 
             // Create a function that the hub can call back to display messages.
             chatHub.client.historyMessages = function (historyMessages) {
+                $('#discussion').html('');
+                
                 if (historyMessages.length >= 10) {
                     $('#discussion')
                         .html('<button type="button" class="btn btn-primary btn-sm btn-block mb-3 btn-loader">Load more message!</button>');
@@ -219,7 +221,7 @@
                     let timestamp = $(this).data("timestamp");
 
                     $("#user-name").html(`<a href="/Admin/Accounts/ProfileAccount/${account ?? '0'}" onclick="return false;">${name ?? ''}</a>`);
-                    $("#user-timestamp").html(momentFromNow(timestamp ?? ""));
+                    $("#user-timestamp").html(timestamp ?? "");
 
                     $("#channel").val(channelId);
                     chatHub.server.join(channelId);
@@ -276,7 +278,7 @@
                                 <span class="active"></span>
                             </div>`;
 
-                let username = `${accountId != messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${momentFromNow(messageView.Timestamp ?? "")}`;
+                let username = `${accountId != messageView.AccountId ? "<b>" + messageView.AccountName + "</b> - " : ''}${messageView.Timestamp ?? ""}`;
 
                 return `
                         <div class="direct-chat-msg media mb-4 justify-content-${accountId == messageView.AccountId ? 'end' : 'start'}
