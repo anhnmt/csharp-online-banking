@@ -237,10 +237,13 @@ namespace Backend.Controllers
             return View();
         }
 
+        [HttpPost]
         public ActionResult CheckLogin(string email, string password)
         {
             var errors = new Dictionary<string, string>();
             var obj = accounts.Get(x => x.Email == email).FirstOrDefault();
+
+            
 
             if (Utils.IsNullOrEmpty(obj))
             {
@@ -274,7 +277,7 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (!password.Equals(obj.Password))
+            if (!Utils.ValidatePassword(password,obj.Password))
             {
                 obj.AttemptLogin++;
                 accounts.Update(obj);
@@ -346,12 +349,14 @@ namespace Backend.Controllers
         {
             return View();
         }
-
+        [HttpPost]
         public ActionResult CheckRegister(RegisterViewModel register)
         {
             var errors = new Dictionary<string, string>();
             var additionCheck = true;
             IRepository<Accounts> users = new Repository<Accounts>();
+
+            
 
             foreach (var k in ModelState.Keys)
             foreach (var err in ModelState[k].Errors)
@@ -381,18 +386,27 @@ namespace Backend.Controllers
                     data = errors
                 }, JsonRequestBehavior.AllowGet);
 
+
             var account = new Accounts
             {
                 Name = register.Name,
                 Email = register.Email,
-                Password = register.Password,
+                Password = Utils.HashPassword(register.Password),
+                NumberId = register.NumberId,
+                Phone = register.Phone,
                 AttemptLogin = 0,
                 RoleId = 3,
                 Birthday = DateTime.Parse("1970-01-01"),
                 Status = ((int) AccountStatus.Actived)
             };
-
-            users.Add(account);
+            if (users.Add(account) == false)
+            {
+                return Json(new
+                {
+                    statusCode = 404,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
             return Json(new
             {
                 statusCode = 200,

@@ -11,7 +11,14 @@ namespace OnlineBanking.DAL
     {
         [Required] public string Name { get; set; }
         [Required] [EmailAddress] public string Email { get; set; }
-        [Required] [MinLength(6)] public string Password { get; set; }
+
+        [Required]
+        [MinLength(6)]
+        public string Password { get; set; }
+
+        [RegularExpression(@"^0[0-9]{9,14}$", ErrorMessage = "Phone number is not in the correct format")]
+        [Required] public string Phone { get; set; }
         [Required] [MinLength(6)] public string RePassword { get; set; }
+        [Required] [MinLength(9)] public string NumberId { get; set; }
     }
 }
