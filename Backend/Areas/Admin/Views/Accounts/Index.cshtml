@@ -401,6 +401,9 @@
                 let userId = $(this).data("id");
                 managerAcc.delete(userId);
             });
+            $('#modifyModal').on('shown.bs.modal', function () {
+                validator.resetForm();
+            });
         })
 
     </script>
