@@ -564,7 +564,10 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (!cheques.Delete(cheque))
+            var fromBankAccount = bankAccounts.Get(cheque.FromBankAccountId);
+            fromBankAccount.Balance += cheque.Amount;
+
+            if (!cheques.Delete(cheque) || !bankAccounts.Edit(fromBankAccount))
             {
                 return Json(new
                 {
@@ -574,6 +577,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
+            
             return Json(new
             {
                 message = "Success",

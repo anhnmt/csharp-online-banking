@@ -328,7 +328,10 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (!cheques.Delete(cheque))
+            var fromBankAccount = bankAccounts.Get(cheque.FromBankAccountId);
+            fromBankAccount.Balance += cheque.Amount;
+
+            if (!cheques.Delete(cheque) || !bankAccounts.Edit(fromBankAccount))
             {
                 return Json(new
                 {
