@@ -536,57 +536,80 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult DeleteData(int chequeId)
         {
-            var cheque = cheques.Get(chequeId);
-            if (cheque == null)
+            using (_context = new ApplicationDbContext())
             {
-                return Json(new
+                using (var transaction = _context.Database.BeginTransaction())
                 {
-                    message = "Error",
-                    data = "This cheque is not exist",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
+                    try
+                    {
+                        var cheque = _context.Cheques.FirstOrDefault(x => x.ChequeId == chequeId);
+                        if (cheque == null)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque is not exist",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+
+                        if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque book is closed",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+
+                        if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
+                        {
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = "This cheque was used or deleted",
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+
+                        var fromBankAccount =
+                            _context.BankAccounts.FirstOrDefault(x => x.BankAccountId == cheque.FromBankAccountId);
+
+                        if (fromBankAccount != null)
+                        {
+                            fromBankAccount.Balance += cheque.Amount;
+                            _context.SaveChanges();
+
+                            // cheques.Delete(cheque);
+                            // bankAccounts.Edit(fromBankAccount);
+                            _context.Cheques.Remove(cheque);
+                            _context.SaveChanges();
+                        }
+
+                        _context.SaveChanges();
+                        transaction.Commit();
+
+                        return Json(new
+                        {
+                            message = "Success",
+                            data = "Delete Successfully",
+                            statusCode = 200,
+                        }, JsonRequestBehavior.AllowGet);
+                    }
+                    catch (Exception ex)
+                    {
+                        transaction.Rollback();
+                        return Json(new
+                        {
+                            data = ex,
+                            message = "error",
+                            statuscode = 404
+                        }, JsonRequestBehavior.AllowGet);
+                        throw;
+                    }
+                }
             }
-
-            if (cheque.ChequeBook.Status != (int) ChequeBookStatus.Opened)
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "This cheque book is closed",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            if (cheque.Status == (int) ChequeStatus.Received || cheque.Status == (int) ChequeStatus.Deleted)
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "This cheque was used or deleted",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            var fromBankAccount = bankAccounts.Get(cheque.FromBankAccountId);
-            fromBankAccount.Balance += cheque.Amount;
-
-            if (!cheques.Delete(cheque) || !bankAccounts.Edit(fromBankAccount))
-            {
-                return Json(new
-                {
-                    message = "Error",
-                    data = "Something error happen",
-                    statusCode = 400,
-                }, JsonRequestBehavior.AllowGet);
-            }
-
-            
-            return Json(new
-            {
-                message = "Success",
-                data = "Delete Successfully",
-                statusCode = 200,
-            }, JsonRequestBehavior.AllowGet);
         }
     }
 }
