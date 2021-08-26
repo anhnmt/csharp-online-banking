@@ -263,7 +263,8 @@
                             $("#myModal").modal("hide");
                             $('#tbl_banks').DataTable().ajax.reload();
                             notifySuccess('Created Successfully',"Created BankAccounts Successfully")
-                        }else {
+                        } else {
+                            notifyError('Created Error', res.data)
                             validator.showErrors(res.data);
                         }
                     }
@@ -280,7 +281,8 @@
                             $("#myModal").modal("hide");
                             $('#tbl_banks').DataTable().ajax.reload();
                             notifySuccess('Updated Successfully',"Updated BankAccounts Successfully");
-                        }else{
+                        } else {
+                            notifyError('Created Error', res.data)
                             validator.showErrors(res.data);
                         }
                     }
@@ -296,7 +298,7 @@
                             notifySuccess('Deleted Successfully',"Deleted BankAccounts Successfully");
                             $('#tbl_banks').DataTable().ajax.reload();
                         }else {
-                            notifyError('Error',"Deleted BankAccounts Error");
+                            notifyError('Error',res.data);
                             $('#tbl_banks').DataTable().ajax.reload();
                         }
 
@@ -313,8 +315,8 @@
                             $("#MoneyManagement").modal("hide");
                             $('#tbl_banks').DataTable().ajax.reload();
                             notifySuccess("Transfers Successfully", res.data);
-                        }else {
-                            notifyError("Transfers Error", res.data.FromId);
+                        } else {
+                            notifyError("Transfers Error", res.data.FormId);
                         }
                     }
 
@@ -337,6 +339,10 @@
                 "columns": [
                     {
                         data: 'BankAccountId',
+                        className: 'align-middle',
+                        render: function (data, type, row) {
+                            return `#${row.BankAccountId}`;
+                        },
                         className: 'align-middle text-center'
                     },
                     {

@@ -17,7 +17,7 @@ namespace OnlineBanking.BLL.Repositories
 
         public Repository()
         {
-            cnn = new ApplicationDbContext(); ;
+            cnn = new ApplicationDbContext();
             tbl = cnn.Set<T>();
         }
 
@@ -90,6 +90,7 @@ namespace OnlineBanking.BLL.Repositories
                 cnn.Entry(e).State = EntityState.Modified;
                 cnn.SaveChanges();
                 return true;
+
             }
             catch (Exception)
             {
