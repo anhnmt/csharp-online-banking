@@ -112,7 +112,7 @@ namespace Backend.Areas.Admin.Controllers
                 errors.Add("NumberId", "Your NumberId has been used!");
             }
 
-            if (accounts.NumberId.Length >= 10)
+            if (accounts.NumberId.Length < 9)
             {
                 check = false;
                 errors.Add("NumberId", "Your NumberId must be more than 10 characters");
@@ -195,7 +195,7 @@ namespace Backend.Areas.Admin.Controllers
                 errors.Add("NumberId", "Your NumberId has been used!");
             }
 
-            if (accounts.NumberId.Length <= 10)
+            if (accounts.NumberId.Length < 9)
             {
                 check = false;
                 errors.Add("NumberId", "Your NumberId must be more than 10 characters");
