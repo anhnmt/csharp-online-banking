@@ -17,9 +17,10 @@ namespace OnlineBanking.DAL
         [Required] [EmailAddress] public string Email { get; set; }
 
         [Required]
-        [StringLength(24, MinimumLength = 6)]
+        [MinLength(6)]
         public string Password { get; set; }
 
+        [RegularExpression(@"^0[0-9]{9,14}$",ErrorMessage = "Phone number is not in the correct format")]
         [Required] public string Phone { get; set; }
 
         public string Address { get; set; }
@@ -30,6 +31,7 @@ namespace OnlineBanking.DAL
 
         [DefaultValue(RoleStatus.User)] public int RoleId { get; set; }
 
+        [StringLength(24, MinimumLength = 9)]
         [Required] public string NumberId { get; set; }
 
         [DefaultValue(0)] public int AttemptLogin { get; set; }
