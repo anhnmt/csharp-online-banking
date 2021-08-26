@@ -237,6 +237,16 @@ namespace Backend.Controllers
         private JsonResult CheckTransactionRequestModels(TransactionRequestModels tran,
             Dictionary<string, string> errors)
         {
+            if (Utils.IsNullOrEmpty(tran.FromId) || Utils.IsNullOrEmpty(tran.ToId))
+            {
+                errors.Add("FromId", "The Source Bank Account is empty.");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
             var sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
             var receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
             if (tran.FromId.Contains(tran.ToId))
