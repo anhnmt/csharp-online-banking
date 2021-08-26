@@ -19,7 +19,7 @@ namespace Backend.Areas.Admin.Controllers
             users = new Repository<Accounts>();
             roles = new Repository<Roles>();
         }
-        
+
         public ActionResult Index()
         {
             return View();
@@ -55,9 +55,56 @@ namespace Backend.Areas.Admin.Controllers
         {
             return Json(roles.Get(), JsonRequestBehavior.AllowGet);
         }
+        [HttpPost]
+        public ActionResult ChangePassword(AdminChangePasswordViewModels changePasswordViewModel)
+        {
+            var errors = new Dictionary<string, string>();
+            var userUpdate = users.Get(changePasswordViewModel.AccountId);
+            foreach (var k in ModelState.Keys)
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
+            if (!ModelState.IsValid)
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+
+            if (!changePasswordViewModel.Password.Equals(changePasswordViewModel.RePassword))
+            {
+                errors.Add("ConfirmPassword", "Your confirm is not the same as your new password!");
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.Password);
+            if (!users.Edit(userUpdate))
+            {
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 200,
+                message = "Change Password Successfully",
+            }, JsonRequestBehavior.AllowGet);
+        }
 
         [HttpPost]
-        public ActionResult Create(Accounts accounts)
+        public ActionResult Create(AccountViewModel accounts)
         {
             var errors = new Dictionary<string, string>();
             var check = true;
@@ -99,13 +146,6 @@ namespace Backend.Areas.Admin.Controllers
                 check = false;
                 errors.Add("Phone", "Your Phone has been used!");
             }
-
-
-            // if ()
-            // {
-            //     check = false;
-            //     errors.Add("Phone", "Your Phone has been used!");
-            // }
             if (users.CheckDuplicate(x => x.NumberId == accounts.NumberId))
             {
                 check = false;
@@ -120,7 +160,20 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid && check)
             {
-                users.Add(accounts);
+                var account = new Accounts
+                {
+                    Name = accounts.Name,
+                    Email = accounts.Email,
+                    Password = Utils.HashPassword("123456"),
+                    NumberId = accounts.NumberId,
+                    Phone = accounts.Phone,
+                    AttemptLogin = 0,
+                    RoleId = accounts.RoleId,
+                    Address = accounts.Address,
+                    Birthday = DateTime.Parse(accounts.Birthday),
+                    Status = ((int)AccountStatus.Actived)
+                };
+                users.Add(account);
                 return Json(new
                 {
                     statusCode = 200,
@@ -129,12 +182,12 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             foreach (var k in ModelState.Keys)
-            foreach (var err in ModelState[k].Errors)
-            {
-                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                if (!errors.ContainsKey(key))
-                    errors.Add(key, err.ErrorMessage);
-            }
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
 
             return Json(new
             {
@@ -145,8 +198,9 @@ namespace Backend.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(Accounts accounts)
+        public ActionResult Edit(AccountViewModel accounts)
         {
+
             var acc1 = users.Get(accounts.AccountId);
             var errors = new Dictionary<string, string>();
             var check = true;
@@ -177,7 +231,7 @@ namespace Backend.Areas.Admin.Controllers
                 }
             }
 
-            if (users.CheckDuplicate(x => x.Email == accounts.Email && x.AccountId != acc1.AccountId) )
+            if (users.CheckDuplicate(x => x.Email == accounts.Email && x.AccountId != acc1.AccountId))
             {
                 check = false;
                 errors.Add("Email", "Your email has been used!");
@@ -203,17 +257,24 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid && check)
             {
-                
-                acc1.Name = accounts.Name;
-                acc1.Email = accounts.Email;
-                acc1.Password = accounts.Password;
-                acc1.Phone = accounts.Phone;
-                acc1.Birthday = accounts.Birthday;
-                acc1.Address = accounts.Address;
-                acc1.NumberId = accounts.NumberId;
-                acc1.RoleId = accounts.RoleId;
-                acc1.Status = accounts.Status;
-                users.Edit(acc1);
+                var acc3 = users.Get(accounts.AccountId);
+                acc3.Name = accounts.Name;
+                acc3.Email = accounts.Email;
+                acc3.Phone = accounts.Phone;
+                acc3.Birthday = DateTime.Parse(accounts.Birthday);
+                acc3.Address = accounts.Address;
+                acc3.NumberId = accounts.NumberId;
+                acc3.RoleId = accounts.RoleId;
+                acc3.Status = accounts.Status;
+                if (!users.Edit(acc3))
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        message = "Error",
+                        data = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
 
                 return Json(new
                 {
@@ -223,12 +284,12 @@ namespace Backend.Areas.Admin.Controllers
             }
 
             foreach (var k in ModelState.Keys)
-            foreach (var err in ModelState[k].Errors)
-            {
-                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                if (!errors.ContainsKey(key))
-                    errors.Add(key, err.ErrorMessage);
-            }
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
 
             return Json(new
             {
@@ -237,9 +298,25 @@ namespace Backend.Areas.Admin.Controllers
                 data = errors
             }, JsonRequestBehavior.AllowGet);
         }
-
+        [HttpPost]
         public ActionResult Delete(int id)
         {
+            using (var _context = new ApplicationDbContext())
+            {
+                var user = _context.Accounts.FirstOrDefault(x => x.AccountId == id);
+                var bankaccount = _context.BankAccounts.FirstOrDefault(x => x.AccountId == id);
+                if (bankaccount != null)
+                {
+                    user.Status = 2;
+                    _context.SaveChanges();
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            
             if (users.Delete(id))
             {
                 return Json(new
@@ -258,7 +335,7 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult ProfileAccount(int id)
         {
-            if (((Accounts) Session["user"]) == null) return RedirectToAction("Login", "Home", new {area = ""});
+            if (((Accounts)Session["user"]) == null) return RedirectToAction("Login", "Home", new { area = "" });
             var x = users.Get(id);
             if (x == null)
             {

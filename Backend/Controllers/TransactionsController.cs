@@ -51,61 +51,6 @@ namespace Backend.Controllers
             return View();
         }
 
-        //private JsonResult TransfersQueue()
-        //{
-        //    lock (Lock)
-        //    {
-        //        var errors = new Dictionary<string, string>();
-
-        //        var bankDequeue = bankQueue.Dequeue();
-        //        do
-        //        {
-        //            var receiverStatus = receiverAccount.Status;
-        //            var sessionUsers = (Accounts)Session["user"];
-        //            if (sessionUsers.RoleId == 1)
-        //            {
-
-
-        //                if (receiverStatus != 0)
-        //                {
-        //                    errors.Add("ToId", "Receipt download has not been activated");
-        //                    return Json(new
-        //                    {
-        //                        data = errors,
-        //                        message = "Error",
-        //                        statusCode = 404
-        //                    }, JsonRequestBehavior.AllowGet);
-        //                }
-
-        //                receiverAccount.Balance += bankDequeue.Amount;
-        //                if (bankAccounts.Edit(receiverAccount) != true)
-        //                    return Json(new
-        //                    {
-        //                        data = "Error adding target account money",
-        //                        message = "Error",
-        //                        statusCode = 404
-        //                    }, JsonRequestBehavior.AllowGet);
-        //                bankDequeue.Status = 1;
-        //                bankDequeue.CreatedAt = DateTime.Now;
-        //                bankDequeue.UpdatedAt = DateTime.Now;
-        //                bankDequeue.BalancedTo = receiverAccount.Balance;
-
-
-        //                return Json(new
-        //                {
-        //                    data = "Transfer failed",
-        //                    message = "Error",
-        //                    statusCode = 404
-        //                });
-        //            }
-
-
-        //        } while (bankQueue.Count != 0);
-
-
-        //    }
-        //}
-
         public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
             var data = transactionDetails.Get(x => x.BankAccountId == fromId);
@@ -161,6 +106,10 @@ namespace Backend.Controllers
                                     sourceBankAccount = _context.BankAccounts.Where(x =>
                                         x.AccountId == sessionUsers.AccountId &&
                                         x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
+                                    if (tran.ToId == sourceBankAccount.Name)
+                                    {
+                                        goto PlusMoney;
+                                    }
                                     var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
                                     if (minusError1 != null)
                                     {
@@ -185,7 +134,18 @@ namespace Backend.Controllers
 
                                 // Plus money
                                 PlusMoney:
+                                
                                 receiverBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.ToId);
+                                //if (sourceBankAccount.BankAccountId == receiverBankAccount.BankAccountId)
+                                //{
+                                //    errors.Add("FormId", "The number of the receiving account and the sending account is the same");
+                                //    return Json(new
+                                //    {
+                                //        data = errors,
+                                //        message = "Error",
+                                //        statusCode = 404
+                                //    }, JsonRequestBehavior.AllowGet);
+                                //}
                                 var plusError = PlusMoney(tran, receiverBankAccount, errors);
                                 if (plusError != null)
                                 {
@@ -249,16 +209,7 @@ namespace Backend.Controllers
             }
             var sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
             var receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
-            if (tran.FromId.Contains(tran.ToId))
-            {
-                errors.Add("ToId", "The number of the receiving account and the sending account is the same");
-                return Json(new
-                {
-                    data = errors,
-                    message = "Error",
-                    statusCode = 404
-                }, JsonRequestBehavior.AllowGet);
-            }
+           
 
             if (tran.Amount <= 0)
             {
@@ -297,6 +248,16 @@ namespace Backend.Controllers
             if (sourceBankAccount.Currency.CurrencyId != receiverBankAccount.Currency.CurrencyId)
             {
                 errors.Add("ToId", "Recipient currency does not match");
+                return Json(new
+                {
+                    data = errors,
+                    message = "Error",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (sourceBankAccount.BankAccountId == receiverBankAccount.BankAccountId)
+            {
+                errors.Add("ToId", "The number of the receiving account and the sending account is the same");
                 return Json(new
                 {
                     data = errors,

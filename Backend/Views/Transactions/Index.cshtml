@@ -238,7 +238,7 @@
 
             $(document).on('blur', '#ToId', function () {
                 let dataInfoBankAccount;
-                if (this.value.length === 0) {
+                if (this.value.trim().length === 0) {
                     $('#text2').css('display', 'none');
                     $('#infoReceiver').css('display', 'none');
                 } else {

@@ -50,6 +50,8 @@
                         <div class="form-group destination-account mt-2" style="display: none">
                             <label for="ToBankAccountId">Bank Account Destination</label>
                             <input type="text" name="ToBankAccountName" id="ToBankAccountName" class="form-control" placeholder="Bank Account Destination...">
+                            <span class="text-dark font-weight-bold" id="text2" style="display: none">Name: </span>
+                            <span class="text-danger font-weight-bold" id="infoReceiver" style="display: none"></span>
                         </div>
                     </div>
                 </div>
@@ -132,7 +134,7 @@
 </section>
 
 @section scripts{
-    <script >
+    <script>
     const validator = $("#formData").validate({
         rules: {
             "Code": {
@@ -157,21 +159,21 @@
         },
         submitHandler: function () {
             const obj = {
-                Code: $("#Code").val(), 
+                Code: $("#Code").val(),
                 NumberId: $("#NumberId").val(),
-                PaymentMethod: $("input[name='payment']:checked").val(), 
+                PaymentMethod: $("input[name='payment']:checked").val(),
                 ToBankAccountName: $("#ToBankAccountName").val(),
             };
            chequeManager.post(obj);
         }
     });
-    
+
     const chequeManager = {
         post: function (obj){
             $.ajax({
                 type: "POST",
                 url: "@Url.Action("ChequeExec", "Cheques")",
-                data: obj, 
+                data: obj,
                 success: function (res){
                     if (res.statusCode === 400){
                         validator.showErrors(res.data);
@@ -193,7 +195,25 @@
             $("#successModal").modal("show");
         }
     }
-    
+        function loadInfoBankAccount(name) {
+            let data;
+            $.ajax({
+                type: "GET",
+                url: "/Admin/BankAccounts/GetInfoBankAccount",
+                data: { name: name },
+                async: false,
+                success: function (res) {
+                    console.log(res)
+                    if (res.statusCode === 200) {
+                        data = res;
+                    } else {
+                        data = res;
+                    }
+                }
+
+            });
+            return data;
+        }
     $(function(){
         $("input:radio[name='payment']").change(function() {
           if ($(this).val() === "bank-account"){
@@ -205,6 +225,24 @@
         })
         $('#successModal').on('shown.bs.modal', function () {
             validator.resetForm();
+        });
+        $(document).on('blur', '#ToBankAccountName', function () {
+            let dataInfoBankAccount;
+            if (this.value.trim().length == 0 && this.value == "") {
+                $('#infoReceiver').css('display', 'none');
+                $('#text2').css('display', 'none');
+                
+            } else {
+                dataInfoBankAccount = loadInfoBankAccount(this.value);
+                $('#text2').css('display', 'inline-block');
+            }
+            if (dataInfoBankAccount.statusCode === 200) {
+                $('#infoReceiver').css('display', 'inline-block');
+                $('#infoReceiver').html(dataInfoBankAccount.data[0].Name);
+            } else {
+                $('#infoReceiver').css('display', 'inline-block');
+                $('#infoReceiver').html("Account doesn't exist");
+            }
         });
     })
     </script>

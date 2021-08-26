@@ -106,7 +106,7 @@
                 }
             }
         });
-        
+
         const currencyManager = {
             post: function (currency) {
                 $.ajax({
@@ -190,7 +190,10 @@
                         className: 'align-middle',
                     },
                     {
-                        data: 'StatusName',
+                        data: { StatusName:'StatusName'},
+                        render:function(data) {
+                            return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>' + data.StatusName + '</span>';
+                            },
                         className: 'align-middle',
                     },
                     {

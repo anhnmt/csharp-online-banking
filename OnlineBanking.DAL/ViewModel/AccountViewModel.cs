@@ -34,7 +34,7 @@
         public string NumberId { get; set; }
         public int? Status { get; set; }
         public string StatusName { get; set; } // active, delete, lock
-        public int? RoleId { get; set; } // Quyền
+        public int RoleId { get; set; } // Quyền
         public string RoleName { get; set; } // Quyền
         public string CreatedAt { get; set; }
         public string UpdatedAt { get; set; }
