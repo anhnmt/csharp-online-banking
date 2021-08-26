@@ -92,7 +92,7 @@ namespace Backend.Areas.Admin.Controllers
             var check = true;
             var userId = ((Accounts) Session["user"]).AccountId;
 
-            if (!IsNullOrEmpty(acc.Birthday))
+            if (!Utils.IsNullOrEmpty(acc.Birthday))
             {
                 if (DateTime.TryParse(acc.Birthday, out var dateTime))
                 {
@@ -117,14 +117,14 @@ namespace Backend.Areas.Admin.Controllers
                 errors.Add("Email", "Your email has been used!");
             }
 
-            if (!IsNullOrEmpty(acc.Phone) &&
+            if (!Utils.IsNullOrEmpty(acc.Phone) &&
                 accounts.CheckDuplicate(x => x.Phone == acc.Phone && x.AccountId != userId))
             {
                 check = false;
                 errors.Add("Phone", "Your phone has been used!");
             }
 
-            if (!IsNullOrEmpty(acc.NumberId) &&
+            if (!Utils.IsNullOrEmpty(acc.NumberId) &&
                 accounts.CheckDuplicate(x => x.NumberId == acc.NumberId && x.AccountId != userId))
             {
                 check = false;
@@ -137,7 +137,7 @@ namespace Backend.Areas.Admin.Controllers
                 acc1.Name = acc.Name;
                 acc1.Email = acc.Email;
                 acc1.Phone = acc.Phone;
-                acc1.Birthday = IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
+                acc1.Birthday = Utils.IsNullOrEmpty(acc.Birthday) ? acc1.Birthday : DateTime.Parse(acc.Birthday);
                 acc1.Address = acc.Address;
                 acc1.NumberId = acc.NumberId;
                 if (!accounts.Edit(acc1))
