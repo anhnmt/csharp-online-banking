@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.Mvc;
 using Backend.Areas.Admin.Data;
 using Backend.Hubs;
+using Microsoft.AspNet.SignalR;
 
 namespace Backend.Controllers
 {
@@ -24,6 +25,13 @@ namespace Backend.Controllers
         private readonly Queue<TransactionRequestModels> bankQueue;
         private static readonly object Lock = new object();
         private static ApplicationDbContext _context;
+        private readonly IHubContext<ChatHub> _hubContext;
+
+        public TransactionsController(IHubContext<ChatHub> hubContext)
+        {
+            _hubContext = hubContext;
+        }
+
 
         public TransactionsController()
         {
@@ -133,7 +141,7 @@ namespace Backend.Controllers
                 var tran = bankQueue.Dequeue();
                 do
                 {
-                    using(_context = new ApplicationDbContext())
+                    using (_context = new ApplicationDbContext())
                     {
                         using (var transaction = _context.Database.BeginTransaction())
                         {
@@ -145,16 +153,20 @@ namespace Backend.Controllers
 
 
                                 // Minus money Admin account
-                                var sessionUsers = (Accounts)Session["user"];
+                                var sessionUsers = (Accounts) Session["user"];
                                 if (sessionUsers.RoleId == 1)
                                 {
-                                    var currenReceiverBankAccount = _context.BankAccounts.Where(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
-                                    sourceBankAccount = _context.BankAccounts.Where(x => x.AccountId == sessionUsers.AccountId && x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
+                                    var currenReceiverBankAccount = _context.BankAccounts
+                                        .Where(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
+                                    sourceBankAccount = _context.BankAccounts.Where(x =>
+                                        x.AccountId == sessionUsers.AccountId &&
+                                        x.CurrencyId == currenReceiverBankAccount).FirstOrDefault();
                                     var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
                                     if (minusError1 != null)
                                     {
                                         return minusError1;
                                     }
+
                                     goto PlusMoney;
                                 }
 
@@ -162,6 +174,7 @@ namespace Backend.Controllers
                                 {
                                     return CheckTransactionRequestModels(tran, errors);
                                 }
+
                                 // Minus money
                                 sourceBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.FromId);
                                 var minusError = MinusMoney(tran, sourceBankAccount, errors);
@@ -170,8 +183,8 @@ namespace Backend.Controllers
                                     return minusError;
                                 }
 
-                            // Plus money
-                            PlusMoney:
+                                // Plus money
+                                PlusMoney:
                                 receiverBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.ToId);
                                 var plusError = PlusMoney(tran, receiverBankAccount, errors);
                                 if (plusError != null)
@@ -186,9 +199,7 @@ namespace Backend.Controllers
                                 var newNotifications = CreateNotifications(newTransaction);
 
                                 transaction.Commit();
-
-                                // ChatHub.Instance().SendNotifications(newNotifications);
-
+                                
                                 return Json(new
                                 {
                                     data = "Successful transfer",
@@ -200,7 +211,7 @@ namespace Backend.Controllers
                             {
                                 transaction.Rollback();
                             }
-                            
+
                             foreach (var k in ModelState.Keys)
                             {
                                 foreach (var err in ModelState[k].Errors)
@@ -210,7 +221,7 @@ namespace Backend.Controllers
                                         errors.Add(key, err.ErrorMessage);
                                 }
                             }
-                            
+
                             return Json(new
                             {
                                 statusCode = 400,
@@ -219,13 +230,12 @@ namespace Backend.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
                     }
-                    
-
                 } while (bankQueue.Count != 0);
             }
         }
 
-        private JsonResult CheckTransactionRequestModels(TransactionRequestModels tran, Dictionary<string, string> errors)
+        private JsonResult CheckTransactionRequestModels(TransactionRequestModels tran,
+            Dictionary<string, string> errors)
         {
             var sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
             var receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
@@ -239,6 +249,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (tran.Amount <= 0)
             {
                 errors.Add("Amount", "Your Amount must be number");
@@ -260,6 +271,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (receiverBankAccount == null)
             {
                 errors.Add("ToId", "Account number doesn't exist");
@@ -270,6 +282,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             //Check Currency two bank account
             if (sourceBankAccount.Currency.CurrencyId != receiverBankAccount.Currency.CurrencyId)
             {
@@ -281,12 +294,13 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             return null;
         }
-        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount, Dictionary<string, string> errors)
-        {
 
+        private JsonResult MinusMoney(TransactionRequestModels tran, BankAccounts sourceBankAccount,
+            Dictionary<string, string> errors)
+        {
             if (sourceBankAccount == null)
             {
                 errors.Add("FromId", "Account number doesn't exist");
@@ -297,6 +311,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (sourceBankAccount.Status != 0)
             {
                 errors.Add("FormId", "Source account is not activated");
@@ -307,6 +322,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (sourceBankAccount.Balance < tran.Amount)
             {
                 errors.Add("Amount", "Balance isn't enough");
@@ -320,15 +336,15 @@ namespace Backend.Controllers
 
 
             sourceBankAccount.Balance -= tran.Amount;
-            
+
             _context.SaveChanges();
-            
+
             return null;
         }
 
-        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount, Dictionary<string, string> errors)
+        private JsonResult PlusMoney(TransactionRequestModels tran, BankAccounts receiverBankAccount,
+            Dictionary<string, string> errors)
         {
-
             if (receiverBankAccount == null)
             {
                 errors.Add("FromId", "Account number doesn't exist");
@@ -339,6 +355,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (receiverBankAccount.Status != 0)
             {
                 errors.Add("FormId", "Source account is not activated");
@@ -349,6 +366,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             receiverBankAccount.Balance += tran.Amount;
             _context.SaveChanges();
             return null; //BankAccount
@@ -379,11 +397,13 @@ namespace Backend.Controllers
             {
                 tran.Messages = "Transfer from " + fromBankAccount.Name + " to " + toBankAccount.Name;
             }
-            var sessionUsers = (Accounts)Session["user"];
+
+            var sessionUsers = (Accounts) Session["user"];
             if (sessionUsers.RoleId == 1)
             {
                 tran.Messages = "Transfer from Admin to " + toBankAccount.Name;
             }
+
             var trannsaction = new Transactions()
             {
                 Status = 1,
@@ -399,8 +419,8 @@ namespace Backend.Controllers
 
         private List<Notifications> CreateNotifications(Transactions transaction)
         {
-            var from = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Minus);
-            var to = transaction.TransactionDetails.First(x => x.Type == (int)TransactionType.Plus);
+            var from = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Minus);
+            var to = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Plus);
 
             var lstNotification = new List<Notifications>()
             {
@@ -431,7 +451,7 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts)Session["user"]) == null)
+            if (((Accounts) Session["user"]) == null)
                 RedirectToAction("Login", "Home", new
                 {
                     area = ""
@@ -442,7 +462,7 @@ namespace Backend.Controllers
 
         public ActionResult TransactionsDetails(int id)
         {
-            var user = (Accounts)Session["user"];
+            var user = (Accounts) Session["user"];
 
             var data = transactionDetails
                 .Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId)
