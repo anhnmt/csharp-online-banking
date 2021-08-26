@@ -175,10 +175,10 @@
                 success: function (res){
                     if (res.statusCode === 400){
                         validator.showErrors(res.data);
-                        toastr.error("Using cheque failed");
+                        notifyError("Error", "Using cheque failed");
                     }else{
                         chequeManager.showModal(res.data);
-                        toastr.success("Using cheque successfully");
+                        notifySuccess("Success", "Using cheque successfully");
                         $("#formData").trigger("reset");
                     }
                 }

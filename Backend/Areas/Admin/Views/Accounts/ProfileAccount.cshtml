@@ -142,7 +142,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Id" id="Id" value="" />
-                    <input type="hidden" name="type2" id="type2" value="CREATE" />
+                    <input type="hidden" name="type" id="type" value="CREATE" />
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
@@ -189,7 +189,7 @@
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="Id" id="Id" value="" />
-                    <input type="hidden" name="type" id="type" value="CREATE" />
+                    <input type="hidden" name="type" id="type" value="TRANSFER" />
                     <div class="form-group">
                         <label>Account Number</label>
                         <div class="error">
@@ -244,7 +244,7 @@
                        Balance: $("#Balance").val(),
                        Name: $("#NameBank").val()
                    };
-                   if ($("#type").val() === "EDIT") {
+                    if ($("#type").val() === "EDIT") {
                        bank.BankAccountId = $("#Id").val();
                        managerBank.put(bank);
                    } else {
@@ -345,9 +345,12 @@
                     url: "@Url.Action("FindId", "BankAccounts")",
                     data: {id : id},
                     success: function (res) {
+                        
+                        $("#MoneyManagement").modal("show");
+                        validator2.resetForm();
+                        $("#Form2").trigger("reset");
                         $("#Id").val(res.BankAccountId);
                         $("#Name").val(res.Name);
-                        $("#MoneyManagement").modal("show");
                     }
 
                 })
@@ -639,7 +642,7 @@
             })
 
             $(document).on("click", ".btn-manager", function () {
-                $("#type").val("TRANSFER");
+                $("#type2").val("TRANSFER");
                 let bankId = $(this).data("id");
                 let a = managerBank.get2(bankId);
             })
