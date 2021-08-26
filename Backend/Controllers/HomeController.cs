@@ -281,7 +281,7 @@ namespace Backend.Controllers
             {
                 obj.AttemptLogin++;
                 accounts.Update(obj);
-                errors.Add("Password", "Your password is wrong!" + obj.AttemptLogin);
+                errors.Add("Password", "Your password is wrong!");
 
                 return Json(new
                 {

@@ -65,6 +65,16 @@ namespace Backend.Areas.Admin.Data
                 };
             }
 
+            if (obj != null && (obj.RoleId == 2 || obj.RoleId == 1) && (string)currentArea == "" && currentController == "Transactions" && !Request.IsAjaxRequest())
+            {
+                filterContext.Result = new RedirectToRouteResult(new RouteValueDictionary(new RouteValueDictionary(new
+                {
+                    action = "Index",
+                    controller = "Home",
+                    area = "Admin"
+                }
+                )));
+            }
 
             string[] AllowedController = { "Logout" };
             if (obj != null && (obj.RoleId == 2 || obj.RoleId == 1) && (string)currentArea == "" && !AllowedController.Contains(currentAction) && currentController != "Transactions")
