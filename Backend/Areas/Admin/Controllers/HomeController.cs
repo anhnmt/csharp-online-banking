@@ -171,21 +171,22 @@ namespace Backend.Areas.Admin.Controllers
                 data = errors
             }, JsonRequestBehavior.AllowGet);
         }
-        
-        
+
+
         public ActionResult ChangePassword(ChangePasswordViewModel changePasswordViewModel)
         {
             var errors = new Dictionary<string, string>();
-            var user = (Accounts) Session["user"];
+            var user = (Accounts)Session["user"];
             var userUpdate = accounts.Get(user.AccountId);
+
             foreach (var k in ModelState.Keys)
-            foreach (var err in ModelState[k].Errors)
-            {
-                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                if (!errors.ContainsKey(key))
-                    errors.Add(key, err.ErrorMessage);
-            }
-            
+                foreach (var err in ModelState[k].Errors)
+                {
+                    var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
+                    if (!errors.ContainsKey(key))
+                        errors.Add(key, err.ErrorMessage);
+                }
+
             if (!ModelState.IsValid)
                 return Json(new
                 {
@@ -194,7 +195,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
 
-            if (!changePasswordViewModel.OldPassword.Equals(userUpdate.Password))
+            if (!Utils.ValidatePassword(changePasswordViewModel.OldPassword, userUpdate.Password))
             {
                 errors.Add("OldPassword", "Your password is not correct!");
                 return Json(new
@@ -204,7 +205,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             if (!changePasswordViewModel.NewPassword.Equals(changePasswordViewModel.ConfirmPassword))
             {
                 errors.Add("ConfirmPassword", "Your confirm is not the same as your new password!");
@@ -216,7 +217,7 @@ namespace Backend.Areas.Admin.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            userUpdate.Password = changePasswordViewModel.NewPassword;
+            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.NewPassword);
             if (!accounts.Edit(userUpdate))
             {
                 return Json(new
@@ -226,7 +227,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             return Json(new
             {
                 statusCode = 200,

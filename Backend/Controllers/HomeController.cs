@@ -436,7 +436,7 @@ namespace Backend.Controllers
                     statusCode = 400,
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
-            //!changePasswordViewModel.OldPassword.Equals(userUpdate.Password)
+
             if (!Utils.ValidatePassword(changePasswordViewModel.OldPassword, userUpdate.Password))
             {
                 errors.Add("OldPassword", "Your password is not correct!");
