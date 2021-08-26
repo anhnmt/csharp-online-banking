@@ -420,6 +420,7 @@ namespace Backend.Controllers
             var errors = new Dictionary<string, string>();
             var user = (Accounts) Session["user"];
             var userUpdate = accounts.Get(user.AccountId);
+
             foreach (var k in ModelState.Keys)
             foreach (var err in ModelState[k].Errors)
             {
@@ -436,7 +437,7 @@ namespace Backend.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
 
-            if (!changePasswordViewModel.OldPassword.Equals(userUpdate.Password))
+            if (!Utils.ValidatePassword(changePasswordViewModel.OldPassword, userUpdate.Password))
             {
                 errors.Add("OldPassword", "Your password is not correct!");
                 return Json(new
@@ -457,8 +458,8 @@ namespace Backend.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
             }
-
-            userUpdate.Password = changePasswordViewModel.NewPassword;
+            
+            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.NewPassword);
             if (!accounts.Edit(userUpdate))
             {
                 return Json(new
