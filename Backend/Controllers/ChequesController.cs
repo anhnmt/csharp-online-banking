@@ -179,7 +179,7 @@ namespace Backend.Controllers
                         chequeInformation.Code = code;
                         chequeInformation.Status = (int) ChequeStatus.Actived;
 
-                        if (fromBankAccount.Balance < chequeInformation.Amount)
+                        if (fromBankAccount != null && fromBankAccount.Balance < chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Your balance is not enough");
                             return Json(new
@@ -205,14 +205,18 @@ namespace Backend.Controllers
                         _context.Cheques.Add(chequeInformation);
                         _context.SaveChanges();
 
-                        fromBankAccount.Balance -= chequeInformation.Amount;
-                        // bankAccounts.Update(fromBankAccount);
-                        _context.SaveChanges();
+                        List<Notifications> newNotifications = null;
+                        if (fromBankAccount != null)
+                        {
+                            fromBankAccount.Balance -= chequeInformation.Amount;
+                            // bankAccounts.Update(fromBankAccount);
+                            _context.SaveChanges();
 
-                        var message = "Your account balance -" + chequeInformation.Amount +
-                                      ", available balance: " + fromBankAccount.Balance;
+                            var message = "Your account balance -" + chequeInformation.Amount +
+                                          ", available balance: " + fromBankAccount.Balance;
 
-                        var newNotifications = CreateNotification(chequeInformation, message);
+                            newNotifications = CreateNotification(chequeInformation, message);
+                        }
 
                         transaction.Commit();
 
@@ -373,7 +377,9 @@ namespace Backend.Controllers
 
                         var fromBankAccount =
                             _context.BankAccounts.FirstOrDefault(x => x.BankAccountId == cheque.FromBankAccountId);
+                        
                         List<Notifications> newNotifications = null;
+                       
                         if (fromBankAccount != null)
                         {
                             fromBankAccount.Balance += cheque.Amount;
