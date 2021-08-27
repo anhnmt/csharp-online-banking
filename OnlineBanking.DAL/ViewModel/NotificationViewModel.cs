@@ -12,7 +12,7 @@ namespace OnlineBanking.DAL
         {
         }
 
-        public NotificationViewModel(Notifications notification, TransactionDetails transactionDetails)
+        public NotificationViewModel(Notifications notification)
         {
             NotificationId = notification.NotificationId;
             AccountId = notification.AccountId;
@@ -23,10 +23,6 @@ namespace OnlineBanking.DAL
 
             PkType = notification.PkType;
             PkTypeName = ((NotificationType) notification.PkType).ToString();
-
-            var obj = new TransactionsViewModels(transactionDetails, transactionDetails.Transaction);
-            PkId = obj.TransactionDetailId;
-            PkObject = obj;
 
             CreatedAt = notification.CreatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
             UpdatedAt = notification.UpdatedAt?.ToString("dd-MM-yyyy HH:mm:ss");
