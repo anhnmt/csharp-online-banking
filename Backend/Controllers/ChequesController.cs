@@ -48,6 +48,23 @@ namespace Backend.Controllers
             }
         }
 
+        public ActionResult Detail(int id)
+        {
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            var cheque = cheques.Get(id);
+
+            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+            {
+                var chequeDetail = new ChequesViewModel(cheque);
+                return View(chequeDetail);
+            }
+            else
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
+        }
+
         public ActionResult GetData(int chequeBookId)
         {
             var user = (Accounts) Session["user"];
@@ -190,7 +207,7 @@ namespace Backend.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
-                        if (0 > chequeInformation.Amount)
+                        if (0 >= chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Please enter a positive number");
                             return Json(new

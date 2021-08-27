@@ -275,8 +275,13 @@
                        var trans = {
                            Amount: $("#Amount").val(),
                            ToId: $("#Name").val(),
-                       };
-                       managerBank.receiveMoney(trans);
+                        };
+                        if (trans.Amount[0] === "0") {
+                            notifyError("Error", "Your Amount must be number")
+                        } else {
+                            managerBank.receiveMoney(trans);
+                        }
+                      
                     }
                 });
         function loadStatus(status = null) {
@@ -420,6 +425,7 @@
                             notifySuccess("Transfers Successfully", res.data);
                         }else {
                             notifyError("Transfers Error", res.data.FromId);
+                            validator2.showErrors(res.data)
                         }
                     }
 
@@ -535,7 +541,7 @@
                     data: 'ChequeBookId',
                     "render": function (data, type, row) {
                         let toggle = row.Status === 0 ? "Close book" : "Open book";
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" data-account="' + row.AccountId + '" class="dropdown-item btn-detail-2" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-toggle" href="javascript:void(0);">' + toggle + '</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item text-danger btn-delete2" href="javascript:void(0);">Delete</a></div></div>'
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeBookId + '" data-account="' + row.AccountId + '" class="dropdown-item btn-detail-2 text-info" href="javascript:void(0);">Details</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item btn-toggle text-warning" href="javascript:void(0);">' + toggle + '</a><a data-id="' + row.ChequeBookId + '" class="dropdown-item text-danger btn-delete2" href="javascript:void(0);">Delete</a></div></div>'
 
                     }
                 },

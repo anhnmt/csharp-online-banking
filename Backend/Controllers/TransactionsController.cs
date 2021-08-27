@@ -101,6 +101,16 @@ namespace Backend.Controllers
                                 var sessionUsers = (Accounts) Session["user"];
                                 if (sessionUsers.RoleId == 1)
                                 {
+                                    if (tran.Amount <= 0)
+                                    {
+                                        errors.Add("Amount", "Your Amount must be number");
+                                        return Json(new
+                                        {
+                                            data = errors,
+                                            message = "Error",
+                                            statusCode = 404
+                                        }, JsonRequestBehavior.AllowGet);
+                                    }
                                     var currenReceiverBankAccount = _context.BankAccounts
                                         .Where(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
                                     sourceBankAccount = _context.BankAccounts.Where(x =>
@@ -161,7 +171,7 @@ namespace Backend.Controllers
                                     statusCode = 200
                                 });
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 transaction.Rollback();
                             }
@@ -418,11 +428,12 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts) Session["user"]) == null)
-                RedirectToAction("Login", "Home", new
-                {
-                    area = ""
-                });
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!bankAccounts.CheckDuplicate(x => x.BankAccountId == id && x.AccountId == account.AccountId))
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
         }
@@ -430,6 +441,12 @@ namespace Backend.Controllers
         public ActionResult TransactionsDetails(int id)
         {
             var user = (Accounts) Session["user"];
+            var account = accounts.Get(user.AccountId);
+
+            if (!transactionDetails.CheckDuplicate(x => x.TransactionDetailId == id && x.BankAccount.AccountId == account.AccountId))
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
 
             var data = transactionDetails
                 .Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId)
