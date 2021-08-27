@@ -75,9 +75,9 @@
                         </div>
                     </div>
                     <div class="form-group row">
-                        <label for="NumberID" class="col-sm-2 col-form-label">Number Id</label>
+                        <label for="NumberId" class="col-sm-2 col-form-label">Number Id</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="NumberID" name="NumberID" placeholder="Number Id">
+                            <input type="text" class="form-control" id="NumberId" name="NumberId" placeholder="Number Id">
                         </div>
                     </div>
                     <div class="form-group row">
@@ -154,7 +154,7 @@
                     required: true,
                     email: true,
                 },
-                NumberID: {
+                NumberId: {
                     required: true,
                     minlength: 9,
                 },
@@ -189,7 +189,7 @@
                     Email: $("#Email").val(),
                     Phone: $("#Phone").val(),
                     Birthday: $("#Birthday").val(),
-                    NumberID: $("#NumberID").val(),
+                    NumberId: $("#NumberId").val(),
                     Address: $("#Address").val(),
                 }
                 accounts.put(user);
@@ -244,7 +244,7 @@
                         $("#Email").val(response.data.Email);
                         $("#Phone").val(response.data.Phone);
                         $("#Birthday").val(response.data.Birthday);
-                        $("#NumberID").val(response.data.NumberId);
+                        $("#NumberId").val(response.data.NumberId);
                         $("#Address").val(response.data.Address);
                         $("#TextName").html(response.data.Name);
                         $("#TextEmail").html(response.data.Email);

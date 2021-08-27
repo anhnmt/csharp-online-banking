@@ -191,16 +191,20 @@ namespace Backend.Hubs
         {
             try
             {
+                var context = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+
                 notifications.ForEach(x =>
                 {
-                    var pkObject = transactionDetailRepo
-                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
+                    var pkObject = transactionDetailRepo.Get()
+                        .FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
-                    Clients.Group("user-" + x.AccountId)
+                    context.Clients.Group("user-" + x.AccountId)
                         .newNotification(new NotificationViewModel(x, pkObject));
+                    // await context.Clients.Group("user-" + x.AccountId)
+                    //     .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                 });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Clients.Caller.onError("Notification can't not send!");
             }

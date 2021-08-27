@@ -59,6 +59,15 @@ namespace Backend.Areas.Admin.Controllers
                 Name = x.Account.Name,
                 Id = x.BankAccountId
             });
+            if (data.FirstOrDefault() == null)
+            {
+                return Json(new
+                {
+                    data,
+                    message = "Error",
+                    statusCode = 400
+                }, JsonRequestBehavior.AllowGet);
+            }
             return Json(new
             {
                 data,
@@ -106,7 +115,7 @@ namespace Backend.Areas.Admin.Controllers
             var errors = new Dictionary<string, string>();
             var check = true;
 
-            if (!int.TryParse(bank.Name, out int i))
+            if (!long.TryParse(bank.Name, out long i))
             {
                 check = false;
                 errors.Add("NameBank", "Your name must be number");
@@ -196,6 +205,21 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
+            using (var _context1 = new ApplicationDbContext())
+            {
+                var bankAccount = _context1.BankAccounts.FirstOrDefault(x => x.BankAccountId == id);
+                var transaction = _context1.TransactionDetails.FirstOrDefault(x => x.BankAccountId == id);
+                if (transaction != null)
+                {
+                    bankAccount.Status = 3;
+                    _context1.SaveChanges();
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
             if (bankAccounts.Delete(id))
             {
                 return Json(new

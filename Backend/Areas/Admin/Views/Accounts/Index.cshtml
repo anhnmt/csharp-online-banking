@@ -71,12 +71,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label>Password <span class="text-danger">*</span></label>
-                        <div class="error">
-                            <input type="password" class="form-control" id="Password" name="Password" placeholder="Password...">
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label>Phone <span class="text-danger">*</span></label>
                         <div class="error"> 
                             <input type="text" class="form-control" id="Phone" name="Phone" placeholder="Phone...">
@@ -132,7 +126,36 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="PasswordChange" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" id="FormPasswordChange" novalidate="novalidate">
+                <div class="modal-header">
+                    <h4 class="modal-MoneyManagement">Update Infomation Account</h4>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id2" id="Id2" value="" />
+                    <div class="form-group">
+                        <label for="Name">New Password</label>
+                        <div class="error">
+                            <input type="password" class="form-control" id="NewPassword" placeholder="New Password ..." name="NewPassword">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Name">Confirm new Password</label>
+                        <div class="error">
+                            <input type="password" class="form-control" id="ConfirmPassword" placeholder="Confirm New Password..." name="ConfirmPassword">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-center">
+                    <button class="btn btn-primary" type="submit">Save change</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @section AdminlteJs{
     <script src="~/Content/vendor/datatables/js/jquery.dataTables.min.js"></script>
 }
@@ -148,16 +171,14 @@
                 var birthDate = new Date(value);
                 var age = today.getFullYear() - birthDate.getFullYear();
                 return age >= min;
-            }, "You are not old enough!");
+    }, "You are not old enough!");
+
         const validator = $("#formData").validate({
             rules: {
                 "Name": {
                     required: true
                 },
                 "Email": {
-                    required: true
-                },
-                "Password": {
                     required: true
                 },
                 "Birthday": {
@@ -202,7 +223,6 @@
                 const user = {
                     Name: $("#Name").val(),
                     Email: $("#Email").val(),
-                    Password: $("#Password").val(),
                     Birthday: $("#Birthday").val(),
                     Address: $("#Address").val(),
                     Phone: $("#Phone").val(),
@@ -218,13 +238,60 @@
                 }
             }
         });
-    
+        const validator2 = $("#FormPasswordChange").validate({
+            rules: {
+                "NewPassword": {
+                    required: true,
+                    minlength: 6,
+                },
+                "ConfirmPassword": {
+                    required: true,
+                    minlength: 6,
+                },
+            },
+            ignore: [],
+            errorClass: "invalid-feedback animated fadeInUp",
+            errorElement: "div",
+            errorPlacement: function (e, a) {
+                jQuery(a).after(e)
+            },
+            highlight: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-invalid")
+            },
+            success: function (e) {
+                jQuery(e).closest(".form-group").removeClass("is-invalid").addClass("is-valid")
+            },
+
+            submitHandler: function () {
+                let account = {
+                    AccountId: $("#Id2").val(),
+                    Password: $("#NewPassword").val(),
+                    RePassword: $("#ConfirmPassword").val(),
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "/Admin/Accounts/ChangePassword",
+                    data: {
+                        changePasswordViewModel: account
+                    },
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            notifySuccess("Success", "Password Change Success");
+                            $("#PasswordChange").modal("hide");
+                        } else {
+                            notifyError("Error", "Password Change Error");
+                            validator2.showErrors(res.data);
+                        }
+                    }
+                })
+            }
+        });
+
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",
                 url: "@Url.Action("GetStatus", "Accounts")",
                 success: function (res) {
-                    console.log(res)
                     var html;
                     $.each(res, function (key, value) {
                         html += "<option value = '" + key + "' " + ((parseInt(status)) === key ? 'selected' : '') + ">" + value + " </option>";
@@ -258,7 +325,6 @@
                         $("#Id").val(res.AccountId);
                         $("#Name").val(res.Name);
                         $("#Email").val(res.Email);
-                        $("#Password").val(res.Password);
                         $("#Phone").val(res.Phone);
                         $("#Address").val(res.Address);
                         $("#Birthday").val(res.Birthday);
@@ -306,8 +372,9 @@
             },
             delete: function (id) {
                 $.ajax({
-                    type: "GET",
-                    url: `/Admin/Accounts/Delete/${id}`,
+                    type: "POST",
+                    url: "@Url.Action("Delete", "Accounts")",
+                    data: {id : id},
                     success: function (res) {
                         if (res.statusCode === 200) {
                             notifySuccess('Successfully',"Deleted Successfully");
@@ -316,7 +383,7 @@
                             notifyError('Error',"Deleted Error");
                             $('#datatables').DataTable().ajax.reload();
                         }
-                        
+
                     }
                 })
             }
@@ -363,7 +430,7 @@
                             }else {
                                 return '<span class="badge light badge-danger"><i class="fa fa-circle text-danger mr-1"></i>'+data.StatusName+'</span>';
                             }
-                           
+
                         },
                         className: 'align-middle text-center',
                         "searchable": false,
@@ -374,6 +441,7 @@
                         "render": function (data) {
                             let detail = "@Url.Action("ProfileAccount", "Accounts")/"+data.AccountId;
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
+                                '<a data-id=" ' + data.AccountId +' " class="dropdown-item btn-changepass text-info" href="javascript:void(0);">Change Password</a>' +
                                 '<a href="' + detail +'" class="dropdown-item btn-detail text-primary" >Details</a>' +
                                 '<a  data-id=" ' + data.AccountId +' " class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
                                '<a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
@@ -387,7 +455,12 @@
                 let userId = $(this).data("id");
                 let a = managerAcc.get(userId);
             })
-            
+            $(document).on("click", ".btn-changepass", function () {
+                $("#PasswordChange").modal("show");
+                let userId = $(this).data("id");
+                $("#Id2").val(userId);
+            })
+
             $(document).on("click", ".btn-add", function () {
                 validator.resetForm();
                 loadRole(0);
