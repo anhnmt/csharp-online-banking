@@ -194,10 +194,9 @@
         function loadStatus(status = null) {
             $.ajax({
                 type: "GET",
-                url: "/Admin/Accounts/GetStatus",
+                url: "/Admin/BankAccounts/GetStatus",
                 success: function (res) {
-                    console.log(res)
-                    let html;
+                    var html;
                     $.each(res, function (key, value) {
                         html += "<option value = '" + key + "' " + ((parseInt(status)) === key ? 'selected' : '') + ">" + value + " </option>";
                     });

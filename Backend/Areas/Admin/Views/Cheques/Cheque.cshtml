@@ -48,10 +48,11 @@
                             </label>
                         </div>
                         <div class="form-group destination-account mt-2" style="display: none">
-                            <label for="ToBankAccountId">Bank Account Destination</label>
+                            <label for="ToBankAccountName">Bank Account Destination</label>
                             <input type="text" name="ToBankAccountName" id="ToBankAccountName" class="form-control" placeholder="Bank Account Destination...">
-                            <span class="text-dark font-weight-bold" id="text2" style="display: none">Name: </span>
-                            <span class="text-danger font-weight-bold" id="infoReceiver" style="display: none"></span>
+                            <div id="InfoBankAccount" style="display: none">
+                                <span class="text-dark font-weight-bold" id="text2">Name: <span class="text-danger font-weight-bold" id="infoReceiver"></span></span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,50 +76,50 @@
                             <div class="item">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <p>Code: </p>
+                                        <p class="text-warning">Code: </p>
                                     </div>
                                     <div class="col-md-8">
-                                        <p id="modal-code"></p>
+                                        <p id="modal-code" class="text-warning"></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <p>Amount: </p>
+                                        <p class="text-danger">Amount: </p>
                                     </div>
                                     <div class="col-md-8">
-                                        <p id="modal-amount"></p>
+                                        <p id="modal-amount" class="text-danger"></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <p>Source: </p>
+                                        <p class="text-success">Source: </p>
                                     </div>
                                     <div class="col-md-8">
-                                        <p id="modal-from"></p>
+                                        <p id="modal-from" class="text-success"></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <p>Destination: </p>
+                                        <p class="text-success">Destination: </p>
                                     </div>
                                     <div class="col-md-8">
-                                        <p id="modal-to"></p>
+                                        <p id="modal-to" class="text-success"></p>
                                     </div>
                                 </div>
                             </div>
                             <div class="item">
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <p>Status: </p>
+                                        <p class="text-info">Status: </p>
                                     </div>
                                     <div class="col-md-8">
-                                        <p id="modal-status"></p>
+                                        <p id="modal-status" class="text-info"></p>
                                     </div>
                                 </div>
                             </div>
@@ -220,27 +221,27 @@
               $(".destination-account").show();
           }else{
               $(".destination-account").hide();
-              $("#ToBankAccountId").val("");
+              $("#ToBankAccountName").val("");
           }
         })
         $('#successModal').on('shown.bs.modal', function () {
+            $(".destination-account").hide();
+            $("#InfoBankAccount").hide();
+            $('#infoReceiver').html("");
             validator.resetForm();
         });
         $(document).on('blur', '#ToBankAccountName', function () {
             let dataInfoBankAccount;
             if (this.value.trim().length == 0 && this.value == "") {
-                $('#infoReceiver').css('display', 'none');
-                $('#text2').css('display', 'none');
-                
+                $("#InfoBankAccount").hide();
             } else {
                 dataInfoBankAccount = loadInfoBankAccount(this.value);
-                $('#text2').css('display', 'inline-block');
+                $("#InfoBankAccount").show();
             }
+
             if (dataInfoBankAccount.statusCode === 200) {
-                $('#infoReceiver').css('display', 'inline-block');
                 $('#infoReceiver').html(dataInfoBankAccount.data[0].Name);
             } else {
-                $('#infoReceiver').css('display', 'inline-block');
                 $('#infoReceiver').html("Account doesn't exist");
             }
         });

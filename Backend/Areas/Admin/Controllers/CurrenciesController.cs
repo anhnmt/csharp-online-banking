@@ -38,7 +38,9 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult FindId(int id)
         {
-            return Json(currencies.Get(id), JsonRequestBehavior.AllowGet);
+            var currency = currencies.Get(id);
+            var data = new CurencyViewModel(currency);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
