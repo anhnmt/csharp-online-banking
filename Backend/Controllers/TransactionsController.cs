@@ -53,6 +53,19 @@ namespace Backend.Controllers
 
         public ActionResult GetData(int fromId, DateTime? startDate, DateTime? endDate)
         {
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+
+            if (!transactionDetails.CheckDuplicate(x => x.BankAccountId == fromId && x.BankAccount.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    data = new List<TransactionsViewModels>(),
+                    message = "Not found",
+                    statusCode = 404
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             var data = transactionDetails.Get(x => x.BankAccountId == fromId);
             if (!Utils.IsNullOrEmpty(startDate) && !Utils.IsNullOrEmpty(endDate))
             {
