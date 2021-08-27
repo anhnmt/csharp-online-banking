@@ -257,7 +257,7 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (obj.AttemptLogin >= 3)
+            if (obj.AttemptLogin >= 3 && obj.RoleId != 1)
             {
                 const int statusLock = (int) AccountStatus.Locked;
                 if (obj.Status != statusLock)
@@ -279,8 +279,11 @@ namespace Backend.Controllers
 
             if (!Utils.ValidatePassword(password,obj.Password))
             {
-                obj.AttemptLogin++;
-                accounts.Update(obj);
+                if (obj.RoleId != 1)
+                {
+                    obj.AttemptLogin++;
+                    accounts.Update(obj);
+                }
                 errors.Add("Password", "Your password is wrong!");
 
                 return Json(new
@@ -291,7 +294,7 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (obj.Status == 1)
+            if (obj.Status == 1 && obj.RoleId != 1)
             {
                 errors.Add("Email", "Your Account is Locked!");
 

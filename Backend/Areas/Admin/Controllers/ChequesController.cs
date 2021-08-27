@@ -114,7 +114,7 @@ namespace Backend.Areas.Admin.Controllers
                         var fromBankAccount = _context.BankAccounts.FirstOrDefault(x =>
                             x.BankAccountId == chequeInformation.FromBankAccountId);
 
-                        if (fromBankAccount.Status != (int) BankAccountStatus.Actived)
+                        if (fromBankAccount != null && fromBankAccount.Status != (int) BankAccountStatus.Actived)
                         {
                             errors.Add("FromBankAccountId", "This bank account is not actived");
                             return Json(new
@@ -127,7 +127,7 @@ namespace Backend.Areas.Admin.Controllers
 
                         var chequeBook =
                             _context.ChequeBooks.FirstOrDefault(x => x.ChequeBookId == chequeInformation.ChequeBookId);
-                        if (chequeBook.Status != (int) ChequeBookStatus.Opened)
+                        if (chequeBook != null && chequeBook.Status != (int) ChequeBookStatus.Opened)
                         {
                             return Json(new
                             {
@@ -145,7 +145,7 @@ namespace Backend.Areas.Admin.Controllers
                         chequeInformation.Code = code;
                         chequeInformation.Status = (int) ChequeStatus.Actived;
 
-                        if (fromBankAccount.Balance < chequeInformation.Amount)
+                        if (fromBankAccount != null && fromBankAccount.Balance < chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Your balance is not enough");
                             return Json(new
@@ -156,7 +156,7 @@ namespace Backend.Areas.Admin.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
-                        if (0 > chequeInformation.Amount)
+                        if (0 >= chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Please enter a positive number");
                             return Json(new
@@ -171,18 +171,23 @@ namespace Backend.Areas.Admin.Controllers
                         _context.Cheques.Add(chequeInformation);
                         _context.SaveChanges();
 
-                        fromBankAccount.Balance -= chequeInformation.Amount;
-                        // bankAccounts.Update(fromBankAccount);
-                        // _context.Entry(fromBankAccount).State = EntityState.Modified;
-                        _context.SaveChanges();
+                        List<Notifications> newNotifications = null;
+                        if (fromBankAccount != null)
+                        {
+                            fromBankAccount.Balance -= chequeInformation.Amount;
+                            // bankAccounts.Update(fromBankAccount);
+                            // _context.Entry(fromBankAccount).State = EntityState.Modified;
+                            _context.SaveChanges();
+
+                            var message = "Your account balance -" + chequeInformation.Amount +
+                                          ", available balance: " + fromBankAccount.Balance;
+
+                            newNotifications = CreateNotification(chequeInformation, message);
+                        }
 
                         transaction.Commit();
 
-                        return Json(new
-                        {
-                            message = "Success",
-                            statusCode = 200,
-                        }, JsonRequestBehavior.AllowGet);
+                        ChatHub.Instance().SendNotifications(newNotifications);
                     }
                     catch (Exception ex)
                     {
@@ -193,8 +198,13 @@ namespace Backend.Areas.Admin.Controllers
                             message = "error",
                             statuscode = 404
                         }, JsonRequestBehavior.AllowGet);
-                        throw;
                     }
+
+                    return Json(new
+                    {
+                        message = "Success",
+                        statusCode = 200,
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
         }
@@ -346,6 +356,17 @@ namespace Backend.Areas.Admin.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
+                        if (chequeExec.PaymentMethod == "bank-account" && string.IsNullOrEmpty(chequeExec.ToBankAccountName))
+                        {
+                            errors.Add("ToBankAccountName", "This field is required!");
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = errors,
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+
                         BankAccounts toBankAccounts;
                         if (chequeExec.PaymentMethod == "bank-account" &&
                             !Utils.IsNullOrEmpty(chequeExec.ToBankAccountName))
@@ -387,36 +408,29 @@ namespace Backend.Areas.Admin.Controllers
 
                         if (toBankAccounts != null)
                         {
-                            cheque.ToBankAccountId = toBankAccounts.AccountId;
+                            cheque.ToBankAccountId = toBankAccounts.BankAccountId;
+                            if (toBankAccounts.Account != null & toBankAccounts.Account.NumberId != null)
+                            {
+                                cheque.NumberId = toBankAccounts.Account.NumberId;
+                            }
                         }
 
                         //cheques.Edit(cheque);
                         _context.SaveChanges();
 
-                        var data = new ChequesViewModel
-                        {
-                            ChequeBookId = cheque.ChequeBookId,
-                            Code = cheque.Code,
-                            NumberId = cheque.NumberId,
-                            ChequeId = cheque.ChequeId,
-                            StatusName = ((ChequeStatus) cheque.Status).ToString(),
-                            Status = cheque.Status,
-                            AmountNumber = cheque.Amount,
-                            FromBankAccountName = cheque.FromBankAccount.Name,
-                            FromBankAccountId = cheque.FromBankAccountId,
-                            ToBankAccountName = cheque.ToBankAccountId == null
-                                ? "None, using cash!"
-                                : cheque.ToBankAccount.Name
-                        };
+                        var data = new ChequesViewModel(cheque);
 
                         if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
+                        {
+                            transaction.Commit();
                             return Json(new
                             {
                                 message = "Success",
                                 data = data,
                                 statusCode = 200,
                             }, JsonRequestBehavior.AllowGet);
-
+                        }
+                            
                         toBankAccounts.Balance += cheque.Amount;
                         //bankAccounts.Edit(toBankAccounts);
                         // _context.Entry(toBankAccounts).State = EntityState.Modified;
@@ -435,7 +449,7 @@ namespace Backend.Areas.Admin.Controllers
                         var newNotifications = CreateNotifications(newTransaction);
 
                         transaction.Commit();
-                        
+
                         ChatHub.Instance().SendNotifications(newNotifications);
 
                         return Json(new
@@ -573,6 +587,8 @@ namespace Backend.Areas.Admin.Controllers
                         var fromBankAccount =
                             _context.BankAccounts.FirstOrDefault(x => x.BankAccountId == cheque.FromBankAccountId);
 
+                        List<Notifications> newNotifications = null;
+
                         if (fromBankAccount != null)
                         {
                             fromBankAccount.Balance += cheque.Amount;
@@ -580,33 +596,58 @@ namespace Backend.Areas.Admin.Controllers
 
                             // cheques.Delete(cheque);
                             // bankAccounts.Edit(fromBankAccount);
-                            _context.Cheques.Remove(cheque);
-                            _context.SaveChanges();
+
+                            var message = "Your account balance +" + cheque.Amount +
+                                          ", available balance: " + cheque.FromBankAccount.Balance;
+
+                            newNotifications = CreateNotification(cheque, message);
                         }
 
+                        _context.Cheques.Remove(cheque);
                         _context.SaveChanges();
                         transaction.Commit();
 
-                        return Json(new
-                        {
-                            message = "Success",
-                            data = "Delete Successfully",
-                            statusCode = 200,
-                        }, JsonRequestBehavior.AllowGet);
+                        ChatHub.Instance().SendNotifications(newNotifications);
                     }
                     catch (Exception ex)
                     {
                         transaction.Rollback();
+
                         return Json(new
                         {
                             data = ex,
                             message = "error",
                             statuscode = 404
                         }, JsonRequestBehavior.AllowGet);
-                        throw;
                     }
+
+                    return Json(new
+                    {
+                        message = "Success",
+                        data = "Delete Successfully",
+                        statusCode = 200,
+                    }, JsonRequestBehavior.AllowGet);
                 }
             }
+        }
+
+        private List<Notifications> CreateNotification(Cheques cheque, string message)
+        {
+            var lstNotification = new List<Notifications>()
+            {
+                new Notifications
+                {
+                    AccountId = cheque.FromBankAccount.AccountId,
+                    Content = message,
+                    Status = (int) NotificationStatus.Unread,
+                    PkType = (int) NotificationType.Cheque,
+                    PkId = cheque.ChequeBookId,
+                }
+            };
+
+            _context.Set<Notifications>().AddRange(lstNotification);
+            _context.SaveChanges();
+            return lstNotification;
         }
     }
 }

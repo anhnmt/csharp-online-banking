@@ -117,9 +117,10 @@
                         if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Created Successfully');
+                            notifySuccess('Success', 'Created Successfully');
                         } else {
                             validator.showErrors(res.data);
+                            notifyError('Error', 'Created Fail');
                         }
                     }
 
@@ -134,9 +135,10 @@
                         if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Updated Successfully');
+                            notifySuccess('Success', 'Updated Successfully');
                         } else {
                             validator.showErrors(res.data);
+                            notifyError('Error', 'Updated Fail');
                         }
                     }
                 })
@@ -156,9 +158,14 @@
                 $.ajax({
                     type: "GET",
                     url: `/Admin/Currencies/Delete/${id}`,
-                    success: function () {
-                        $('#datatables').DataTable().ajax.reload();
-                        toastr.success('Deleted Successfully');
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $('#datatables').DataTable().ajax.reload();
+                            notifySuccess('Success', 'Deleted Successfully');
+                        } else {
+                            notifyError('Error', res.data);
+                        }
+                        
                     }
                 })
             }
@@ -201,7 +208,7 @@
                         data: '',
                         className: 'align-middle text-right',
                         "render": function (data, type, row) {
-                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id=" ' + row.CurrencyId + ' " class="dropdown-item btn-edit" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.CurrencyId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                            return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id=" ' + row.CurrencyId + ' " class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a><a  data-id=" ' + row.CurrencyId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                         }
                     },
                 ]

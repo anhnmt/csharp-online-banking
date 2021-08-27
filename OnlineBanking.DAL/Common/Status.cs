@@ -65,7 +65,7 @@ namespace OnlineBanking.DAL
     public enum NotificationType
     {
         Transaction = 0,
-        Message = 1,
+        Cheque = 1,
     }
     public enum TransactionType
     {

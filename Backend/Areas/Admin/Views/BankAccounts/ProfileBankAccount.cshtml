@@ -162,7 +162,6 @@
                     {
                         data: { Amount: 'Amount', Type: 'Type', Currency: "Currency" },
                         render: function (data) {
-                            let fromId = $("#fromId").val();
                             return (data.Amount) == null ? "" : ((data.Type ? " - " : " + ") + new Intl.NumberFormat('vi-VN', { style: 'currency', currency: data.Currency }).format(data.Amount));
                         },
                         className: 'align-middle',
@@ -187,7 +186,6 @@
                                 },
 
                             ],
-                             dom: 'Bfrtip',
                              dom: 'Bfrtip',
                              buttons: [
                                  { extend: 'excel', className: 'btn btn-primary glyphicon glyphicon-list-alt' },

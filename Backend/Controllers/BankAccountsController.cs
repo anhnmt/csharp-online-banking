@@ -28,12 +28,14 @@ namespace Backend.Controllers
         [HttpPost]
         public ActionResult GetBalance(int bankId)
         {
-            var data = bankAccounts.Get().Where(x => x.BankAccountId == bankId).Select(x => new BalanceViewModels
-            {
-                Balance = x.Balance,
-                BankId = x.BankAccountId,
-                Currency = x.Currency.Name
-            });
+            var data = bankAccounts.Get()
+                .Where(x => x.BankAccountId == bankId)
+                .Select(x => new BalanceViewModels
+                {
+                    Balance = x.Balance,
+                    BankId = x.BankAccountId,
+                    Currency = x.Currency.Name
+                });
 
             return Json(new
             {
@@ -45,11 +47,14 @@ namespace Backend.Controllers
 
         public ActionResult GetInfoBankAccount(string name)
         {
-            var data = bankAccounts.Get().Where(x => x.Name == name).Select(x => new GetInfoBankAccountViewModels
-            {
-                Name = x.Account.Name,
-                Id = x.BankAccountId
-            });
+            var data = bankAccounts
+                .Get()
+                .Where(x => x.Name == name)
+                .Select(x => new GetInfoBankAccountViewModels
+                {
+                    Name = x.Account.Name,
+                    Id = x.BankAccountId
+                });
 
             if (data.FirstOrDefault() == null)
             {
@@ -72,17 +77,20 @@ namespace Backend.Controllers
         public ActionResult GetData(int Account)
         {
             ViewBag.Accounts = "active";
-            var data = bankAccounts.Get().Where(a => a.AccountId == Account).Select(x => new BankAccountsViewModels
-            {
-                AccountId = x.AccountId,
-                BankAccountId = x.BankAccountId,
-                CurrencyId = x.CurrencyId,
-                CurrencyName = x.Currency.Name,
-                Name = x.Name,
-                Balance = x.Balance,
-                Status = x.Status,
-                StatusName = ((BankAccountStatus) x.Status).ToString()
-            });
+            var data = bankAccounts
+                .Get()
+                .Where(a => a.AccountId == Account)
+                .Select(x => new BankAccountsViewModels
+                {
+                    AccountId = x.AccountId,
+                    BankAccountId = x.BankAccountId,
+                    CurrencyId = x.CurrencyId,
+                    CurrencyName = x.Currency.Name,
+                    Name = x.Name,
+                    Balance = x.Balance,
+                    Status = x.Status,
+                    StatusName = ((BankAccountStatus) x.Status).ToString()
+                });
 
             return Json(new
             {
@@ -95,7 +103,10 @@ namespace Backend.Controllers
         // GET: Admin/BankAccounts/Details/5
         public ActionResult GetStatus()
         {
-            var data = Enum.GetValues(typeof(BankAccountStatus)).Cast<BankAccountStatus>().Select(v => v.ToString())
+            var data = Enum
+                .GetValues(typeof(BankAccountStatus))
+                .Cast<BankAccountStatus>()
+                .Select(v => v.ToString())
                 .ToArray();
 
             return Json(data, JsonRequestBehavior.AllowGet);

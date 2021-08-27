@@ -38,7 +38,9 @@ namespace Backend.Areas.Admin.Controllers
 
         public ActionResult FindId(int id)
         {
-            return Json(currencies.Get(id), JsonRequestBehavior.AllowGet);
+            var currency = currencies.Get(id);
+            var data = new CurencyViewModel(currency);
+            return Json(data, JsonRequestBehavior.AllowGet);
         }
 
         [HttpPost]
@@ -155,18 +157,52 @@ namespace Backend.Areas.Admin.Controllers
         // GET: Admin/Currencies/Delete/5
         public ActionResult Delete(int id)
         {
-            if (currencies.Delete(id))
+            try
+            {
+                var currency = currencies.Get(id);
+                if (currency == null)
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        data = "This currency does not exist",
+                        message = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (currency.BankAccounts.Count > 0)
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        data = "This currency have bank account link to it, cannot delete!",
+                        message = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
+                if (currencies.Delete(currency))
+                {
+                    return Json(new
+                    {
+                        statusCode = 200,
+                        message = "Success"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (System.Exception)
             {
                 return Json(new
                 {
-                    statusCode = 200,
-                    message = "Success"
+                    statusCode = 400,
+                    data = "Something error happen",
+                    message = "Error"
                 }, JsonRequestBehavior.AllowGet);
             }
 
             return Json(new
             {
                 statusCode = 400,
+                data = "Something error happen",
                 message = "Error"
             }, JsonRequestBehavior.AllowGet);
         }
