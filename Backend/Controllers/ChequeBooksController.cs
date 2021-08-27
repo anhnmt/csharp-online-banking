@@ -86,6 +86,18 @@ namespace Backend.Controllers
         public ActionResult PutData(int id)
         {
             var x = chequebooks.Get(id);
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+
+            if (!chequebooks.CheckDuplicate(y => y.ChequeBookId == id && y.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    statusCode = 404,
+                    message = "Not found",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             if (x.Status == (int)ChequeBookStatus.Deleted)
             {
                 return Json(new
@@ -119,6 +131,18 @@ namespace Backend.Controllers
         public ActionResult DeleteData(int id)
         {
             var x = chequebooks.Get(id);
+
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!chequebooks.CheckDuplicate(y => y.ChequeBookId == id && y.AccountId == account.AccountId))
+            {
+                return Json(new
+                {
+                    statusCode = 404,
+                    message = "Not found",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             if (x.Status == (int)ChequeBookStatus.Deleted)
             {
                 return Json(new

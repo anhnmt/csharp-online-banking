@@ -428,11 +428,12 @@ namespace Backend.Controllers
 
         public ActionResult ProfileAccountNumber(int id)
         {
-            if (((Accounts) Session["user"]) == null)
-                RedirectToAction("Login", "Home", new
-                {
-                    area = ""
-                });
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            if (!bankAccounts.CheckDuplicate(x => x.BankAccountId == id && x.AccountId == account.AccountId))
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
             var data = bankAccounts.Get(x => x.BankAccountId == id).FirstOrDefault();
             return data == null ? View() : View(data);
         }
@@ -440,6 +441,12 @@ namespace Backend.Controllers
         public ActionResult TransactionsDetails(int id)
         {
             var user = (Accounts) Session["user"];
+            var account = accounts.Get(user.AccountId);
+
+            if (!transactionDetails.CheckDuplicate(x => x.TransactionDetailId == id && x.BankAccount.AccountId == account.AccountId))
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
 
             var data = transactionDetails
                 .Get(x => x.TransactionDetailId == id && x.BankAccount.AccountId == user.AccountId)
