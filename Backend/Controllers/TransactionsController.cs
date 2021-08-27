@@ -136,16 +136,7 @@ namespace Backend.Controllers
                                 PlusMoney:
                                 
                                 receiverBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.ToId);
-                                //if (sourceBankAccount.BankAccountId == receiverBankAccount.BankAccountId)
-                                //{
-                                //    errors.Add("FormId", "The number of the receiving account and the sending account is the same");
-                                //    return Json(new
-                                //    {
-                                //        data = errors,
-                                //        message = "Error",
-                                //        statusCode = 404
-                                //    }, JsonRequestBehavior.AllowGet);
-                                //}
+
                                 var plusError = PlusMoney(tran, receiverBankAccount, errors);
                                 if (plusError != null)
                                 {
