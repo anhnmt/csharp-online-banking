@@ -173,7 +173,7 @@ namespace Backend.Hubs
                             return "/Transactions/TransactionsDetails/" + notification.PkId;
 
                         case (int) NotificationType.Cheque:
-                            return "/Cheques/?ChequeBookId=" + notification.PkId;
+                            return "/Cheques/Detail/" + notification.PkId;
                     }
                 }
                 catch (Exception ex)
