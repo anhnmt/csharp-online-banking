@@ -25,13 +25,13 @@ namespace Backend.Controllers
 
         public ActionResult Index()
         {
-            if ((Accounts) Session["user"] == null) return RedirectToAction("Login");
             ViewBag.Index = "active";
             return View();
         }
 
-        public ActionResult GetDataBankAccount(int account)
+        public ActionResult GetDataBankAccount()
         {
+            var account = ((Accounts)Session["user"]).AccountId;
             ViewBag.Accounts = "active";
             var data = bankAccounts.Get().Where(a => a.AccountId == account).Select(x => new BankAccountsViewModels
             {
@@ -75,7 +75,7 @@ namespace Backend.Controllers
                     number += random.Next(10).ToString();
                 }
             } while (bankAccounts.CheckDuplicate(x => x.Name == number));
-
+            bank.AccountId = ((Accounts)Session["user"]).AccountId;
             bank.Name = number;
             bank.Status = 2;
             bank.CreatedAt = DateTime.Now;
