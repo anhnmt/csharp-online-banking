@@ -146,13 +146,7 @@ namespace Backend.Hubs
                 .OrderByDescending(m => m.CreatedAt)
                 .Take(5)
                 .AsEnumerable()
-                .Select(x =>
-                {
-                    var pkObject = transactionDetailRepo
-                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
-
-                    return new NotificationViewModel(x, pkObject);
-                });
+                .Select(x => new NotificationViewModel(x));
         }
 
         public string ReadNotification(int notificationId)
@@ -173,9 +167,13 @@ namespace Backend.Hubs
                         _context.SaveChanges();
                     }
 
-                    if (notification.PkType == (int) NotificationType.Transaction)
+                    switch (notification.PkType)
                     {
-                        return "/Transactions/TransactionsDetails/" + notification.PkId;
+                        case (int) NotificationType.Transaction:
+                            return "/Transactions/TransactionsDetails/" + notification.PkId;
+
+                        case (int) NotificationType.Cheque:
+                            return "/Cheques/?ChequeBookId=" + notification.PkId;
                     }
                 }
                 catch (Exception ex)
@@ -195,11 +193,8 @@ namespace Backend.Hubs
 
                 notifications.ForEach(x =>
                 {
-                    var pkObject = transactionDetailRepo.Get()
-                        .FirstOrDefault(y => y.TransactionDetailId == x.PkId);
-
                     context.Clients.Group("user-" + x.AccountId)
-                        .newNotification(new NotificationViewModel(x, pkObject));
+                        .newNotification(new NotificationViewModel(x));
                     // await context.Clients.Group("user-" + x.AccountId)
                     //     .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                 });
