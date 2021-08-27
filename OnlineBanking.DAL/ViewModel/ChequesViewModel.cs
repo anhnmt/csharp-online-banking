@@ -26,6 +26,7 @@ namespace OnlineBanking.DAL
             StatusName = ((ChequeStatus) x.Status).ToString();
             FromBankAccountName = x.FromBankAccount.Name;
             FromBankAccountId = x.FromBankAccountId;
+            UpdatedAt = x.UpdatedAt;
             if (x.Status == (int) ChequeStatus.Received)
             {
                 ToBankAccountName = x.ToBankAccountId == null ? "Using cash, his ID card: " + x.NumberId : x.ToBankAccount.Name;
@@ -48,5 +49,6 @@ namespace OnlineBanking.DAL
         public string FromBankAccountName { get; set; }
         public int FromBankAccountId { get; set; }
         public string ToBankAccountName { get; set; }
+        public DateTime? UpdatedAt { get; set; }
     }
 }

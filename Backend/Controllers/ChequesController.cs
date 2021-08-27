@@ -48,6 +48,23 @@ namespace Backend.Controllers
             }
         }
 
+        public ActionResult Detail(int id)
+        {
+            var user = (Accounts)Session["user"];
+            var account = accounts.Get(user.AccountId);
+            var cheque = cheques.Get(id);
+
+            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
+            {
+                var chequeDetail = new ChequesViewModel(cheque);
+                return View(chequeDetail);
+            }
+            else
+            {
+                return RedirectToAction("NotFound", "Error");
+            }
+        }
+
         public ActionResult GetData(int chequeBookId)
         {
             var user = (Accounts) Session["user"];

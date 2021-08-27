@@ -1,0 +1,50 @@
+﻿@model OnlineBanking.DAL.ChequesViewModel
+@{
+    ViewBag.Title = "Cheque Detail";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title">Cheque #@Model.ChequeId</h5>
+            </div>
+            <div class="card-body">
+                <div class="basic-list-group">
+                    <ul class="list-group">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Reference number <span class="badge badge-rounded badge-outline-info">@Model.ChequeId</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Code <span class="badge badge-rounded badge-outline-dark">@Model.Code</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            From account <span class="badge badge-rounded badge-outline-secondary">@Model.FromBankAccountName</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Date <span class="badge badge-rounded badge-outline-warning">@Model.UpdatedAt</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Amount
+                            @* <span class="badge badge-rounded badge-outline-danger">@Model.Currency</span> *@
+                            <span class="badge badge-rounded badge-outline-danger" id="Amount"></span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Beneficiary Account <span class="badge badge-rounded badge-outline-success">@Model.ToBankAccountName</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+    $(function (){
+        $("#Amount").html(new Intl.NumberFormat('vi-VN', { style: 'currency', currency: '@Model.CurrencyName' }).format(@Model.Amount));
+    });
+    </script>
+}
+
