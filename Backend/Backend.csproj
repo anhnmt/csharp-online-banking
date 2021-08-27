@@ -675,6 +675,7 @@
     <Content Include="Views\BankAccounts\Index.cshtml" />
     <Content Include="Views\Transactions\ProfileAccountNumber.cshtml" />
     <Content Include="Views\Home\Register.cshtml" />
+    <Content Include="Views\Cheques\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Areas\Admin\Content\js\" />

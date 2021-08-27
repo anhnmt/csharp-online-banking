@@ -266,7 +266,7 @@
                     className: 'align-middle text-right',
                     "render": function (data, type, row) {
                         let toggle = row.Status === 0 ? "Stop this cheque" : "Active this cheque";
-                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" data-status="' + row.Status + '"class="dropdown-item btn-edit text-warning" href="javascript:void(0);">' + toggle + '</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
+                        return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);"><a data-id="' + row.ChequeId + '" class="dropdown-item btn-detail text-info" href="javascript:void(0);">Detail</a><a data-id="' + row.ChequeId + '" data-status="' + row.Status + '"class="dropdown-item btn-edit text-warning" href="javascript:void(0);">' + toggle + '</a><a  data-id="' + row.ChequeId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                     }
                 },
             ]
@@ -287,6 +287,11 @@
                 let chequeId = $(this).data("id");
                 chequesManager.put(chequeId);
             }
+        });
+
+        $(document).on("click", ".btn-detail", function () {
+            let id = $(this).data("id");
+            window.location.assign("@Url.Action("Detail", "Cheques")" +"/" + id);
         });
 
         $(document).on("click", ".btn-delete", function () {
