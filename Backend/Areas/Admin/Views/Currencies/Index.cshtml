@@ -117,9 +117,10 @@
                         if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Created Successfully');
+                            notifySuccess('Success', 'Created Successfully');
                         } else {
                             validator.showErrors(res.data);
+                            notifyError('Error', 'Created Fail');
                         }
                     }
 
@@ -134,9 +135,10 @@
                         if (res.statusCode === 200) {
                             $("#modifyModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                            toastr.success('Updated Successfully');
+                            notifySuccess('Success', 'Updated Successfully');
                         } else {
                             validator.showErrors(res.data);
+                            notifyError('Error', 'Updated Fail');
                         }
                     }
                 })
@@ -156,9 +158,14 @@
                 $.ajax({
                     type: "GET",
                     url: `/Admin/Currencies/Delete/${id}`,
-                    success: function () {
-                        $('#datatables').DataTable().ajax.reload();
-                        toastr.success('Deleted Successfully');
+                    success: function (res) {
+                        if (res.statusCode == 200) {
+                            $('#datatables').DataTable().ajax.reload();
+                            notifySuccess('Success', 'Deleted Successfully');
+                        } else {
+                            notifyError('Error', res.data);
+                        }
+                        
                     }
                 })
             }
