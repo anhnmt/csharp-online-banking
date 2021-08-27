@@ -190,7 +190,7 @@ namespace Backend.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
-                        if (0 > chequeInformation.Amount)
+                        if (0 >= chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Please enter a positive number");
                             return Json(new
