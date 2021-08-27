@@ -156,7 +156,7 @@ namespace Backend.Areas.Admin.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
-                        if (0 > chequeInformation.Amount)
+                        if (0 >= chequeInformation.Amount)
                         {
                             errors.Add("Amount", "Please enter a positive number");
                             return Json(new
@@ -408,7 +408,7 @@ namespace Backend.Areas.Admin.Controllers
 
                         if (toBankAccounts != null)
                         {
-                            cheque.ToBankAccountId = toBankAccounts.AccountId;
+                            cheque.ToBankAccountId = toBankAccounts.BankAccountId;
                             if (toBankAccounts.Account != null & toBankAccounts.Account.NumberId != null)
                             {
                                 cheque.NumberId = toBankAccounts.Account.NumberId;
