@@ -21,22 +21,25 @@
     <div class="col-md-12">
         <a href="#" class="btn btn-primary mb-3 btn-add">Create New Account</a>
         <div class="card card-success">
-            <div class="card-header">
+            @*<div class="card-header">
                 <h3 class="card-title">Account Number</h3>
-            </div>
+            </div>*@
             <div class="card-body">
-                <table class="table">
-                    <tr>
-                        <th>Account Number</th>
-                        <th>Balance</th>
-                        <th>Currency</th>
-                        <th>Status</th>
-                        <th></th>
-                    </tr>
+                <div class="table-responsive">
+                    <table class="table table-striped table-responsive-sm">
+                        <thead>
+                            <tr>
+                                <th>Account Number</th>
+                                <th>Balance</th>
+                                <th>Currency</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbl_user"></tbody>
 
-                    <tbody id="tbl_user"></tbody>
-
-                </table>
+                    </table>
+                </div>
             </div>
             <!-- /.card-body -->
         </div>
@@ -92,15 +95,15 @@
             })
         }
         var managerAccBank = {
-            load: function (accountId) {
+            load: function () {
                 $.ajax({
                     type: "GET",
                     url: "/Home/GetDataBankAccount",
-                    data: { Account: accountId },
                     success: function (res) {
                         let _html = "";
-                        for (let item of res.data) {
-                            _html += `<tr>
+                        if (res.data.length > 0) {
+                            for (let item of res.data) {
+                                _html += `<tr>
                                             <td>${item.Name}</td>
                                             <td>${new Intl.NumberFormat('vi-VN', { style: 'currency', currency: item.CurrencyName }).format(item.Balance)}</td>
                                             <td>${item.CurrencyName}</td>
@@ -109,8 +112,14 @@
                                                 <a href="/Transactions/ProfileAccountNumber/${item.BankAccountId}" class='btn btn-primary'>Detail</a>
                                             </td>
                                           </tr>`
+                            }
+                            $('#tbl_user').html(_html);
+                        } else {
+                            console.log(res.data.length)
+                            _html = `<tr><td colspan="5" class="text-center">No accounts yet !!!!</td></tr>`
+                            $('#tbl_user').html(_html);
                         }
-                        $('#tbl_user').html(_html);
+                        
                     }
                 });
             },
@@ -123,7 +132,7 @@
                         console.log(bank)
                         if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
-                            managerAccBank.load("@user.AccountId");
+                            managerAccBank.load();
                             toastr.success('Created Successfully')
                         }
                     }
@@ -131,28 +140,17 @@
             },
         }
         $(function () {
-            managerAccBank.load("@user.AccountId");
+            managerAccBank.load();
             $(document).on("click", ".btn-add", function () {
                 loadCurrency();
                 $("#myModal").modal("show");
                 $(".modal-title").html("Create Account Number");
             })
             $(document).on("click", "#btnSave", function () {
-                var today = new Date();
                 var bank = {
-                    AccountId: "@user.AccountId",
                     CurrencyId: $("#CurrencyId").val()
                 };
-                if ($("#type").val() == "EDIT") {
-                    bank.BankAccountId = $("#Id").val(),
-                        managerBank.put(user);
-                } else if ($("#type").val() == "TRANSFER") {
-                    let accountNumber = $("#AccountNumberManament").val();
-                    let balance = $("#BalanceManament").val();
-                    managerBank.receiveMoney(accountNumber, balance);
-                } else {
-                    managerAccBank.post(bank);
-                }
+                managerAccBank.post(bank);
             })
 
         })

@@ -364,7 +364,13 @@
                             $('#datatables').DataTable().ajax.reload();
                         }
                         else {
-                             validator.showErrors(res.data);
+                            if (typeof res.data == "string") {
+                                notifyError("Error", res.data);
+                                $("#modifyModal").modal("hide");
+                            } else {
+                                validator.showErrors(res.data);
+                            }
+                             
                         }
                     }
 
