@@ -187,18 +187,20 @@ namespace Backend.Hubs
             }
         }
 
-        public void SendNotifications(List<Notifications> notifications)
+        public async Task SendNotifications(List<Notifications> notifications)
         {
             try
             {
-                notifications.ForEach(x =>
+                IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
+                notifications.ForEach(async x =>
                 {
                     var pkObject = transactionDetailRepo
                         .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
 
-                    Clients.Group("user-" + x.AccountId)
+                    await context.Clients.Group("user-" + x.AccountId)
                         .newNotification(new NotificationViewModel(x, pkObject));
                 });
+                await context.Clients.All.reloadChatData();
             }
             catch (Exception)
             {
@@ -237,8 +239,7 @@ namespace Backend.Hubs
                         userViewModel.CurrentChannelId = channel.ChannelId;
                         Groups.Add(connectionId, "channel-" + channel.ChannelId);
                         Clients.Client(connectionId).historyMessages(GetMessageHistory(channel.ChannelId));
-                        Clients.Client(connectionId)
-                            .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
+                        Clients.Client(connectionId).historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                     }
 
                     var tempAccount = Connections.FirstOrDefault(u => u.AccountId == accountId);
