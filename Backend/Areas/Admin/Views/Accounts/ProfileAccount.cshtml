@@ -213,7 +213,7 @@
 </div>
 
 @section scripts{
-    <script>
+    <div><script>
     const validator = $("#FormBank").validate({
                 rules: {
                     "NameBank": {
@@ -281,7 +281,7 @@
                         } else {
                             managerBank.receiveMoney(trans);
                         }
-                      
+
                     }
                 });
         function loadStatus(status = null) {
@@ -350,7 +350,7 @@
                     url: "@Url.Action("FindId", "BankAccounts")",
                     data: {id : id},
                     success: function (res) {
-                        
+
                         $("#MoneyManagement").modal("show");
                         validator2.resetForm();
                         $("#Form2").trigger("reset");
@@ -371,8 +371,12 @@
                             $('#tbl_banks').DataTable().ajax.reload();
                             notifySuccess('Created Successfully',"Created BankAccounts Successfully")
                         } else {
-                            
-                            validator.showErrors(res.data);
+                            if (typeof res.data == "string") {
+                                notifyError("Error", res.data);
+                                $("#modifyModal").modal("hide");
+                            } else {
+                                validator.showErrors(res.data);
+                            }
                         }
                     }
 
@@ -383,6 +387,24 @@
                     type: "POST",
                     url: "@Url.Action("Edit", "BankAccounts")",
                     data: bank,
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            $("#myModal").modal("hide");
+                            $('#tbl_banks').DataTable().ajax.reload();
+                            notifySuccess('Updated Successfully',"Updated BankAccounts Successfully");
+                        } else {
+                            notifyError('Created Error', res.data)
+                            validator.showErrors(res.data);
+                        }
+                    }
+
+                })
+            },
+            put2: function (id) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("Edit", "BankAccounts")",
+                    data: {id:id},
                     success: function (res) {
                         if (res.statusCode === 200) {
                             $("#myModal").modal("hide");
@@ -600,13 +622,14 @@
                                 "orderable": false,
                             },
                             {
-                                data: {BankAccountId:'BankAccountId'},
-                                "render": function (data) {
+                                data: { BankAccountId: 'BankAccountId', Status:"Status"},
+                                render: function (data) {
+                                    let toggle = data.Status === 0 ? "Lock Account" : "Active Account";
                                     let detail = "@Url.Action("ProfileAccountNumber", "Transactions")/"+data.BankAccountId;
                                     return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
                                         '<a data-id="' + data.BankAccountId +'" class="dropdown-item btn-manager text-info" href="javascript:void(0);" >Money Managment</a>' +
                                         '<a href="' + detail +'" class="dropdown-item btn-detail text-primary" >Details</a>' +
-                                        '<a  data-id="' + data.BankAccountId +'" class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
+                                        '<a  data-id="' + data.BankAccountId + '" class="dropdown-item btn-edit text-warning" href="javascript:void(0);">' + toggle+'</a>' +
                                         '<a  data-id="' + data.BankAccountId +'" class="dropdown-item text-danger btn-delete btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                                      }
                             },
@@ -646,7 +669,7 @@
             $(document).on("click", ".btn-edit", function () {
                 $("#type").val("EDIT");
                 let bankId = $(this).data("id");
-                let a = managerBank.get(bankId);
+                let a = managerBank.put2(bankId);
             })
 
             $(document).on("click", ".btn-manager", function () {
@@ -665,5 +688,5 @@
                 managerChequeBook.delete(bookId);
             })
         })
-    </script>
+</script></div>
 }
