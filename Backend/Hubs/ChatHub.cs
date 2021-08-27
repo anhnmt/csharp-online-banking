@@ -187,22 +187,24 @@ namespace Backend.Hubs
             }
         }
 
-        public async Task SendNotifications(List<Notifications> notifications)
+        public void SendNotifications(List<Notifications> notifications)
         {
             try
             {
-                IHubContext context = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
-                notifications.ForEach(async x =>
-                {
-                    var pkObject = transactionDetailRepo
-                        .Get().FirstOrDefault(y => y.TransactionDetailId == x.PkId);
+                var context = GlobalHost.ConnectionManager.GetHubContext<ChatHub>();
 
-                    await context.Clients.Group("user-" + x.AccountId)
+                notifications.ForEach(x =>
+                {
+                    var pkObject = transactionDetailRepo.Get()
+                        .FirstOrDefault(y => y.TransactionDetailId == x.PkId);
+
+                    context.Clients.Group("user-" + x.AccountId)
                         .newNotification(new NotificationViewModel(x, pkObject));
+                    // await context.Clients.Group("user-" + x.AccountId)
+                    //     .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                 });
-                await context.Clients.All.reloadChatData();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Clients.Caller.onError("Notification can't not send!");
             }
@@ -239,7 +241,8 @@ namespace Backend.Hubs
                         userViewModel.CurrentChannelId = channel.ChannelId;
                         Groups.Add(connectionId, "channel-" + channel.ChannelId);
                         Clients.Client(connectionId).historyMessages(GetMessageHistory(channel.ChannelId));
-                        Clients.Client(connectionId).historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
+                        Clients.Client(connectionId)
+                            .historyNotifications(GetNotificationsHistory(GetIntegerAccountId()));
                     }
 
                     var tempAccount = Connections.FirstOrDefault(u => u.AccountId == accountId);

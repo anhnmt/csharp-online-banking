@@ -110,6 +110,7 @@ namespace Backend.Controllers
                                     {
                                         goto PlusMoney;
                                     }
+
                                     var minusError1 = MinusMoney(tran, sourceBankAccount, errors);
                                     if (minusError1 != null)
                                     {
@@ -134,7 +135,7 @@ namespace Backend.Controllers
 
                                 // Plus money
                                 PlusMoney:
-                                
+
                                 receiverBankAccount = _context.BankAccounts.FirstOrDefault(x => x.Name == tran.ToId);
 
                                 var plusError = PlusMoney(tran, receiverBankAccount, errors);
@@ -150,7 +151,9 @@ namespace Backend.Controllers
                                 var newNotifications = CreateNotifications(newTransaction);
 
                                 transaction.Commit();
-                                
+
+                                ChatHub.Instance().SendNotifications(newNotifications);
+
                                 return Json(new
                                 {
                                     data = "Successful transfer",
@@ -158,7 +161,7 @@ namespace Backend.Controllers
                                     statusCode = 200
                                 });
                             }
-                            catch (Exception)
+                            catch (Exception ex)
                             {
                                 transaction.Rollback();
                             }
@@ -198,9 +201,10 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             var sourceBankAccount = bankAccounts.Get(x => x.Name == tran.FromId).FirstOrDefault();
             var receiverBankAccount = bankAccounts.Get(x => x.Name == tran.ToId).FirstOrDefault();
-           
+
 
             if (tran.Amount <= 0)
             {
@@ -246,6 +250,7 @@ namespace Backend.Controllers
                     statusCode = 404
                 }, JsonRequestBehavior.AllowGet);
             }
+
             if (sourceBankAccount.BankAccountId == receiverBankAccount.BankAccountId)
             {
                 errors.Add("ToId", "The number of the receiving account and the sending account is the same");
