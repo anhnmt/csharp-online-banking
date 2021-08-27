@@ -275,8 +275,13 @@
                        var trans = {
                            Amount: $("#Amount").val(),
                            ToId: $("#Name").val(),
-                       };
-                       managerBank.receiveMoney(trans);
+                        };
+                        if (trans.Amount[0] === "0") {
+                            notifyError("Error", "Your Amount must be number")
+                        } else {
+                            managerBank.receiveMoney(trans);
+                        }
+                      
                     }
                 });
         function loadStatus(status = null) {
@@ -420,6 +425,7 @@
                             notifySuccess("Transfers Successfully", res.data);
                         }else {
                             notifyError("Transfers Error", res.data.FromId);
+                            validator2.showErrors(res.data)
                         }
                     }
 
