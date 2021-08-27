@@ -154,30 +154,22 @@ namespace Backend.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public ActionResult Edit(BankAccounts bank)
+        public ActionResult Edit(int id)
         {
             var errors = new Dictionary<string, string>();
-            var check = true;
-            var bank1 = bankAccounts.Get(bank.BankAccountId);
+            var bank1 = bankAccounts.Get(x =>x.BankAccountId == id).FirstOrDefault();
             
-            if (!long.TryParse(bank.Name, out long i))
-            {
-                check = false;
-                errors.Add("NameBank", "Your name must be number");
-            }
 
-            if (bankAccounts.CheckDuplicate(x => x.Name == bank.Name && x.BankAccountId != bank.BankAccountId))
+            if (ModelState.IsValid)
             {
-                check = false;
-                errors.Add("NameBank", "Your Name has been used!");
-            }
-
-            if (check && ModelState.IsValid)
-            {
-                bank1.CurrencyId = bank.CurrencyId;
-                bank1.Name = bank.Name;
-                bank1.Balance = bank.Balance;
-                bank1.Status = bank.Status;
+                if (bank1.Status != (int)BankAccountStatus.Actived)
+                {
+                    bank1.Status = (int)BankAccountStatus.Actived;
+                }
+                else
+                {
+                    bank1.Status = (int)BankAccountStatus.Locked;
+                }
                 bankAccounts.Edit(bank1);
                 return Json(new
                 {
@@ -185,15 +177,6 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Success"
                 }, JsonRequestBehavior.AllowGet);
             }
-
-            foreach (var k in ModelState.Keys)
-            foreach (var err in ModelState[k].Errors)
-            {
-                var key = Regex.Replace(k, @"(\w+)\.(\w+)", @"$2");
-                if (!errors.ContainsKey(key))
-                    errors.Add(key, err.ErrorMessage);
-            }
-
             return Json(new
             {
                 statusCode = 400,
