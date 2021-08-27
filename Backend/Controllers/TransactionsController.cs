@@ -101,6 +101,16 @@ namespace Backend.Controllers
                                 var sessionUsers = (Accounts) Session["user"];
                                 if (sessionUsers.RoleId == 1)
                                 {
+                                    if (tran.Amount <= 0)
+                                    {
+                                        errors.Add("Amount", "Your Amount must be number");
+                                        return Json(new
+                                        {
+                                            data = errors,
+                                            message = "Error",
+                                            statusCode = 404
+                                        }, JsonRequestBehavior.AllowGet);
+                                    }
                                     var currenReceiverBankAccount = _context.BankAccounts
                                         .Where(x => x.Name == tran.ToId).FirstOrDefault().CurrencyId;
                                     sourceBankAccount = _context.BankAccounts.Where(x =>
@@ -161,7 +171,7 @@ namespace Backend.Controllers
                                     statusCode = 200
                                 });
                             }
-                            catch (Exception ex)
+                            catch (Exception)
                             {
                                 transaction.Rollback();
                             }
