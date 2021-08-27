@@ -479,13 +479,13 @@ namespace Backend.Areas.Admin.Controllers
         {
             var transactionDetails = new List<TransactionDetails>()
             {
-                new TransactionDetails
-                {
-                    BankAccountId = fromBankAccount.BankAccountId,
-                    Balance = fromBankAccount.Balance,
-                    Type = (int) TransactionType.Minus,
-                    Status = 1
-                },
+                // new TransactionDetails
+                // {
+                //     BankAccountId = fromBankAccount.BankAccountId,
+                //     Balance = fromBankAccount.Balance,
+                //     Type = (int) TransactionType.Minus,
+                //     Status = 1
+                // },
                 new TransactionDetails
                 {
                     BankAccountId = toBankAccount.BankAccountId,
