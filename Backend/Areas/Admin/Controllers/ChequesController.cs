@@ -356,6 +356,17 @@ namespace Backend.Areas.Admin.Controllers
                             }, JsonRequestBehavior.AllowGet);
                         }
 
+                        if (chequeExec.PaymentMethod == "bank-account" && string.IsNullOrEmpty(chequeExec.ToBankAccountName))
+                        {
+                            errors.Add("ToBankAccountName", "This field is required!");
+                            return Json(new
+                            {
+                                message = "Error",
+                                data = errors,
+                                statusCode = 400,
+                            }, JsonRequestBehavior.AllowGet);
+                        }
+
                         BankAccounts toBankAccounts;
                         if (chequeExec.PaymentMethod == "bank-account" &&
                             !Utils.IsNullOrEmpty(chequeExec.ToBankAccountName))
@@ -398,35 +409,28 @@ namespace Backend.Areas.Admin.Controllers
                         if (toBankAccounts != null)
                         {
                             cheque.ToBankAccountId = toBankAccounts.AccountId;
+                            if (toBankAccounts.Account != null & toBankAccounts.Account.NumberId != null)
+                            {
+                                cheque.NumberId = toBankAccounts.Account.NumberId;
+                            }
                         }
 
                         //cheques.Edit(cheque);
                         _context.SaveChanges();
 
-                        var data = new ChequesViewModel
-                        {
-                            ChequeBookId = cheque.ChequeBookId,
-                            Code = cheque.Code,
-                            NumberId = cheque.NumberId,
-                            ChequeId = cheque.ChequeId,
-                            StatusName = ((ChequeStatus) cheque.Status).ToString(),
-                            Status = cheque.Status,
-                            AmountNumber = cheque.Amount,
-                            FromBankAccountName = cheque.FromBankAccount.Name,
-                            FromBankAccountId = cheque.FromBankAccountId,
-                            ToBankAccountName = cheque.ToBankAccountId == null
-                                ? "None, using cash!"
-                                : cheque.ToBankAccount.Name
-                        };
+                        var data = new ChequesViewModel(cheque);
 
                         if (chequeExec.PaymentMethod != "bank-account" || toBankAccounts == null)
+                        {
+                            transaction.Commit();
                             return Json(new
                             {
                                 message = "Success",
                                 data = data,
                                 statusCode = 200,
                             }, JsonRequestBehavior.AllowGet);
-
+                        }
+                            
                         toBankAccounts.Balance += cheque.Amount;
                         //bankAccounts.Edit(toBankAccounts);
                         // _context.Entry(toBankAccounts).State = EntityState.Modified;
