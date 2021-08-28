@@ -54,15 +54,13 @@ namespace Backend.Controllers
             var account = accounts.Get(user.AccountId);
             var cheque = cheques.Get(id);
 
-            if (chequebooks.CheckDuplicate(x => x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
-            {
-                var chequeDetail = new ChequesViewModel(cheque);
-                return View(chequeDetail);
-            }
-            else
-            {
+            if (!chequebooks.CheckDuplicate(x =>
+                x.ChequeBookId == cheque.ChequeBookId && x.AccountId == account.AccountId))
                 return RedirectToAction("NotFound", "Error");
-            }
+            
+            var chequeDetail = new ChequesViewModel(cheque);
+            return View(chequeDetail);
+
         }
 
         public ActionResult GetData(int chequeBookId)
@@ -450,7 +448,7 @@ namespace Backend.Controllers
                     Content = message,
                     Status = (int) NotificationStatus.Unread,
                     PkType = (int) NotificationType.Cheque,
-                    PkId = cheque.ChequeBookId,
+                    PkId = cheque.ChequeId,
                 }
             };
 
