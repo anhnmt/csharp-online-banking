@@ -60,7 +60,7 @@ namespace Backend.Areas.Admin.Controllers
         {
             var errors = new Dictionary<string, string>();
             var userUpdate = users.Get(changePasswordViewModel.AccountId);
-            var user = (Accounts) Session["user"];
+            var user = (Accounts)Session["user"];
             foreach (var k in ModelState.Keys)
                 foreach (var err in ModelState[k].Errors)
                 {
@@ -79,10 +79,9 @@ namespace Backend.Areas.Admin.Controllers
 
             if (userUpdate.AccountId == 1 && user.AccountId != 1)
             {
-                errors.Add("NewPassword", "Unauthorized");
                 return Json(new
                 {
-                    data = errors,
+                    data = "Unauthorized",
                     statusCode = 400,
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
@@ -90,10 +89,9 @@ namespace Backend.Areas.Admin.Controllers
 
             if (userUpdate.RoleId == 1 && user.RoleId != 1)
             {
-                errors.Add("NewPassword", "Unauthorized");
                 return Json(new
                 {
-                    data = errors,
+                    data = "Unauthorized",
                     statusCode = 400,
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
@@ -131,6 +129,7 @@ namespace Backend.Areas.Admin.Controllers
         {
             var errors = new Dictionary<string, string>();
             var check = true;
+            var userSession = (Accounts)Session["user"];
             if (!ModelState.IsValid)
                 return Json(new
                 {
@@ -191,11 +190,12 @@ namespace Backend.Areas.Admin.Controllers
                     NumberId = accounts.NumberId,
                     Phone = accounts.Phone,
                     AttemptLogin = 0,
-                    RoleId = accounts.RoleId,
+                    RoleId = userSession.AccountId == 1 ? accounts.RoleId : 3,
                     Address = accounts.Address,
                     Birthday = DateTime.Parse(accounts.Birthday),
                     Status = ((int)AccountStatus.Actived)
                 };
+
                 users.Add(account);
                 return Json(new
                 {
@@ -219,6 +219,7 @@ namespace Backend.Areas.Admin.Controllers
                 data = errors
             }, JsonRequestBehavior.AllowGet);
         }
+
 
         [HttpPost]
         public ActionResult Edit(AccountViewModel accounts)
@@ -257,27 +258,32 @@ namespace Backend.Areas.Admin.Controllers
 
             if (acc1.AccountId == 1 && user.AccountId != 1)
             {
-                errors.Add("Status", "Unauthorized");
                 return Json(new
                 {
                     statusCode = 400,
                     message = "Error",
-                    data = errors
-                }, JsonRequestBehavior.AllowGet);
+                    data = "Unauthorized"
+                }, JsonRequestBehavior.AllowGet); ;
             }
-
-            if (user.RoleId != 1 && acc1.RoleId == 1)
+            if (acc1.RoleId == 1 && user.RoleId != 1)
             {
-                check = false;
-                errors.Add("Status", "Unauthorized");
                 return Json(new
                 {
                     statusCode = 400,
                     message = "Error",
-                    data = errors
-                }, JsonRequestBehavior.AllowGet);
+                    data = "Unauthorized"
+                }, JsonRequestBehavior.AllowGet); ;
             }
 
+            if (user.AccountId == 1 && accounts.RoleId != 1)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = "You can't change your role!"
+                }, JsonRequestBehavior.AllowGet); ;
+            }
             if (users.CheckDuplicate(x => x.Email == accounts.Email && x.AccountId != acc1.AccountId))
             {
                 check = false;
@@ -304,7 +310,7 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid && check)
             {
-                
+
                 var acc3 = users.Get(accounts.AccountId);
                 acc3.Name = accounts.Name;
                 acc3.Email = accounts.Email;
@@ -316,7 +322,6 @@ namespace Backend.Areas.Admin.Controllers
                 {
                     acc3.RoleId = accounts.RoleId;
                 }
-                acc3.Status = accounts.Status;
                 acc3.AttemptLogin = accounts.Status == (int)AccountStatus.Actived ? 0 : 3;
                 if (!users.Edit(acc3))
                 {
@@ -363,7 +368,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error"
                 }, JsonRequestBehavior.AllowGet);
             }
-            
+
             using (var _context = new ApplicationDbContext())
             {
                 var user = _context.Accounts.FirstOrDefault(x => x.AccountId == id);
@@ -388,17 +393,8 @@ namespace Backend.Areas.Admin.Controllers
                         message = "Success"
                     }, JsonRequestBehavior.AllowGet);
                 }
-                
-            {
-                return Json(new
-                {
-                    statusCode = 400,
-                    data = "You cannot delete your own account",
-                    message = "Error"
-                }, JsonRequestBehavior.AllowGet);
             }
-            }
-            
+
             if (users.Delete(id))
             {
                 return Json(new
@@ -426,6 +422,72 @@ namespace Backend.Areas.Admin.Controllers
 
             var data = new AccountViewModel(x);
             return View(data);
+        }
+        [HttpPost]
+        public ActionResult ChangeStatus(int id)
+        {
+            var userSession = (Accounts)Session["user"];
+            if (!CheckValidate(id))
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Unathorzied",
+                    data = "Unathorzied"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            if (userSession.AccountId == id)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Unathorzied",
+                    data = "You can't change your status yourself"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            var user  = users.Get(id);
+            if (user.Status == (int)AccountStatus.Actived)
+            {
+                user.Status = (int)AccountStatus.Locked;
+            }
+            else
+            {
+                user.Status = (int)AccountStatus.Actived;
+            }
+            if (users.Edit(user))
+            {
+                return Json(new
+                {
+                    statusCode = 200,
+                    message = "Success"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            return Json(new
+            {
+                statusCode = 400,
+                message = "Error"
+            }, JsonRequestBehavior.AllowGet);
+        }
+        private bool CheckValidate(int id)
+        {
+            var userSession = (Accounts)Session["user"];
+            var user = users.Get(id);
+            switch (userSession.RoleId)
+            {
+                case 1:
+                    if (user.AccountId == 1)
+                    {
+                        return false;
+                    }
+                    break;
+                case 2:
+                    if (user.RoleId == 1)
+                    {
+                        return false;
+                    }
+                    break;
+            }
+            return true;
         }
     }
 }
