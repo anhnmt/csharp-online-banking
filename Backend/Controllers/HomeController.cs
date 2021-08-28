@@ -294,7 +294,7 @@ namespace Backend.Controllers
                 }, JsonRequestBehavior.AllowGet);
             }
 
-            if (obj.Status == 1 && obj.RoleId != 1)
+            if (obj.Status == 1)
             {
                 errors.Add("Email", "Your Account is Locked!");
 

@@ -1,4 +1,6 @@
-﻿@{
+﻿@using OnlineBanking.DAL
+@{
+    var user = (Accounts)Session["user"];
     ViewBag.Title = "Index";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
@@ -27,14 +29,14 @@
                 <div class="table-responsive">
                     <table class="display table-responsive-lg min-w850 dataTable no-footer" id="datatables" role="grid" aria-describedby="example4_info">
                         <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>RoleName </th>
-                            <th>Status </th>
-                            <th>Action</th>
-                        </tr>
+                            <tr>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>RoleName </th>
+                                <th>Status </th>
+                                <th>Action</th>
+                            </tr>
                         </thead>
                         <tbody id="tbl_user"></tbody>
 
@@ -55,8 +57,8 @@
                 </div>
 
                 <div class="modal-body">
-                    <input type="hidden" name="Id" id="Id" value=""/>
-                    <input type="hidden" name="type" id="type" value="CREATE"/>
+                    <input type="hidden" name="Id" id="Id" value="" />
+                    <input type="hidden" name="type" id="type" value="CREATE" />
 
                     <div class="form-group">
                         <label>Name <span class="text-danger">*</span></label>
@@ -72,7 +74,7 @@
                     </div>
                     <div class="form-group">
                         <label>Phone <span class="text-danger">*</span></label>
-                        <div class="error"> 
+                        <div class="error">
                             <input type="text" class="form-control" id="Phone" name="Phone" placeholder="Phone...">
                         </div>
                     </div>
@@ -101,20 +103,16 @@
                     </div>
                     <div class="form-group">
                         <div class="row">
-                            <div class="col-md-6">
-                                <label>Role <span class="text-danger">*</span></label>
-                                <div>
-                                    <select class="form-control" id="RoleId" name="RoleId">
-                                    </select>
+                            @if (user.RoleId == 1 && user.AccountId == 1)
+                            {
+                                <div class="col-md-12">
+                                    <label>Role <span class="text-danger">*</span></label>
+                                    <div>
+                                        <select class="form-control" id="RoleId" name="RoleId">
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label>Status <span class="text-danger">*</span></label>
-                                <div>
-                                    <select class="form-control" id="Status" name="Status">
-                                    </select>
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -197,9 +195,6 @@
                 "RoleId": {
                     required: true
                 },
-                "Status": {
-                    required: true
-                },
             },
             messages: {
                 Birthday: {
@@ -228,7 +223,6 @@
                     Phone: $("#Phone").val(),
                     NumberId: $("#NumberId").val(),
                     RoleId: $("#RoleId").val(),
-                    Status: parseInt(($("#Status").val()))
                 };
                 if ($("#type").val() === "EDIT") {
                     user.AccountId = $("#Id").val();
@@ -265,8 +259,8 @@
             submitHandler: function () {
                 let account = {
                     AccountId: $("#Id2").val(),
-                    Password: $("#NewPassword").val(),
-                    RePassword: $("#ConfirmPassword").val(),
+                    NewPassword: $("#NewPassword").val(),
+                    ConfirmPassword: $("#ConfirmPassword").val(),
                 };
                 $.ajax({
                     type: "POST",
@@ -279,7 +273,11 @@
                             notifySuccess("Success", "Password Change Success");
                             $("#PasswordChange").modal("hide");
                         } else {
-                            notifyError("Error", "Password Change Error");
+                            
+                            if (typeof res.data == "string") {
+                                notifyError("Error", res.data);
+                                $("#PasswordChange").modal("hide");
+                            }
                             validator2.showErrors(res.data);
                         }
                     }
@@ -345,8 +343,34 @@
                             notifySuccess('Updated Successfully',"Updated Successfully");
                             $("#myModal").modal("hide");
                             $('#datatables').DataTable().ajax.reload();
-                        }else {
-                            validator.showErrors(res.data);
+                        } else {
+                            if (typeof res.data == "string") {
+                                $("#myModal").modal("hide");
+                                notifyError('Updated Error', res.data);
+                            } else {
+                                validator.showErrors(res.data);
+                            }
+                            
+                        }
+                    }
+
+                })
+            },
+            put2: function (id) {
+                $.ajax({
+                    type: "POST",
+                    url: "@Url.Action("ChangeStatus", "Accounts")",
+                    data: { id :id },
+                    success: function (res) {
+                        if (res.statusCode === 200) {
+                            notifySuccess('Updated Successfully',"Updated Successfully");
+                            $("#myModal").modal("hide");
+                            $('#datatables').DataTable().ajax.reload();
+                        } else {
+                            if (typeof res.data == "string") {
+                                notifyError('Updated Error', res.data);
+                            }
+                            validator2.showErrors(res.data);
                         }
                     }
 
@@ -370,7 +394,7 @@
                             } else {
                                 validator.showErrors(res.data);
                             }
-                             
+
                         }
                     }
 
@@ -427,7 +451,7 @@
                         "orderable": false,
                     },
                     {
-                        data: {Status: Status,StatusName:'StatusName'},
+                        data: {Status: "Status",StatusName:'StatusName'},
                         render: function (data) {
                             if (data.Status === 0){
                                 return '<span class="badge light badge-success"><i class="fa fa-circle text-success mr-1"></i>'+data.StatusName+'</span>';
@@ -443,13 +467,15 @@
                         "orderable": false,
                     },
                     {
-                        data: {AccountId:'AccountId'},
-                        "render": function (data) {
+                        data: { AccountId: 'AccountId', Status:"Status"},
+                        render: function (data) {
+                            let toggle = data.Status === 0 ? "Lock Account" : "Active Account";
                             let detail = "@Url.Action("ProfileAccount", "Accounts")/"+data.AccountId;
                             return '<div class="dropdown custom-dropdown mb-0"><div class="btn sharp btn-primary tp-btn" data-toggle="dropdown" aria-expanded="false"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="18px" height="18px" viewBox="0 0 24 24" version="1.1"><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><rect x="0" y="0" width="24" height="24"></rect><circle fill="#000000" cx="12" cy="5" r="2"></circle><circle fill="#000000" cx="12" cy="12" r="2"></circle><circle fill="#000000" cx="12" cy="19" r="2"></circle></g></svg></div><div class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(40px, 41px, 0px);">' +
                                 '<a data-id=" ' + data.AccountId +' " class="dropdown-item btn-changepass text-info" href="javascript:void(0);">Change Password</a>' +
                                 '<a href="' + detail +'" class="dropdown-item btn-detail text-primary" >Details</a>' +
-                                '<a  data-id=" ' + data.AccountId +' " class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
+                                '<a  data-id=" ' + data.AccountId + ' " class="dropdown-item btn-edit text-warning" href="javascript:void(0);">Edit</a>' +
+                                '<a  data-id="' + data.AccountId + '" class="dropdown-item btn-edit2 text-warning" href="javascript:void(0);">' + toggle + '</a>' +
                                '<a  data-id=" '+ data.AccountId + '" class="dropdown-item text-danger btn-delete" href="javascript:void(0);">Delete</a></div></div>'
                              }
                     },
@@ -461,8 +487,15 @@
                 let userId = $(this).data("id");
                 let a = managerAcc.get(userId);
             })
+            $(document).on("click", ".btn-edit2", function () {
+                let userId = $(this).data("id");
+                let a = managerAcc.put2(userId);
+            })
             $(document).on("click", ".btn-changepass", function () {
+                validator2.resetForm();
+                $("#FormPasswordChange").trigger("reset");
                 $("#PasswordChange").modal("show");
+
                 let userId = $(this).data("id");
                 $("#Id2").val(userId);
             })

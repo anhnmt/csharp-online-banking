@@ -109,14 +109,18 @@
                         }
                     },
                 });
+            },
+            invalidHandler: function (form, validator) {
+                $("#btnLogin").css('display', 'block');
+                $("#loading").css('display', 'none');
             }
+
         });
         $(function () {
             $(document).on("click", "#btnLogin", function () {
                 $("#btnLogin").css('display', 'none');
                 $("#loading").css('display', 'block');
             })
-
             $("#forget").click(function () {
                 swal("Please contact admin to get new password");
             })
