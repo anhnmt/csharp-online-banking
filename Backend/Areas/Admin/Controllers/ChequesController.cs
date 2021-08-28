@@ -641,7 +641,7 @@ namespace Backend.Areas.Admin.Controllers
                     Content = message,
                     Status = (int) NotificationStatus.Unread,
                     PkType = (int) NotificationType.Cheque,
-                    PkId = cheque.ChequeBookId,
+                    PkId = cheque.ChequeId,
                 }
             };
 
