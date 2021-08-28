@@ -60,6 +60,7 @@ namespace Backend.Areas.Admin.Controllers
         {
             var errors = new Dictionary<string, string>();
             var userUpdate = users.Get(changePasswordViewModel.AccountId);
+            var user = (Accounts) Session["user"];
             foreach (var k in ModelState.Keys)
                 foreach (var err in ModelState[k].Errors)
                 {
@@ -76,7 +77,29 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
 
-            if (!changePasswordViewModel.Password.Equals(changePasswordViewModel.RePassword))
+            if (userUpdate.AccountId == 1 && user.AccountId != 1)
+            {
+                errors.Add("NewPassword", "Unauthorized");
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (userUpdate.RoleId == 1 && user.RoleId != 1)
+            {
+                errors.Add("NewPassword", "Unauthorized");
+                return Json(new
+                {
+                    data = errors,
+                    statusCode = 400,
+                    message = "Error",
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (!changePasswordViewModel.NewPassword.Equals(changePasswordViewModel.ConfirmPassword))
             {
                 errors.Add("ConfirmPassword", "Your confirm is not the same as your new password!");
                 return Json(new
@@ -86,7 +109,7 @@ namespace Backend.Areas.Admin.Controllers
                     message = "Error",
                 }, JsonRequestBehavior.AllowGet);
             }
-            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.Password);
+            userUpdate.Password = Utils.HashPassword(changePasswordViewModel.NewPassword);
             if (!users.Edit(userUpdate))
             {
                 return Json(new
@@ -202,6 +225,7 @@ namespace Backend.Areas.Admin.Controllers
         {
 
             var acc1 = users.Get(accounts.AccountId);
+            var user = (Accounts)Session["user"];
             var errors = new Dictionary<string, string>();
             var check = true;
             if (!ModelState.IsValid)
@@ -231,6 +255,29 @@ namespace Backend.Areas.Admin.Controllers
                 }
             }
 
+            if (acc1.AccountId == 1 && user.AccountId != 1)
+            {
+                errors.Add("Status", "Unauthorized");
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            if (user.RoleId != 1 && acc1.RoleId == 1)
+            {
+                check = false;
+                errors.Add("Status", "Unauthorized");
+                return Json(new
+                {
+                    statusCode = 400,
+                    message = "Error",
+                    data = errors
+                }, JsonRequestBehavior.AllowGet);
+            }
+
             if (users.CheckDuplicate(x => x.Email == accounts.Email && x.AccountId != acc1.AccountId))
             {
                 check = false;
@@ -257,6 +304,7 @@ namespace Backend.Areas.Admin.Controllers
 
             if (ModelState.IsValid && check)
             {
+                
                 var acc3 = users.Get(accounts.AccountId);
                 acc3.Name = accounts.Name;
                 acc3.Email = accounts.Email;
@@ -264,8 +312,12 @@ namespace Backend.Areas.Admin.Controllers
                 acc3.Birthday = DateTime.Parse(accounts.Birthday);
                 acc3.Address = accounts.Address;
                 acc3.NumberId = accounts.NumberId;
-                acc3.RoleId = accounts.RoleId;
+                if (user.RoleId == 1 && user.AccountId == 1)
+                {
+                    acc3.RoleId = accounts.RoleId;
+                }
                 acc3.Status = accounts.Status;
+                acc3.AttemptLogin = accounts.Status == (int)AccountStatus.Actived ? 0 : 3;
                 if (!users.Edit(acc3))
                 {
                     return Json(new
@@ -301,10 +353,31 @@ namespace Backend.Areas.Admin.Controllers
         [HttpPost]
         public ActionResult Delete(int id)
         {
+            var current = (Accounts)Session["user"];
+            if (id == current.AccountId)
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "You cannot delete your own account",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
+            
             using (var _context = new ApplicationDbContext())
             {
                 var user = _context.Accounts.FirstOrDefault(x => x.AccountId == id);
                 var bankaccount = _context.BankAccounts.FirstOrDefault(x => x.AccountId == id);
+                if (user.AccountId == 1)
+                {
+                    return Json(new
+                    {
+                        statusCode = 400,
+                        data = "Unauthorized",
+                        message = "Error"
+                    }, JsonRequestBehavior.AllowGet);
+                }
+
                 if (bankaccount != null)
                 {
                     user.Status = 2;
@@ -315,6 +388,15 @@ namespace Backend.Areas.Admin.Controllers
                         message = "Success"
                     }, JsonRequestBehavior.AllowGet);
                 }
+                
+            {
+                return Json(new
+                {
+                    statusCode = 400,
+                    data = "You cannot delete your own account",
+                    message = "Error"
+                }, JsonRequestBehavior.AllowGet);
+            }
             }
             
             if (users.Delete(id))
@@ -328,7 +410,7 @@ namespace Backend.Areas.Admin.Controllers
 
             return Json(new
             {
-                statusCode = 402,
+                statusCode = 400,
                 message = "Error"
             }, JsonRequestBehavior.AllowGet);
         }
