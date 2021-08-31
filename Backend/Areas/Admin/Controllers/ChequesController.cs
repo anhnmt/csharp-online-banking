@@ -479,13 +479,13 @@ namespace Backend.Areas.Admin.Controllers
         {
             var transactionDetails = new List<TransactionDetails>()
             {
-                // new TransactionDetails
-                // {
-                //     BankAccountId = fromBankAccount.BankAccountId,
-                //     Balance = fromBankAccount.Balance,
-                //     Type = (int) TransactionType.Minus,
-                //     Status = 1
-                // },
+                new TransactionDetails
+                {
+                    BankAccountId = fromBankAccount.BankAccountId,
+                    Balance = fromBankAccount.Balance,
+                    Type = (int) TransactionType.Minus,
+                    Status = 1
+                },
                 new TransactionDetails
                 {
                     BankAccountId = toBankAccount.BankAccountId,
@@ -514,20 +514,19 @@ namespace Backend.Areas.Admin.Controllers
 
         private static List<Notifications> CreateNotifications(Transactions transaction)
         {
-            var from = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Minus);
             var to = transaction.TransactionDetails.First(x => x.Type == (int) TransactionType.Plus);
 
             var lstNotification = new List<Notifications>()
             {
-                new Notifications
-                {
-                    AccountId = from.BankAccount.AccountId,
-                    Content = "Your account balance -" + transaction.Amount +
-                              ", available balance: " + from.Balance,
-                    Status = (int) NotificationStatus.Unread,
-                    PkType = (int) NotificationType.Transaction,
-                    PkId = from.TransactionDetailId,
-                },
+                // new Notifications
+                // {
+                //     AccountId = from.BankAccount.AccountId,
+                //     Content = "Your account balance -" + transaction.Amount +
+                //               ", available balance: " + from.Balance,
+                //     Status = (int) NotificationStatus.Unread,
+                //     PkType = (int) NotificationType.Transaction,
+                //     PkId = from.TransactionDetailId,
+                // },
                 new Notifications
                 {
                     AccountId = to.BankAccount.AccountId,
