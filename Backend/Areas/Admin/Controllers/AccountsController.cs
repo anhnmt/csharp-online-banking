@@ -322,7 +322,6 @@ namespace Backend.Areas.Admin.Controllers
                 {
                     acc3.RoleId = accounts.RoleId;
                 }
-                acc3.AttemptLogin = accounts.Status == (int)AccountStatus.Actived ? 0 : 3;
                 if (!users.Edit(acc3))
                 {
                     return Json(new
@@ -454,6 +453,7 @@ namespace Backend.Areas.Admin.Controllers
             {
                 user.Status = (int)AccountStatus.Actived;
             }
+            user.AttemptLogin = user.Status == (int)AccountStatus.Actived ? 0 : 3;
             if (users.Edit(user))
             {
                 return Json(new
